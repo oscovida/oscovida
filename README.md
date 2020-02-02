@@ -21,14 +21,14 @@ See [notebook](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob
 | Prediction date | 1-day ahead predicted | actual | 10 days ahead predicted | actual        | 
 | --------------- | ---------------------:| ------:|------------------------:|--------------:|
 | 31 Jan 2020     | 262                   | 258    | 1072                    |  ?            |
-| 1 Feb 2020      | 312                   | ?      | 1120                    |  ?            |
+| 1 Feb 2020      | 312                   | 304    | 1120                    |  ?            |
 
 ### Infections
 
-| Prediction date | 1-day ahead predicted | actual | 10 days ahead predicted | actual        |
-| --------------- | ---------------------:| ------:|------------------------:|--------------:|
-| 31 Jan 2020     | 12358                 | 11948  | 48558                   |   ?           |
-| 1 Feb 2020      | 14687                 | ?      | 50738                   | ?             |
+| Prediction date |  1-day ahead predicted |  actual |   10 days ahead predicted | actual      |
+| --------------- | ---------------------: | ------: | ------------------------: | ----------: |
+| 31 Jan 2020     |                  12358 |   11948 |                     48558 | ?           |
+| 1 Feb 2020      |                  14687 |   14551 |                     50738 | ?           |
 
 
 
