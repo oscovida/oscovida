@@ -2,8 +2,13 @@
 
 ## Infections
 
-![Infection data](figures/infections.svg)
+![Infection data](figures/infections-with-model-fit.svg)
+
+![Infections daily change](figures/new-infections.svg)
 
 ## Deaths
 
-![Deaths data](figures/deaths.svg)
+![Infection data](figures/deaths-with-model-fit.svg)
+
+![Deaths daily change](figures/new-deaths.svg)
+
