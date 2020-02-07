@@ -20,7 +20,12 @@ Predict increase in infections and deaths based on extrapolation of fit
   actual numbers; this would indicate the outbreak starts to be constrained).
 - see also discussion in notebook
 - raw data is available from this URL https://raw.githubusercontent.com/fangohr/coronavirus-2020/master/data.txt
+- and some processed data is available at https://raw.githubusercontent.com/fangohr/coronavirus-2020/master/figures/table-1.html
 - it may not be possible to update this daily/ 
+
+## News 7 February
+
+It looks like the spread starts to slow down now - this is promising.
 
 
 ## Infections
