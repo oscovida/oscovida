@@ -25,7 +25,10 @@ Predict increase in infections and deaths based on extrapolation of fit
 
 ## News 7 February
 
-It looks like the spread starts to slow down now - this is promising.
+It looks like the spread starts to slow down now - this is promising. 
+
+The predictions should here should now fail and overestimate actual numbers
+(because the fitted model assumes constant growth during the whole outbreak).
 
 
 ## Infections
