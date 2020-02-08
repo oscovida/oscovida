@@ -12,6 +12,7 @@ Predict increase in infections and deaths based on extrapolation of fit
 
 - an exploration of the data on infection and deaths related to the Coronavirus outbreak early 2020
 - maybe this opens up the data and situation to more people (citizen science?)
+- I find it useful to put statements in the press into the context of actual (reported) numbers
 - disclaimer: this is not done by epidemiology experts, [don't trust anything here](https://github.com/fangohr/coronavirus-2020/blob/master/LICENSE)
 - contributions welcome
 - The "predictions" below are based on a very simple model of growth, where we
@@ -20,7 +21,7 @@ Predict increase in infections and deaths based on extrapolation of fit
   actual numbers; this would indicate the outbreak starts to be constrained).
 - see also discussion in notebook
 - raw data is available from this URL https://raw.githubusercontent.com/fangohr/coronavirus-2020/master/data.txt
-- and some processed data is available at https://raw.githubusercontent.com/fangohr/coronavirus-2020/master/figures/table-1.md
+- and some processed data is available at https://github.com/fangohr/coronavirus-2020/blob/master/figures/table-1.md
 - it may not be possible to update this daily
 
 ## News 7 February
