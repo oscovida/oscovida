@@ -20,15 +20,19 @@ Predict increase in infections and deaths based on extrapolation of fit
   actual numbers; this would indicate the outbreak starts to be constrained).
 - see also discussion in notebook
 - raw data is available from this URL https://raw.githubusercontent.com/fangohr/coronavirus-2020/master/data.txt
-- and some processed data is available at https://raw.githubusercontent.com/fangohr/coronavirus-2020/master/figures/table-1.html
-- it may not be possible to update this daily/ 
+- and some processed data is available at https://raw.githubusercontent.com/fangohr/coronavirus-2020/master/figures/table-1.md
+- it may not be possible to update this daily
 
 ## News 7 February
 
 It looks like the spread starts to slow down now - this is promising. 
 
+This is best seen in the bar chart showing "New infections per day".
+
 The predictions should here should now fail and overestimate actual numbers
-(because the fitted model assumes constant growth during the whole outbreak).
+(because the fitted model assumes constant growth during the whole outbreak, 
+and actual data points of infection seem to start to deviate from this.
+Would be interesting to check this quantitatively).
 
 
 ## Infections
@@ -71,7 +75,8 @@ See [notebook](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob
 | 4 Feb 2020      |                    493 |     492 |                      1393 | ?               |
 | 5 Feb 2020      |                    566 |     565 |                      1518 | ?               |
 | 6 Feb 2020      |                    645 |     638 |                      1650 | ?               |
-| 7 Feb 2020      |                    724 |       ? |                      1746 | ?               |
+| 7 Feb 2020      |                    724 |     724 |                      1746 | ?               |
+| 8 Feb 2020      |                    813 |       ? |                      1891 | ?               |
 
 
 ### Infections
@@ -85,6 +90,6 @@ See [notebook](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob
 | 4 Feb 2020      |                  23956 |   24553 |                     67084 | ?           |
 | 5 Feb 2020      |                  28137 |   28276 |                     77138 | ?           |
 | 6 Feb 2020      |                  32417 |   31439 |                     85451 | ?           |
-| 7 Feb 2020      |                  36170 | ?       |                     88039 | ?           |
-
+| 7 Feb 2020      |                  36170 |   34875 |                     88039 | ?           |
+| 8 Feb 2020      |                  39987 |       ? |                     91704 | ?           |
 
