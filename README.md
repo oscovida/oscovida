@@ -12,20 +12,20 @@ Predict increase in infections and deaths based on extrapolation of fit
 
 - an exploration of the data on infection and deaths related to the Coronavirus outbreak early 2020
 - all data used from https://www.worldometers.info/coronavirus/
-- maybe this opens up the data and situation to more people (citizen science?)
+- maybe this opens up the data and situation to more people (citizen science?) Anybody with a browser can re-execute and modify the analysis [here](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=model.ipynb) (Jupyter Notebook and Python skills are needed).
 - I find it useful to put statements in the press into the context of actual (reported) numbers
 - disclaimer: this is not done by epidemiology experts, [don't trust anything here](https://github.com/fangohr/coronavirus-2020/blob/master/LICENSE)
-- contributions welcome
-- The "predictions" below are based on a very simple model of growth, where we
-  assume the same growth rate over the duration of the outbreak. We want to see
-  these predictions to start to be wrong (and in particular to overestimate
-  actual numbers; this would indicate the outbreak starts to be constrained).
-- see also discussion in notebook
+- contributions and discussion is welcome of course
 - raw data is available from this URL https://raw.githubusercontent.com/fangohr/coronavirus-2020/master/data.txt
 - and some processed data is available at https://github.com/fangohr/coronavirus-2020/blob/master/figures/table-1.md
 - it may not be possible to update this daily
+- The "predictions" below are based on a very simple model of growth ($\proptot^p$), where we
+  assume the same growth rate over the duration of the outbreak. We want to see
+  these predictions to start to be wrong (and in particular to overestimate
+  actual numbers; this would indicate the outbreak starts to be constrained).
 
-## News 7 February
+
+## Update 7 February
 
 It looks like the spread starts to slow down now - this is promising. 
 
@@ -36,6 +36,21 @@ The predictions should here should now fail and overestimate actual numbers
 and actual data points of infection seem to start to deviate from this.
 Would be interesting to check this quantitatively).
 
+## Update 10 February
+
+The trend shown in the chart "New infections per day" (of a decreasing number of
+new infections reported per day) continues.
+
+There is some discussion what could have cause the stop of increasing
+infections, including:
+- measures to reduce spread of the virus show impact
+- capacities for carrying out tests are exhausted, i.e. we have a backlog of
+  people who may be infected but cannot be tested fast enough
+  (https://twitter.com/GaelVaroquaux/status/1226256025193525257)
+- the classification of 'infected' may have been changed so that the reported
+  numbers appear smaller (the change is associated with 7 Feb, see
+  https://twitter.com/lwcalex/status/1226840055869632512). Apparently, people
+  who do not show symptons are excluded from the reported numbers.
 
 ## Infections
 
