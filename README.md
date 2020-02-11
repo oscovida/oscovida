@@ -56,7 +56,11 @@ infections, including:
 
 ![Infection data](figures/infections-with-model-fit.svg)
 
+The model doesn't fit the data very well anymore. (Fit was good until ~6 Feb)
+
 ![Infections daily change](figures/new-infections.svg)
+
+The model fits the data pretty well.
 
 ## Deaths
 
