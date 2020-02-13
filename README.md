@@ -51,7 +51,13 @@ infections, including:
   numbers appear smaller (the change is associated with 7 Feb, see
   https://twitter.com/lwcalex/status/1226840055869632512). Apparently, people
   who do not show symptons are excluded from the reported numbers.
-
+  
+  ## Update 12 February
+  
+  With the new data from 12 February that shows a sudden increase in infection
+  cases and deaths, it seems that indeed the previous data points were under
+  reporting.
+  
 ## Infections
 
 ![Infection data](figures/infections-with-model-fit.svg)
