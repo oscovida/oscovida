@@ -58,6 +58,9 @@ infections, including:
   cases and deaths, it seems that indeed the previous data points were under
   reporting.
   
+  New predictions based on the data of 12 February, and some data points around
+  22 Jan.
+  
 ## Infections
 
 ![Infection data](figures/infections-with-model-fit.svg)
@@ -93,35 +96,38 @@ See [notebook](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob
 
 ### Deaths
 
-| Prediction date | 1-day ahead predicted  | actual  | 10 days ahead predicted   | actual          |
+| Prediction date |  1-day ahead predicted |  actual |   10 days ahead predicted | actual          |
 | --------------- | ---------------------: | ------: | ------------------------: | --------------: |
-| 31 Jan 2020     | 262                    | 258     | 1072                      | 910             |
-| 1 Feb 2020      | 312                    | 304     | 1120                      | 1018            |
-| 2 Feb 2020      | 361                    | 362     | 1104                      | ?               |
-| 3 Feb 2020      | 423                    | 426     | 1230                      | ?               |
-| 4 Feb 2020      | 493                    | 492     | 1393                      | ?               |
-| 5 Feb 2020      | 566                    | 565     | 1518                      | ?               |
-| 6 Feb 2020      | 645                    | 638     | 1650                      | ?               |
-| 7 Feb 2020      | 724                    | 724     | 1746                      | ?               |
-| 8 Feb 2020      | 813                    | 813     | 1891                      | ?               |
-| 9 Feb 2020      | ?                      | 910     |                           | ?               |
-| 10 Feb 2020     | ?                      | 1018    |                           | ?               |
-| 11 Feb 2020     | 1124                   | ?       | 2408                      | ?               |
+| 31 Jan 2020     |                    262 |     258 |                      1072 | 910             |
+| 1 Feb 2020      |                    312 |     304 |                      1120 | 1018            |
+| 2 Feb 2020      |                    361 |     362 |                      1104 | 1114            |
+| 3 Feb 2020      |                    423 |     426 |                      1230 | 1369            |
+| 4 Feb 2020      |                    493 |     492 |                      1393 | ?               |
+| 5 Feb 2020      |                    566 |     565 |                      1518 | ?               |
+| 6 Feb 2020      |                    645 |     638 |                      1650 | ?               |
+| 7 Feb 2020      |                    724 |     724 |                      1746 | ?               |
+| 8 Feb 2020      |                    813 |     813 |                      1891 | ?               |
+| 9 Feb 2020      |                      ? |     910 |                           | ?               |
+| 10 Feb 2020     |                      ? |    1018 |                           | ?               |
+| 11 Feb 2020     |                   1124 |       ? |                      2408 | ?               |
+| 12 Feb 2020     |                      ? |         |                           | ?               |
+| 13 Feb 2020     |                   1504 |         |                      3056 |                 |
 
 ### Infections
 
-| Prediction date | 1-day ahead predicted  | actual  | 10 days ahead predicted   | actual      |
+| Prediction date |  1-day ahead predicted |  actual |   10 days ahead predicted | actual      |
 | --------------- | ---------------------: | ------: | ------------------------: | ----------: |
-| 31 Jan 2020     | 12358                  | 11948   | 48558                     | 40553       |
-| 1 Feb 2020      | 14687                  | 14551   | 50738                     | 43099       |
-| 2 Feb 2020      | 17436                  | 17387   | 55286                     | ?           |
-| 3 Feb 2020      | 20498                  | 20626   | 60621                     | ?           |
-| 4 Feb 2020      | 23956                  | 24553   | 67084                     | ?           |
-| 5 Feb 2020      | 28137                  | 28276   | 77138                     | ?           |
-| 6 Feb 2020      | 32417                  | 31439   | 85451                     | ?           |
-| 7 Feb 2020      | 36170                  | 34875   | 88039                     | ?           |
-| 8 Feb 2020      | 39987                  | 37552   | 91704                     | ?           |
-| 9 Feb 2020      | -                      | 40553   | -                         | ?           |
-| 10 Feb 2020     | -                      | 43099   | -                         | ?           |
-| 11 Feb 2020     | 49526                  | ?       | 95403                     | ?           |
-
+| 31 Jan 2020     |                  12358 |   11948 |                     48558 | 40553       |
+| 1 Feb 2020      |                  14687 |   14551 |                     50738 | 43099       |
+| 2 Feb 2020      |                  17436 |   17387 |                     55286 | 44919       |
+| 3 Feb 2020      |                  20498 |   20626 |                     60621 | 60327       |
+| 4 Feb 2020      |                  23956 |   24553 |                     67084 | ?           |
+| 5 Feb 2020      |                  28137 |   28276 |                     77138 | ?           |
+| 6 Feb 2020      |                  32417 |   31439 |                     85451 | ?           |
+| 7 Feb 2020      |                  36170 |   34875 |                     88039 | ?           |
+| 8 Feb 2020      |                  39987 |   37552 |                     91704 | ?           |
+| 9 Feb 2020      |                      - |   40553 |                         - | ?           |
+| 10 Feb 2020     |                      - |   43099 |                         - | ?           |
+| 11 Feb 2020     |                  49526 |       ? |                     95403 | ?           |
+| 12 Feb 2020     |                      ? |       ? |                         - |             |
+| 13 Feb 2020     |                  66627 | ?       |                    140086 | ?           |
