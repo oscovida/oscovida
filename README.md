@@ -109,7 +109,7 @@ See [notebook](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob
 | 12 Feb 2020     |                      ? |    1369 |                         - | ?               |
 | 13 Feb 2020     |                   1504 |    1491 |                      3056 | ?               |
 | 14 Feb 2020     |                   1619 |    1526 |                      3006 | ?               |
-| 15 Feb 2020     |                   1753 |       ? |                      3186 | ?               |
+| 15 Feb 2020     |                   1753 |       ? |             3186 (24 Feb) | ?               |
 
 ### Infections
 
@@ -130,5 +130,5 @@ See [notebook](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob
 | 12 Feb 2020     |                      - |   60327 |                         - | ?           |
 | 13 Feb 2020     |                  66627 |   71321 |                    140086 |             |
 | 14 Feb 2020     |                  71321 |   67100 |                    134404 | ?           |
-| 15 Feb 2020     |                  77349 |       ? |                    142640 | ?           |
+| 15 Feb 2020     |                  77349 |       ? |           142640 (24 Feb) | ?           |
 
