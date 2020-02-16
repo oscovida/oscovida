@@ -61,6 +61,11 @@ infections, including:
   New predictions based on the data of 12 February and later, and some data points around
   22 Jan.
   
+## Update 16 Feb
+
+- The data points from the past few days are more erratic than before. We use
+  all data for the fits of the model parameters again.
+  
 ## Infections
 
 ![Infection data](figures/infections-with-model-fit.svg)
@@ -100,7 +105,7 @@ See [notebook](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob
 | 3 Feb 2020      |                    423 |     426 |                      1230 | 1369            |
 | 4 Feb 2020      |                    493 |     492 |                      1393 | 1491            |
 | 5 Feb 2020      |                    566 |     565 |                      1518 | 1619            |
-| 6 Feb 2020      |                    645 |     638 |                      1650 | ?               |
+| 6 Feb 2020      |                    645 |     638 |                      1650 | 1699            |
 | 7 Feb 2020      |                    724 |     724 |                      1746 | ?               |
 | 8 Feb 2020      |                    813 |     813 |                      1891 | ?               |
 | 9 Feb 2020      |                      ? |     910 |                         - | ?               |
@@ -109,7 +114,8 @@ See [notebook](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob
 | 12 Feb 2020     |                      ? |    1369 |                         - | ?               |
 | 13 Feb 2020     |                   1504 |    1491 |                      3056 | ?               |
 | 14 Feb 2020     |                   1619 |    1526 |                      3006 | ?               |
-| 15 Feb 2020     |                   1753 |       ? |             3186 (24 Feb) | ?               |
+| 15 Feb 2020     |                   1753 |    1699 |             3186 (24 Feb) | ?               |
+| 16 Feb 2020     |                   1865 |    ?    |             3699 (25 Feb) | ?               |
 
 ### Infections
 
@@ -121,14 +127,14 @@ See [notebook](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob
 | 3 Feb 2020      |                  20498 |   20626 |                     60621 | 60327       |
 | 4 Feb 2020      |                  23956 |   24553 |                     67084 | 65246       |
 | 5 Feb 2020      |                  28137 |   28276 |                     77138 | 67100       |
-| 6 Feb 2020      |                  32417 |   31439 |                     85451 | ?           |
+| 6 Feb 2020      |                  32417 |   31439 |                     85451 | 69197       |
 | 7 Feb 2020      |                  36170 |   34875 |                     88039 | ?           |
 | 8 Feb 2020      |                  39987 |   37552 |                     91704 | ?           |
 | 9 Feb 2020      |                      - |   40553 |                         - | ?           |
 | 10 Feb 2020     |                      - |   43099 |                         - | ?           |
 | 11 Feb 2020     |                  49526 |   44919 |                     95403 | ?           |
 | 12 Feb 2020     |                      - |   60327 |                         - | ?           |
-| 13 Feb 2020     |                  66627 |   71321 |                    140086 |             |
+| 13 Feb 2020     |                  66627 |   71321 |                    140086 | ?           |
 | 14 Feb 2020     |                  71321 |   67100 |                    134404 | ?           |
-| 15 Feb 2020     |                  77349 |       ? |           142640 (24 Feb) | ?           |
-
+| 15 Feb 2020     |                  77349 |   69197 |           142640 (24 Feb) | ?           |
+| 16 Feb 2020     |                  69197 |       ? |                    137216 | ?           |
