@@ -1,29 +1,26 @@
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=model.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=model2.ipynb)
 
 # coronavirus-2020
 Predict increase in infections and deaths based on extrapolation of fit
 
-- [Static view of notebook, rendered by github](model.ipynb)
-- [Static view of notebook, rendered by nbviewer](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/model.ipynb)
-- [Interactive session (allows execution and modification of notebook with Binder)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=model.ipynb)
+- [Static view of notebook, model.ipynb, data up to 16 Feb, fit like n(t) ~ n^p ](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/model.ipynb)
+- [Static view of notebook, model2.ipynb, more recent data, also sigmoidal fit attempt](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/model2.ipynb)
+
+- [Interactive session model.ipynb (allows execution and modification of notebook with Binder)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=model.ipynb)
+- [Interactive session model2.ipynb (allows execution and modification of notebook with Binder)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=model2.ipynb)
 
 
 ## What is this?
 
 - an exploration of the data on infection and deaths related to the Coronavirus outbreak early 2020
 - all data used from https://www.worldometers.info/coronavirus/
-- maybe this opens up the data and situation to more people (citizen science?) Anybody with a browser can re-execute and modify the analysis [here](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=model.ipynb) (Jupyter Notebook and Python skills are needed).
+- maybe this opens up the data and situation to more people (citizen science?) Anybody with a browser can re-execute and modify the analysis [here](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=model2.ipynb) (Jupyter Notebook and Python skills are needed).
 - I find it useful to put statements in the press into the context of actual (reported) numbers
 - disclaimer: this is not done by epidemiology experts, [don't trust anything here](https://github.com/fangohr/coronavirus-2020/blob/master/LICENSE)
 - contributions and discussion is welcome of course
 - raw data is available from this URL https://raw.githubusercontent.com/fangohr/coronavirus-2020/master/data.txt
 - and some processed data is available at https://github.com/fangohr/coronavirus-2020/blob/master/figures/table-1.md
 - it may not be possible to update this daily
-- The "predictions" below are based on a very simple model of growth ($\proptot^p$), where we
-  assume the same growth rate over the duration of the outbreak. We want to see
-  these predictions to start to be wrong (and in particular to overestimate
-  actual numbers; this would indicate the outbreak starts to be constrained).
-
 
 ## Update 7 February
 
@@ -66,6 +63,12 @@ infections, including:
 - The data points from the past few days are more erratic than before. We use
   all data for the fits of the model parameters again.
   
+## Update 21 Feb
+
+- As there appears to be a slowdown in daily new infections, we try to fit a
+  sigmoidal model. See notes in model2.ipynb.
+  
+    
 ## Infections
 
 ![Infection data](figures/infections-with-model-fit.svg)
