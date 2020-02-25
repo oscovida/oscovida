@@ -68,6 +68,23 @@ infections, including:
 - As there appears to be a slowdown in daily new infections, we try to fit a
   sigmoidal model. See notes in model2.ipynb.
   
+## Update 25 Feb
+
+The exercise here, at least with the fits, becomes less meaningful now:
+
+- the deaths are slowing down (for now), so the assumed model is not a good description anymore (although it was in the beginning)
+- the sigmoidal model for infections also doesn't fit the data so well.
+- the outbreak is slowing down in China, but starting up in other places. It
+  would be interesting to repeat the plots/fits for each area of the new
+  outbreaks, but that's too much effort to carry out here.
+  
+This site: https://covid2019.azurewebsites.net has a wealth of data, nicely
+categorized into countries and days, and also reports interesing graphs (such as
+https://twitter.com/jodigraphics15/status/1231664567517949959) from the Twitter account https://twitter.com/jodigraphics15
+
+I'll probably stop updating this page because of the reasons listed above.
+
+  
     
 ## Infections
 
