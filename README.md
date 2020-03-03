@@ -13,11 +13,24 @@ Offering data in Pandas dataFrame to explore.
 
 ## Some plots with global numbers
 
-![Infections daily change](figures/new-infections.svg)
+![Global overview](figures/global-overview.svg)
 
-![Deaths daily change](figures/new-deaths.svg)
+![Global deaths](figures/global-deaths.svg)
+
+![Infections daily change](figures/global-new-infections.svg)
+
+![Deaths daily change](figures/global-new-deaths.svg)
 
 ## Germany
 
-![Infection data](figures/deaths-with-model-fit.svg)
+![Plot](germany-overview.svg)
+![Plot](germany-overview-25-feb.svg)
+
+![Plot](new-cases-Germany.svg)
+![Plot](new-recovered-Germany.svg)
+![Plot](new-active-Germany.svg)
+![Plot](new-deaths-Germany.svg)
+
+
+
 
