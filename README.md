@@ -50,6 +50,8 @@ Note: "Active" cases are those that are infected, not recovered and not dead.
 - Assumes no significant change to containment measures 
 
 [comment] insert table here
+
+<pre>
 Predictions for cases in Germany:
 
 Last data point used in prediction from 2020-03-09 00:00:00
@@ -85,3 +87,4 @@ Infections in 28 days:  28581 (06 Apr 2020)
 Infections in 29 days:  30542 (07 Apr 2020)
 
 Fit parameters: p = 2.754 c = 1.03 t0= -0.000 a0= 5.903
+</pre>
