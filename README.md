@@ -40,5 +40,19 @@ Note: "Active" cases are those that are infected, not recovered and not dead.
 ![Plot](figures/new-active-Germany.svg)
 ![Plot](figures/new-deaths-Germany.svg)
 
+# Fit model of type n(t) = c*(t-t0)^p + a0
+
+![Plot](figures/infections-with-model-fit.svg')
+
+# Predicting increase in infections
+
+- Based on data since 25 Feb
+- Assumes no significant change to containment measures 
+
+[comment] insert table here
+
+
+
+
 
 
