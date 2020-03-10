@@ -85,4 +85,5 @@ Infections in 27 days:  26703 (05 Apr 2020)
 Infections in 28 days:  28581 (06 Apr 2020)
 Infections in 29 days:  30542 (07 Apr 2020)
 
-Fit parameters: p = 2.754 c = 1.03 t0= -0.000 a0= 5.903</pre>
+Fit parameters: p = 2.754 c = 1.03 t0= -0.000 a0= 5.903
+</pre>
