@@ -2,6 +2,10 @@
 
 # coronavirus-2020 (covid2019)
 
+This page isa little outdated. Nice plots are available at https://ourworldindata.org/coronavirus
+
+What is available here?
+
 - Offering data in Pandas dataFrame to explore.
 
 - We use data from the files at https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series
@@ -29,7 +33,7 @@ Note: "Active" cases are those that are infected, not recovered and not dead.
 
 ![Infections daily change](figures/global-new-infections.svg)
 
-![Deaths daily change](figures/global-new-deaths.svg)
+![Deaths daily change](figures/global-new-deaths.svg)<
 
 # Some plots for Germany
 
