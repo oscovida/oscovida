@@ -5,6 +5,10 @@
 - doubling time
 ** How do we compute it?
 - probably expert topic
+** What are the inaccuracies?
+- confirmed cases
+  - not testing enough
+  - tests may give wrong positives and negatives
 
 * Curve your city / country
 Useful plots:
@@ -17,6 +21,8 @@ Useful plots:
     - average over last n days?
     - or fit exponential function through n days to get one data point?
 
+- also show data in numbers per million (or, I prefer, per 1000)
+
 Useful fits:
 - fit through data from last n days (n between 3 and 21, 10 might be a good
   default) and extrapolate for the future
@@ -24,6 +30,9 @@ Useful fits:
 
 Compare countries and strategies
 - compare with China, Italy and other countries
+  - use deaths where possible 
+  - fit model function to china data, so we can fit it to other data and compare?
+    - sigmoidal
 
 * Presentation
 Jupyter notebooks that can 
