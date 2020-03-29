@@ -33,6 +33,7 @@ Compare countries and strategies
   - use deaths where possible 
   - fit model function to china data, so we can fit it to other data and compare?
     - sigmoidal
+  -> estimate total infect / deaths?
 
 * Presentation
 Jupyter notebooks that can 
