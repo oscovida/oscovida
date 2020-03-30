@@ -48,3 +48,14 @@ Jupyter notebooks that can
   - https://covid19dashboards.com/compare-country-death-trajectories/
     - nice comparison of trajectories
       - would be good to have per state or 'Landkreis'
+
+** Data about Germany
+- Germany Government? https://npgeo-corona-npgeo-de.hub.arcgis.com/ -> Menu top
+  left -> "Data", scroll down to "RKI Corona Landkreise" data set, -> select
+  interesting data set -> for example
+  - RKI Corona Bundesländer
+  - RKI COVID19 -> RKI Corona Landkreise
+  - Download button (below image, on the right) -> Full Data set -> Spreadsheet
+    This provides a link to a csv file, but with a URL that includes a hash, something like 
+    https://opendata.arcgis.com/datasets/917fc37a709542548cc3be077a786c17_0.csv
+
