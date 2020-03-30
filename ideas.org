@@ -4,7 +4,10 @@
 - grow factor
 - doubling time
 ** How do we compute it?
-- probably expert topic
+- for example doubling time: (probably expert topic)
+  - take two points
+  - fit curve through more points
+  - go back from last value and look for when numbers are half
 ** What are the inaccuracies?
 - confirmed cases
   - not testing enough
@@ -35,6 +38,9 @@ Compare countries and strategies
     - sigmoidal
   -> estimate total infect / deaths?
 
+* Other topics
+- fewer reported cases over the weekends
+- investigate numbers in China, South Korea and Singapore 
 * Presentation
 Jupyter notebooks that can 
 - be seen as static data and be interesting in their own right
