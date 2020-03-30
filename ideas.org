@@ -1,17 +1,6 @@
-* Basics
-** What is exponential growth
-** How do we characterise it
-- grow factor
-- doubling time
-** How do we compute it?
-- for example doubling time: (probably expert topic)
-  - take two points
-  - fit curve through more points
-  - go back from last value and look for when numbers are half
-** What are the inaccuracies?
-- confirmed cases
-  - not testing enough
-  - tests may give wrong positives and negatives
+* Priorities
+- provide local data (Germany, Land (state), Landkreise)
+- open source (All source is available, Binder)
 
 * Curve your city / country
 Useful plots:
@@ -24,11 +13,12 @@ Useful plots:
     - average over last n days?
     - or fit exponential function through n days to get one data point?
 
-- also show data in numbers per million (or, I prefer, per 1000)
+- also show data in numbers per million (or per 1000?)
 
 Useful fits:
 - fit through data from last n days (n between 3 and 21, 10 might be a good
   default) and extrapolate for the future
+  - use error margin in fit estimate as shown at 
   - allow user to vary n
 
 Compare countries and strategies
@@ -38,9 +28,12 @@ Compare countries and strategies
     - sigmoidal
   -> estimate total infect / deaths?
 
+- investigate numbers in China, South Korea and Singapore - what are the
+  'positive signs' we are looking for?
+
 * Other topics
 - fewer reported cases over the weekends
-- investigate numbers in China, South Korea and Singapore 
+
 * Presentation
 Jupyter notebooks that can 
 - be seen as static data and be interesting in their own right
@@ -48,3 +41,10 @@ Jupyter notebooks that can
 - use Voila for interactive exploration (need to run on some kind of binder host??)
 
 
+* Related resources
+- https://nextstrain.org/ncov
+- Jupyter notebooks as templates: https://covid19dashboards.com/
+  One of these is 
+  - https://covid19dashboards.com/compare-country-death-trajectories/
+    - nice comparison of trajectories
+      - would be good to have per state or 'Landkreis'
