@@ -12,6 +12,11 @@ What is available here?
 
   Thank you @CSSEGISandData for providing the data!
 
+- An attempt (April 2020) to visualise the effectiveness of 
+  virus containment measures in different countries (ongoing work)
+  in [index.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb), 
+  
+
 - An exploration of the early infection numbers in China is described in [this link](readme-old.md).
 
 - Plots below are from [germany.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb), 
