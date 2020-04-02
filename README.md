@@ -88,7 +88,7 @@ Discussion and contributions are welcome.
   decreased to around 100 per day for the second half of March.
 
 ### Plot 3: daily changes in deaths
-    *  Red bars shows how many new deaths were reported for each day.
+* Red bars shows how many new deaths were reported for each day.
 * Red line shows a seven day (rolling) average over the bar data.
 * The number of deaths is expected to follow the number of infections with some
   time delay, and reduced by a fraction (the [case fatality
@@ -133,7 +133,16 @@ Discussion and contributions are welcome.
     
   * There is no red curve for the doubling time of deaths as there have
     been too few deaths to be useful for the analysis.
-    
+
+# What about other countries and plots for those?
+
+* More plots for countries with high numbers of reported infections in 
+  [index.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  (needs scrolling down to find plots).
+
+* If your country of interest is not listed, you can [execute the notebook to
+  modify the commands to show other countries
+  here](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
   
 # What about errors in the data?
 
@@ -166,6 +175,5 @@ Discussion and contributions are welcome.
 The plots and code here has been put together by volunteers who have no training
 in epidemiology. You are welcome to use the material at your own risk. 
 The [license is available](LICENSE).
-
 
 
