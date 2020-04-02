@@ -8,7 +8,13 @@
 - [ ] compare growth in different areas
   - focus around point of 100 infections
   - loglog plot (Hans has example)
+- [ ] add growth factor to plots (Robert's suggestion)
+  - try running average on top
+  - maybe can add this to daily change plots?
 
+* Minor fixes
+- label subplots in index.ipynb (1, 2, 3, 4 ?)
+- adjust plot size to make sure headline shows in svg/pdf files when saved
 * Curve your city / country
 Useful plots:
 - [X] total deaths in log scale
