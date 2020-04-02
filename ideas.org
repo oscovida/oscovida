@@ -1,45 +1,52 @@
 * Priorities
-- provide local data (Germany, Land (state), Landkreise)
-- open source (All source is available, Binder)
+- [X] set of plots to start from (see index.ipynb)
+- [ ] provide local data (Germany, Land (state), Landkreise)
+  - [ ] are the same plots still usable
+- [ ] show data with more interactive technology (plotly?)
+- select data set by clicking on landkreis? (possible? Use voila?)
+- [X] open source (All source is available, Binder)
+- [ ] compare growth in different areas
+  - focus around point of 100 infections
+  - loglog plot (Hans has example)
+- [ ] add growth factor to plots (Robert's suggestion)
+  - try running average on top
+  - maybe can add this to daily change plots?
 
+* Minor fixes
+- label subplots in index.ipynb (1, 2, 3, 4 ?)
+- adjust plot size to make sure headline shows in svg/pdf files when saved
 * Curve your city / country
 Useful plots:
-- total deaths in log scale
-- total cases in log scale
-- new cases per day (normal scale)
-- new deaths per day (normal scale)
-- doubling time on these plots
+- [X] total deaths in log scale
+- [X] total cases in log scale
+- [X] new cases per day (normal scale)
+- [X] new deaths per day (normal scale)
+- [X] doubling time on these plots
   - based on day-to-day difference is probably too noisy
     - average over last n days?
     - or fit exponential function through n days to get one data point?
+    - rolling average works well
 
-- also show data in numbers per million (or per 1000?)
+- [ ] also show data in numbers per million (or per 1000?)
 
-Useful fits:
-- fit through data from last n days (n between 3 and 21, 10 might be a good
-  default) and extrapolate for the future
-  - use error margin in fit estimate as shown at 
-  - allow user to vary n
-
-Compare countries and strategies
-- compare with China, Italy and other countries
-  - use deaths where possible 
-  - fit model function to china data, so we can fit it to other data and compare?
-    - sigmoidal
-  -> estimate total infect / deaths?
-
-- investigate numbers in China, South Korea and Singapore - what are the
-  'positive signs' we are looking for?
 
 * Other topics
-- fewer reported cases over the weekends
+- fewer reported cases over the weekends -> fourier transform to confirm?
+
+- Compare countries and strategies
+  - compare with China, Italy and other countries
+    - fit model function to china data, so we can fit it to other data and compare?
+      - sigmoidal
+    -> estimate total infect / deaths?
+  
+  - investigate numbers in China, South Korea and Singapore - what are the
+    'positive signs' we are looking for?
 
 * Presentation
 Jupyter notebooks that can 
-- be seen as static data and be interesting in their own right
-- executable through Binder (open science aspect)
-- use Voila for interactive exploration (need to run on some kind of binder host??)
-
+- [X] be seen as static data and be interesting in their own right
+  - [ ] or have plain html for faster loading and being more accessible to a broader audience?
+- [X] executable through Binder (open science aspect)
 
 * Related resources
 - https://nextstrain.org/ncov

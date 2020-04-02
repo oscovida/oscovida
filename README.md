@@ -1,104 +1,179 @@
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=germany.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=index.ipynb)
 
-# coronavirus-2020 (covid2019)
+# Coronavirus 2020 - how effective are our measures to slow down the virus?
 
-This page is it parts a little outdated. Nice plots are available at https://ourworldindata.org/coronavirus
+## Available materials
 
-What is available here?
+* Plots (discussion to be added), see
+  [index.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  and scroll down, an example for South Korea is shown below
 
-- Offering data in Pandas dataFrame to explore.
+* Jupyter notebooks that create these plots and make the data available in
+  pandas dataframes.
 
-- We use data from the files at https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series
+* Ability to [execute the notebooks in the cloud, to modify them, or inspect the
+  trends in other
+  countries](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  and scroll down, an example for South Korea is shown below)
 
-  Thank you @CSSEGISandData for providing the data!
+## Data source
 
-- An exploration of the early infection numbers in China is described in [this link](readme-old.md).
+- We use
+  [data](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data)
+  from the Johns Hopkins university
 
-- Plots below are from [germany.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb), 
-  which includes an attempt to fit one polynomial through all the outbreak within one country.
+## Motivation
+
+### Understanding the situation
+
+The reporting in the media on the #COVID19 situation is not always providing
+sufficient context to interpret the numbers: we hear many reports about how many
+people have been confirmed to be infected by the virus, or have died. 
+
+The relevant questions are though: how do these numbers compare to yesterday,
+and the week before? Can we see and understand how quickly infections are
+spreading? Can we see if the containment measures of people staying at home,
+schools and universities closing etc are showing any effect and if so, how
+strong is it? What can we learn from countries that have managed to reduce the
+number of new infections?
+
+With the plots and data available here, we hope to contribute to this.
+
+Discussion and contributions are welcome.
+
+### Enable citizen science
+
+* The [source code](https://github.com/fangohr/coronavirus-2020) that creates
+  the plots is available here, can be inspected, downloaded, modified and
+  improved.
+
+* Using Jupyter Notebooks and the https://mybinder.org project, anyone with a
+  web browser can execute the source (to create the same or new plots) from
+  within a webbrowser, by clicking [this
+  link](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb).
+
+## Plans
+
+* Extend this to provide data for Landkreise within Germany, and other more
+  local data.
+
+* Further plots to compare slowdowns of the outbreak in different regions.
+
+* Make plots more interactive (plotly?)
+
+## Discussion of example plots
+
+![south-korea data](figures/Korea--South.svg)
+
+* Discussion of plots from the top (number 1) to the bottom (number 4)
+
+### Plot 1: accumulated cases and deaths as function of time
+* Shows how many people have been confirmed to be infected (blue) or have died (red) as a function of time.
+* The y-axis is logarithmic, that means from one grid line to the next, the
+  value represented increases by a factor of 10. (Axis labels: 10<sup>2</sup>=
+  100, 10<sup>3</sup>= 1000, 10<sup>4</sup>= 10000, and so on).
+* These numbers are generally reported in the media.
+* These numbers can only grow.
+* The interesting question is: how fast do they grow?
+
+### Plot 2: daily changes in cases
+* Shows how many new confirmed cases are reported per day, shown as blue bars.
+* Blue lines shows a seven day (rolling) average over the bar data - this
+  produces smoother data, and in particular removes the effect of the weekend
+  (in some countries reported numbers drop during and just after the weekend)
+* We would like to see these numbers of daily changes decrease from day to day.
+  The faster they go down the better. 
+* For the data of South Korea, we can see that the peak of new infections was
+  around 1st March 2020, and following that the number of new infections
+  decreased to around 100 per day for the second half of March.
+
+### Plot 3: daily changes in deaths
+* Red bars shows how many new deaths were reported for each day.
+* Red line shows a seven day (rolling) average over the bar data.
+* The number of deaths is expected to follow the number of infections with some
+  time delay, and reduced by a fraction (the [case fatality
+  rate](https://en.wikipedia.org/wiki/Case_fatality_rate)).
+
+### Plot 4:
+* This plot computes the doubling time of the cases (blue) and deaths (red),
+  assuming that the growth of cases and deaths as shown in plot 1 is
+  exponential.
   
-- for short term understanding of the data (i.e. over time scales of two weeks,
-say), an exponential fit is more appropriate (i.e. for shorter periods where the
-growth rate does not change.
+  * in more detail, we compute the doubling period from one day to the next and
+    show this as transparent dots.
+    
+    If a value of 3 is shown, this means that at that point in time, it took 3
+    days for the numbers of cases (or deaths) to double.
+     
+  * the solid line is a 7-day rolling mean over these data points and provides
+    more robust guidance.
+    
+* Looking at the solid lines, we may be able to assess the spread of the virus. 
 
-  This is explored in [current-trends2.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/current-trends2.ipynb) in rough form.
+  * For many countries, in the early stages of the outbreak, this doubling time
+    for confirmed infections (blue line) is somewhere around 2 to 3 days.
+  
+  * As the spread of infections is reduced (by schools closing, people
+    exercising social distancing, staying at home, etc), the growth rate of the
+    exponential function becomes smaller, and correspondingly the doubling time 
+    increases. 
+    
+  * We would like to see the doubling time to get larger, as this an indication
+    that the growth of infections and deaths is decreasing.
+  
+  * Hopefully, we can learn from other countries, what kind of doubling period
+    has to be achieved, to control the number of infected people.
+  
+* The example data for South Korea shows that the doubling time grows from
+  around 3 days to around 60 days as the number of daily new infections (plot 2)
+  decreases.
+  
+  * as the doubling period reaches 60, the number of daily new infections
+    stabilises around 100.
+    
+  * There is no red curve for the doubling time of deaths as there have
+    been too few deaths to be useful for the analysis.
 
-## See the sample notebook
+# What about other countries and plots for those?
 
-- [Static view of notebook, germany.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb)
-- [current-trends2.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/current-trends2.ipynb) 
+* More plots for countries with high numbers of reported infections in 
+  [index.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  (needs scrolling down to find plots).
 
-## Execute and modify the notebook using MyBinder
+* If your country of interest is not listed, you can [execute the notebook to
+  modify the commands to show other countries
+  here](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  
+# What about errors in the data?
 
-- [Interactive session germany.ipynb (allows execution and modification of notebook with Binder)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=germany.ipynb)
+* The data we have available is likely to be in accurate:
+  - Infections can only be confirmed if they are being tested: the more testing
+    takes place, the more infected people can be found. Asymptomatic individuals
+    may not be tested if tests are prioritised for severely sick, health workers
+    or those showing symptoms.
+  - Tests may be inaccurate and report false positives or false negatives.
+  - Deaths may be easier to detect than infections, but may also be inaccurate.
+  - The reporting of cases and deaths may not take place during weekends, or
+    there may be delays for other reasons.
+  
+* Despite the errors in the data, we can try to learn something from it as long
+  as we remember the data is not representing the full trush of the situation
+  but just the measurement that we have available.
+  
+  * For some plots on this page, we have omitted data lines or points because
+    there were not enough numbers and data points to estimate anything.
+    
+  * Some data points appear random or as outliers - for some we understand the
+    reasons, for others not.
+    
+* It is possible we have made errors in our processing of the numbers. The
+  source code is available for anyone to check. (Please feedback any
+  observations.)
+    
+# Disclaimer
+
+The plots and code here has been put together by volunteers who have no training
+in epidemiology. You are welcome to use the material at your own risk. 
+The [license is available](LICENSE).
 
 
-# Some plots with global numbers
-
-Note: "Active" cases are those that are infected, not recovered and not dead.
-
-![Global overview](figures/global-overview.svg)
-
-![Global deaths](figures/global-deaths.svg)
-
-![Infections daily change](figures/global-new-infections.svg)
-
-![Deaths daily change](figures/global-new-deaths.svg)<
-
-# Some plots for Germany
-
-![Plot](figures/germany-overview.svg)
-![Plot](figures/germany-overview-25-feb.svg)
-![Plot](figures/new-cases-Germany.svg)
-![Plot](figures/new-deaths-Germany.svg)
-
-# Fit model of type n(t) = c*(t-t0)^p + a0
-
-![Plot](figures/infections-with-model-fit.svg)
-
-# Fit exponential curves
-
-See [current-trends2.ipynb](current-trends2.ipynb)
-
-# Predicting increase in infections
-
-- Based on data since 25 Feb
-- Assumes no significant change to containment measures 
-
-[comment]: <> insert table here
-<pre>
-Predictions for cases in Germany:
-
-Last data point used in prediction from 2020-03-29 00:00:00
-
-Infections in  1 days:  72281 (30 Mar 2020)
-Infections in  2 days:  81208 (31 Mar 2020)
-Infections in  3 days:  90937 (01 Apr 2020)
-Infections in  4 days: 101512 (02 Apr 2020)
-Infections in  5 days: 112981 (03 Apr 2020)
-Infections in  6 days: 125395 (04 Apr 2020)
-Infections in  7 days: 138804 (05 Apr 2020)
-Infections in  8 days: 153258 (06 Apr 2020)
-Infections in  9 days: 168812 (07 Apr 2020)
-Infections in 10 days: 185520 (08 Apr 2020)
-Infections in 11 days: 203437 (09 Apr 2020)
-Infections in 12 days: 222620 (10 Apr 2020)
-Infections in 13 days: 243129 (11 Apr 2020)
-Infections in 14 days: 265022 (12 Apr 2020)
-Infections in 15 days: 288361 (13 Apr 2020)
-Infections in 16 days: 313208 (14 Apr 2020)
-Infections in 17 days: 339627 (15 Apr 2020)
-Infections in 18 days: 367682 (16 Apr 2020)
-Infections in 19 days: 397441 (17 Apr 2020)
-Infections in 20 days: 428970 (18 Apr 2020)
-Infections in 21 days: 462338 (19 Apr 2020)
-Infections in 22 days: 497616 (20 Apr 2020)
-Infections in 23 days: 534876 (21 Apr 2020)
-Infections in 24 days: 574190 (22 Apr 2020)
-Infections in 25 days: 615633 (23 Apr 2020)
-Infections in 26 days: 659279 (24 Apr 2020)
-Infections in 27 days: 705207 (25 Apr 2020)
-Infections in 28 days: 753493 (26 Apr 2020)
-Infections in 29 days: 804218 (27 Apr 2020)
-
-Fit parameters: p = 4.006 c = 0.0532 t0= -0.000 a0= -231.576</pre>
