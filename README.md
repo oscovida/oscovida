@@ -12,9 +12,7 @@
 
 ## Data source
 
-- We use data from the files at https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data/csse_covid_19_time_series
-
-  Thank you @CSSEGISandData for providing the data!
+- We use [data](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data) from the Johns Hopkins university 
 
 ## Motivation
 
@@ -45,8 +43,32 @@ Discussion and contributions are welcome.
 
 * Further plots to compare progress of the virus in different regions
 
+* Make plots more interactive (plotly?)
+
 ## Discussion of example plots
 
-![south-korea data](figures/Korea, South.svg)
+![south-korea data](figures/Korea--South.svg)
 
-* [to be added]
+* Discussion of plots from the top (number 1) to the bottom (number 4)
+
+### Plot 1: accumulated cases and deaths as function of time
+* shows how many people have been confirmed to be infected as a function of time 
+* y-axis is logarithmic
+* these numbers are generally reported in the media
+* they can only grow 
+* the interesting question is: how fast do they grow
+
+### Plot 2: daily changes in cases
+* shows how many new confirmed cases are reported per day, shown as bars
+* blue lines shows a seven day (rolling) average over the bar - this produces smoother data, and in particular
+  removes the effect of the weekend which seems to affect reporting of numbers in some countries
+* [want to see this going down]
+
+### Plot 3: daily changes in deaths
+* shows how many new deaths were reported each day
+* red lin shows a seven day (rolling) average over the bar - this produces smoother data, and in particular
+  removes the effect of the weekend which seems to affect reporting of numbers in some countries
+* [mention delay to infections]
+
+### Plot 4:
+* to be written
