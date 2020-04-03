@@ -35,26 +35,28 @@ def report_download(url, df):
     print(f"Downloaded data: last data point {df.columns[-1]} from {url}")
 
 
+@lru_cache(maxsize=1)
 def fetch_deaths():
     url = os.path.join(base_url, "time_series_covid19_" + "deaths" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
     return df
 
-
+@lru_cache(maxsize=1)
 def fetch_cases():
     url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
     return df
 
-deaths = fetch_deaths()
-cases = fetch_cases()
-
 
 def get_country(country):
     """Given a country name, return deaths and cases as time series.
     All rows should contain a datetime index and a value"""
+
+    deaths = fetch_deaths()
+    cases = fetch_cases()
+
     assert country in deaths.index, f"{country} not in available countries. These are {sorted(deaths.index)}"
         
     # Some countries report sub areas (i.e. multiple rows per country) such as China, France, United Kingdom
