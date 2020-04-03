@@ -94,7 +94,19 @@ Discussion and contributions are welcome.
   time delay, and reduced by a fraction (the [case fatality
   rate](https://en.wikipedia.org/wiki/Case_fatality_rate)).
 
-### Plot 4:
+### Plot 4: growth factors
+* The growth factor is the ratio of new cases (or deaths) today relative to new cases (or deaths) yesterday
+* Blue (red) dots show these ratios for cases (deaths), and are computed as the ratio over a week to reduce noise
+* The solid line is a 7-day rolling mean over these points to provide smoother data.
+* As long as the growth value is greater than 1.0, the number of new infections is increasing
+* If the growth value would is exactly 1.0, we have the same number of new infections every day
+* The growth factor needs to be below 1.0 for the spread to slow down.
+* As this number is computed on the relative change from yesterday to today, we
+  can get high fluctuations where the numbers of new cases and deaths is small
+  (imagine there was 1 case yesterday, and 7 cases today, this would give a
+  growth factor of 7). 
+
+### Plot 5: doubling times
 * This plot computes the doubling time of the cases (blue) and deaths (red),
   assuming that the growth of cases and deaths as shown in plot 1 is
   exponential.
