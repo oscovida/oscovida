@@ -1,7 +1,10 @@
 """Code used for notebooks and data exploration on
 https://github.com/fangohr/coronavirus-2020"""
 
+
+from functools import lru_cache
 import os
+import time
 import numpy as np
 import pandas as pd
 
@@ -98,6 +101,75 @@ def get_country(country):
     
     return c, d
 
+
+@lru_cache(maxsize=1)
+def fetch_data_germany():
+    datasource = "https://opendata.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0.csv"
+    t0 = time.time()
+    print(f"Please be patient - downloading data from {datasource} ...")
+    germany = pd.read_csv(datasource)
+    delta_t = time.time() - t0
+    print(f"Completed downloading {len(germany)} rows in {delta_t:.1f} seconds.")
+
+    ## create new column 'landkreis' and get rid of "SK " and "LK " for this
+    ## - this is too simplistic. We have fields like "Region Hannover"
+    # germany['landkreis'] = germany['Landkreis'].apply(lambda s: s[3:]) 
+
+    # remember for the next call of this function
+    return germany
+
+
+def germany_get_region(state=None, landkreis=None):
+    germany = fetch_data_germany()
+    """Returns two time series: (cases, deaths)"""
+    assert state or landkreis, "Need to provide a value for state or landkreis"
+
+    if state and landkreis:
+        raise NotImplementedError
+        """We need to check if this is important."""
+
+    if state:
+        assert state in germany['Bundesland'].values, \
+            f"{state} not in available German states. These are {sorted(germany['Bundesland'].drop_duplicates())}"
+
+        land = germany[germany['Bundesland'] == state]
+        land = land.set_index(pd.to_datetime(land['Meldedatum']))
+        land.index.name = 'date'
+        land.sort_index(inplace=True)
+
+        # group over multiple rows for the same date 
+        # (this will also group over the different landkreise in the state)
+        cases = land["AnzahlFall"].groupby('date').agg('sum').cumsum()
+        cases.country = f'Germany-{state}'
+        cases.label = 'cases'
+
+        # group over all multiple entries per day
+        deaths = land["AnzahlTodesfall"].groupby('date').agg('sum').cumsum()
+        deaths.country = f'Germany-{state}'
+        deaths.label = 'deaths'
+
+        return cases, deaths
+
+    if landkreis:
+        assert landkreis in germany['Landkreis'].values, \
+            f"{state} not in available German states. These are {sorted(germany['Landkreis'].drop_duplicates())}"
+
+        lk = germany[germany["Landkreis"] == landkreis]
+        lk.index = pd.to_datetime(lk['Meldedatum'])
+        lk.index.name = 'date'
+        lk = lk.sort_index()
+
+        cases = lk["AnzahlFall"].groupby('date').agg('sum').cumsum()
+        cases.country = f'Germany-{landkreis}'
+        cases.label = 'cases'
+
+        deaths = lk["AnzahlTodesfall"].groupby('date').agg('sum').cumsum()
+        deaths.country = f'Germany-{landkreis}'
+        deaths.label = 'deaths'
+
+        return cases, deaths
+
+
 def plot_time_step(ax, series, style="-", logscale=True):
     ax.step(series.index, series.values, style, label=series.country + " " + series.label,
            linewidth=LW)
@@ -163,6 +235,7 @@ def plot_doubling_time(ax, series, color, minchange=10):
     ax.set_ylabel("doubling time [days]")
     return ax, rolling, dtime
 
+
 def plot_growth_factor(ax, series, color, minchange=10):
     """relative change of number of new cases/deaths from day to day
     See https://youtu.be/Kas0tIxDvrg?t=330, 5:30 onwards
@@ -204,6 +277,7 @@ def plot_growth_factor(ax, series, color, minchange=10):
     ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3') # label="critical value"
     return ax, rolling, f
 
+
 def test_plot_growth_factor():
     c, d = get_country("Korea, South")
     c, d = get_country("China")
@@ -216,8 +290,18 @@ def test_plot_growth_factor():
     return rolling, f
 # rolling, f = test_plot_growth_factor()
 
-def overview(country):
-    c, d = get_country(country)
+
+
+def overview(country, region=None, subregion=None):
+    if country.lower() == 'germany':
+        if region == None and subregion == None:
+            c, d = get_country(country)  # use johns hopkins data
+        else:
+            # use German data
+            c, d = germany_get_region(state=region, landkreis=subregion)
+    else:
+        c, d = get_country(country)
+
 
     fig, axes = plt.subplots(5, 1, figsize=(10, 15), sharex=False)
     ax = axes[0]
@@ -235,25 +319,22 @@ def overview(country):
     ax = axes[3]
     plot_growth_factor(ax, series=d, color="C0")
     plot_growth_factor(ax, series=c, color="C1")
-    
+
     ax = axes[4]
     plot_doubling_time(ax, series=d, color="C0")
     plot_doubling_time(ax, series=c, color="C1")
-    
+
     # enforce same x-axis on all plots
     axes[1].set_xlim(axes[0].get_xlim())
     axes[2].set_xlim(axes[0].get_xlim())
     axes[3].set_xlim(axes[0].get_xlim())
     axes[4].set_xlim(axes[0].get_xlim())
-    
-   
-    
+
     title = f"Overview {c.country}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
 
     fig.tight_layout(pad=1)
-    
     filename = os.path.join("figures", c.country.replace(" ", "-").replace(",", "-") + '.svg')
     fig.savefig(filename)
-    
+
     return axes, c, d
