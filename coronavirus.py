@@ -1,5 +1,8 @@
-from numpy import log, exp
+"""Code used for notebooks and data exploration on
+https://github.com/fangohr/coronavirus-2020"""
+
 import os
+import numpy as np
 import pandas as pd
 
 # choose font - can be deactivated
@@ -7,7 +10,6 @@ from matplotlib import rcParams
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
 
-import matplotlib
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
 
@@ -15,7 +17,6 @@ plt.style.use('ggplot')
 from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
-import numpy as np
 LW = 3   # line width
 
 base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/"
@@ -24,16 +25,19 @@ def double_time_exponential(q2_div_q1, t2_minus_t1=None):
     """ See https://en.wikipedia.org/wiki/Doubling_time"""
     if t2_minus_t1 is None:
         t2_minus_t1 = np.ones(q2_div_q1.shape)
-    return t2_minus_t1 * np.log(2) / np.log(q2_div_q1) 
-    
+    return t2_minus_t1 * np.log(2) / np.log(q2_div_q1)
+
+
 def report_download(url, df):
     print(f"Downloaded data: last data point {df.columns[-1]} from {url}")
+
 
 def fetch_deaths():
     url = os.path.join(base_url, "time_series_covid19_" + "deaths" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
     return df
+
 
 def fetch_cases():
     url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_global.csv")
