@@ -5,7 +5,7 @@
 ## Available materials
 
 * Plots (discussion to be added), see
-  [index.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  [index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
   and scroll down, an example for South Korea is shown below
 
 * Jupyter notebooks that create these plots and make the data available in
@@ -13,7 +13,7 @@
 
 * Ability to [execute the notebooks in the cloud, to modify them, or inspect the
   trends in other
-  countries](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  countries](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
   and scroll down, an example for South Korea is shown below)
 
 ## Data source
@@ -50,7 +50,7 @@ Discussion and contributions are welcome.
 * Using Jupyter Notebooks and the https://mybinder.org project, anyone with a
   web browser can execute the source (to create the same or new plots) from
   within a webbrowser, by clicking [this
-  link](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb).
+  link](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
 
 ## Plans
 
@@ -149,7 +149,7 @@ Discussion and contributions are welcome.
 # What about other countries and plots for those?
 
 * More plots for countries with high numbers of reported infections in 
-  [index.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  [index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
   (needs scrolling down to find plots).
 
 * If your country of interest is not listed, you can [execute the notebook to
