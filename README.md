@@ -11,7 +11,7 @@
 
 * Plots for states in Germany (and Pinneberg) - experimental: 
   [germany.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb)
-  [faster version if it works](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb))
+  ([faster version if it works](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb))
   
 
 * Jupyter notebooks that create these plots and make the data available in
