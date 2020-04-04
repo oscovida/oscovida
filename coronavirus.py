@@ -365,6 +365,6 @@ def overview(country, region=None, subregion=None):
 
     fig.tight_layout(pad=1)
     filename = os.path.join("figures", c.country.replace(" ", "-").replace(",", "-") + '.svg')
-    fig.savefig(filename)
+    # fig.savefig(filename)
 
     return axes, c, d
