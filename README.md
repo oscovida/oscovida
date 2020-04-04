@@ -11,7 +11,7 @@
 
 * Plots for states in Germany (and Pinneberg) - experimental: 
   [germany.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb)
-  ([faster version if it works](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb))
+  ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb))
   
 
 * Jupyter notebooks that create these plots and make the data available in
@@ -24,9 +24,11 @@
 
 ## Data source
 
-- We use
-  [data](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data)
-  from the Johns Hopkins university
+- We use data 
+  from the [Johns Hopkins university](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data)
+  for countries, 
+- and from [German sources (RKI)](https://npgeo-corona-npgeo-de.hub.arcgis.com/)
+  for data within Germany.
 
 ## Motivation
 
