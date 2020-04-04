@@ -4,9 +4,16 @@
 
 ## Available materials
 
-* Plots (discussion to be added), see
+* Plots for strongly affected countries (discussion below), see
   [index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
-  and scroll down, an example for South Korea is shown below
+  [faster version if it works](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb))
+  An example for South Korea is shown below
+
+* Plots for states in Germany (and Pinneberg) - experimental: 
+  [germany.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb)
+  [faster version if it works](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb))
+  An example for South Korea is shown below
+
 
 * Jupyter notebooks that create these plots and make the data available in
   pandas dataframes.
@@ -14,7 +21,7 @@
 * Ability to [execute the notebooks in the cloud, to modify them, or inspect the
   trends in other
   countries](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
-  and scroll down, an example for South Korea is shown below)
+  
 
 ## Data source
 
