@@ -322,7 +322,7 @@ def test_plot_growth_factor():
 
 
 
-def overview(country, region=None, subregion=None):
+def overview(country, region=None, subregion=None, savefig=False):
     if country.lower() == 'germany':
         if region == None and subregion == None:
             c, d = get_country(country)  # use johns hopkins data
@@ -365,6 +365,7 @@ def overview(country, region=None, subregion=None):
 
     fig.tight_layout(pad=1)
     filename = os.path.join("figures", c.country.replace(" ", "-").replace(",", "-") + '.svg')
-    # fig.savefig(filename)
+    if savefig:
+        fig.savefig(filename)
 
     return axes, c, d
