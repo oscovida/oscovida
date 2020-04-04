@@ -22,13 +22,14 @@
   countries](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
   
 
-## Data source
+## Data source and processing
 
 - We use data 
   from the [Johns Hopkins university](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data)
   for countries, 
 - and from [German sources (RKI)](https://npgeo-corona-npgeo-de.hub.arcgis.com/)
   for data within Germany.
+- All computational steps and code are available [here](https://github.com/fangohr/coronavirus-2020/blob/master/coronavirus.py) -- contributions and corrections welcome.
 
 ## Motivation
 
