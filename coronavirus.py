@@ -51,8 +51,11 @@ def fetch_cases():
 
 
 def get_country(country):
-    """Given a country name, return deaths and cases as time series.
-    All rows should contain a datetime index and a value"""
+    """Given a country name, return deaths and cases as a tuple of pandas time
+    series. Works for all (?) countries in the world, or at least those in the
+    Johns Hopkins data set. All rows should contain a datetime index and a
+    value.
+    """
 
     deaths = fetch_deaths()
     cases = fetch_cases()
@@ -253,7 +256,7 @@ def plot_doubling_time(ax, series, color, minchange=10):
     ymax = min(rolling.max()*1.5, 500)
     if np.isnan(ymax):
         # This happens is rolling is empty, for example for deaths in Austria, Singapore
-        print(f"Can't plot doublingtime line for {series.label} in {series.country} due to too small numbers")
+        # print(f"Can't plot doublingtime line for {series.label} in {series.country} due to too small numbers")
         ymax = 10
         
     # some countries require special care
@@ -341,12 +344,126 @@ def get_country_data(country, region=None, subregion=None):
         c, d = get_country(country)
     return c, d
 
+#######################
+
+def day0atleast(v0, series):
+    try:
+        day0 = series[series > v0].index[0]
+    except IndexError:  # means no days found for which series.values > v0
+        print(f"Haven't found value > {v0} is Series {series.name}")
+        result = pd.Series()
+        return result 
+
+    # compute timedelta  
+    timedelta = series.index - day0
+    # convert to int as index
+    t = pd.to_numeric(timedelta.astype("timedelta64[D]").astype(int))
+    # Assemble new series
+    result = pd.Series(index=t, data=series.values)
+    
+    return result
+    
+
+    
+
+def align_sets_at(v0, df):
+    """Accepts data frame, and aligns so that all enttries close to v0 are on the same row.
+    
+    Returns new dataframe with integer index (reprenting days after v0).
+    """
+    res = pd.DataFrame()
+
+    for col in df.columns:
+        # res[col] = day0for(v0, df[col])
+        series = day0atleast(v0, df[col])
+        series.name = col
+        res = pd.merge(res, series, how='outer', left_index=True, right_index=True)
+
+    return res
+
+def compare_data(countrynames, rolling=7):
+    """Given a list of country names, return two dataframes: one with cases and one with deaths
+    where
+    - each column is one country
+    - data in the column is the diff of accumulated numbers
+    - any zero values are removed for italy (data error)
+    - apply some smoothing
+    """
+    df_c = pd.DataFrame()
+    df_d = pd.DataFrame()
+    
+    for countryname in countrynames:
+        c, d = get_country(countryname)
+
+        df_c[countryname + ' cases'] = c.diff().rolling(rolling, center=True).mean()
+        df_d[countryname + ' deaths'] = d.diff().rolling(rolling, center=True).mean()        
+
+    return df_c, df_d
+
+
+
+def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, labeloffset=2, v0=0,
+                      highlight={}, other_lines_alpha=0.4):
+    """highlight is dictionary: {country_name : color}"""
+    for i, col in enumerate(df.columns):
+        if col in highlight:
+            alpha = 1.0
+            color = highlight[col]
+            linewidth = 4
+        else:
+            alpha = other_lines_alpha
+            color = style + 'C' + str(i)
+            linewidth = 2
+
+        ax.plot(df.index, df[col].values, color, label=col, linewidth=linewidth, alpha=alpha)
+        if labels:
+            tmp = df[col].dropna()
+            if len(tmp) > 0:   # possible we have no data points
+                x, y = tmp.index[-1], tmp.values[-1]
+                ax.annotate(col, xy=(x + labeloffset, y), textcoords='data') 
+                ax.plot([x], [y], "o" + color, alpha=alpha)
+    # ax.legend()
+    ax.set_ylabel(yaxislabel)
+    ax.set_xlabel(xaxislabel)
+    ax.set_yscale('log')
+    # ax.set_xscale('log')   # also interesting
+    ax.set_ylim(bottom=v0)
+    ax.set_xlim(left=-1)  #ax.set_xlim(-1, df.index.max())
+    ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
+    ax.yaxis.set_ticks_position('both')
+
+
+def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea, South",
+                                                  "Spain", "United Kingdom", "Iran"],
+                     v0c=10, v0d=3):
+    df_c, df_d = compare_data([main_country] + compare_with)
+    res_c = align_sets_at(v0c, df_c)
+    res_d = align_sets_at(v0d, df_d)
+    fig, axes = plt.subplots(2, 1, figsize=(10, 6))
+    ax=axes[0]
+    plot_logdiff_time(ax, res_c, f"days since {v0c} cases", "daily new cases", 
+                      v0=v0c, highlight={main_country + " cases":"C1"})
+    ax = axes[1]
+    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths", "daily new deaths", 
+                      v0=v0d, highlight={main_country + " deaths":"C0"})
+
+    fig.tight_layout(pad=1)
+    title = f"Daily cases (top) and deaths (below) for {main_country}"
+    axes[0].set_title(title)
+    
+    return axes, res_c, res_d
+    
+
+
+
+
+#######################
 
 
 def overview(country, region=None, subregion=None, savefig=False):
     c, d = get_country_data(country, region=region, subregion=subregion)
 
-    fig, axes = plt.subplots(5, 1, figsize=(10, 15), sharex=False)
+    fig, axes = plt.subplots(5, 1, figsize=(10, 12), sharex=False)
     ax = axes[0]
     plot_time_step(ax=ax, series=c, style="-C1")
     plot_time_step(ax=ax, series=d, style="-C0")
@@ -383,4 +500,10 @@ def overview(country, region=None, subregion=None, savefig=False):
     if savefig:
         fig.savefig(filename)
 
-    return axes, c, d
+    if not subregion and not region: # i.e. not a region of Germany 
+        axes_compare, res_c, res_d = make_compare_plot(country)
+        return_axes = np.concatenate([axes, axes_compare])
+    else:
+        return_axes = axes
+
+    return return_axes, c, d
