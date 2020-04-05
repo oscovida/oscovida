@@ -63,12 +63,9 @@ Discussion and contributions are welcome.
 
 ## Plans
 
-* Extend this to provide data for Landkreise within Germany, and other more
-  local data.
-
-* Further plots to compare slowdowns of the outbreak in different regions.
-
 * Make plots more interactive (plotly?)
+
+* Offer German translation?
 
 ## Discussion of example plots
 
@@ -104,18 +101,22 @@ Discussion and contributions are welcome.
   rate](https://en.wikipedia.org/wiki/Case_fatality_rate)).
 
 ### Plot 4: growth factors
-* The growth factor is the ratio of new cases (or deaths) today relative to new cases (or deaths) yesterday
-* Blue (red) dots show these ratios for cases (deaths), and are computed as the ratio over a week to reduce noise
+* The growth factor is the ratio of new cases (or deaths) today relative to new
+  cases (or deaths) yesterday
+* Blue (red) dots show these ratios for cases (deaths), and are computed as the
+  ratio over a week to reduce noise
 * The solid line is a 7-day rolling mean over these points to provide smoother data.
-* As long as the growth value is greater than 1.0, the number of new infections is increasing
-* If the growth value would is exactly 1.0, we have the same number of new infections every day
+* As long as the growth value is greater than 1.0, the number of new infections
+  is increasing
+* If the growth value would is exactly 1.0, we have the same number of new
+  infections every day
 * The growth factor needs to be below 1.0 for the spread to slow down.
 * As this number is computed on the relative change from yesterday to today, we
   can get high fluctuations where the numbers of new cases and deaths is small
   (imagine there was 1 case yesterday, and 7 cases today, this would give a
   growth factor of 7). 
 
-### Plot 5: doubling times
+### Plot 5: Doubling times
 * This plot computes the doubling time of the cases (blue) and deaths (red),
   assuming that the growth of cases and deaths as shown in plot 1 is
   exponential.
@@ -155,11 +156,37 @@ Discussion and contributions are welcome.
   * There is no red curve for the doubling time of deaths as there have
     been too few deaths to be useful for the analysis.
 
+
+### Plot 6: Comparison of daily new cases with other countries
+
+* X-axis shows the number of days since a particular number of new cases (such
+  as 10) have occurred in that country, and the y-axis the number of new cases
+  for that day.
+  
+* We see that countries follow similar paths, with the common properties that
+  the curve increases until the number of cases per day peaks, and then the
+  curve comes down again.
+  
+* The y-axis is logarithmic.
+
+* Due to the logarithmic y-axis, this visualisation can help to understand at
+  what stage in the outbreak an area is (despite the different size of the
+  countries and numbers of cases).
+  
+### Plot 7: Comparison of daily new deaths with other countries
+
+* As Plot 6, but for deaths not cases.
+
+
 # What about other countries and plots for those?
 
 * More plots for countries with high numbers of reported infections in 
   [index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
   (needs scrolling down to find plots).
+  
+* Plots for states in Germany (and Pinneberg):
+  [germany.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb)
+  ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb))
 
 * If your country of interest is not listed, you can [execute the notebook to
   modify the commands to show other countries
