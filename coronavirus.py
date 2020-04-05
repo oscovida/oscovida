@@ -357,10 +357,13 @@ def overview(country, region=None, subregion=None, savefig=False):
     plot_doubling_time(ax, series=c, color="C1")
 
     # enforce same x-axis on all plots
-    axes[1].set_xlim(axes[0].get_xlim())
-    axes[2].set_xlim(axes[0].get_xlim())
-    axes[3].set_xlim(axes[0].get_xlim())
-    axes[4].set_xlim(axes[0].get_xlim())
+    for i in range(1, 5):
+        axes[i].set_xlim(axes[0].get_xlim())
+    for i in range(0, 5):
+        axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
+        axes[i].yaxis.set_ticks_position('both')
+
+    
 
     title = f"Overview {c.country}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
