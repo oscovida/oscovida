@@ -1,20 +1,25 @@
 * Priorities
 - [X] set of plots to start from (see index.ipynb)
-- [ ] provide local data (Germany, Land (state), Landkreise)
-  - [ ] are the same plots still usable
+- [X] provide local data (Germany, Land (state), Landkreise)
+  - [X] are the same plots still usable
 - [ ] show data with more interactive technology (plotly?)
 - select data set by clicking on landkreis? (possible? Use voila?)
 - [X] open source (All source is available, Binder)
-- [ ] compare growth in different areas
+- [X] compare growth in different areas
   - focus around point of 100 infections
   - loglog plot (Hans has example)
-- [ ] add growth factor to plots (Robert's suggestion)
+- [ ] daily growth for German regions
+- [X] add growth factor to plots (Robert's suggestion)
   - try running average on top
   - maybe can add this to daily change plots?
+- [ ] write test that attempts to generate plots for all countries in Johns Hopkins data
 
 * Minor fixes
 - label subplots in index.ipynb (1, 2, 3, 4 ?)
 - adjust plot size to make sure headline shows in svg/pdf files when saved
+- PEP8 coronavirus.py
+- review and refactor coronavirus.py (in particular function names)
+
 * Curve your city / country
 Useful plots:
 - [X] total deaths in log scale
@@ -28,7 +33,16 @@ Useful plots:
     - rolling average works well
 
 - [ ] also show data in numbers per million (or per 1000?)
+  - needs 
+- [ ] show ratio of deaths to recorded cases?
 
+* Germany
+- [ ] add daily growth against days since outbreak plots for Germany
+  - are they interesting?
+  - compare a particular state against all others, and add China and Italy for good measure?
+- [ ] show data split into age groups and gender
+- [ ] check that sum over all states in Germany is similar to total data for Germany
+- [ ] check metadata and our interpretation of data sets
 
 * Other topics
 - fewer reported cases over the weekends -> fourier transform to confirm?
@@ -46,6 +60,7 @@ Useful plots:
 Jupyter notebooks that can 
 - [X] be seen as static data and be interesting in their own right
   - [ ] or have plain html for faster loading and being more accessible to a broader audience?
+    - could also have static pages for all countries
 - [X] executable through Binder (open science aspect)
 
 * Related resources
