@@ -70,8 +70,9 @@ Discussion and contributions are welcome.
 ## Discussion of example plots
 
 ![south-korea data](figures/Korea--South.svg)
+![south-korea data 2](figures/Korea--South2.svg)
 
-* Discussion of plots from the top (number 1) to the bottom (number 4)
+* Discussion of plots from the top (number 1) to the bottom (number 7)
 
 ### Plot 1: accumulated cases and deaths as function of time
 * Shows how many people have been confirmed to be infected (blue) or have died (red) as a function of time.
