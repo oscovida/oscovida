@@ -322,9 +322,15 @@ def test_plot_growth_factor():
     return rolling, f
 # rolling, f = test_plot_growth_factor()
 
+def get_country_data(country, region=None, subregion=None):
+    """Given the name of a country, get the Johns Hopkins data for cases and  deaths,
+    and return them as a tuple of pandas.Series objects: (cases, deaths)
 
+    If the country is "Germany", use the region (=Land) and subregion (=Kreis) to select
+    the appropriate subset from the Robert Koch Institute. If only the region is provided,
+    the data from all subregions in that region is accumulated.
+    """
 
-def overview(country, region=None, subregion=None, savefig=False):
     if country.lower() == 'germany':
         if region == None and subregion == None:
             c, d = get_country(country)  # use johns hopkins data
@@ -333,7 +339,12 @@ def overview(country, region=None, subregion=None, savefig=False):
             c, d = germany_get_region(state=region, landkreis=subregion)
     else:
         c, d = get_country(country)
+    return c, d
 
+
+
+def overview(country, region=None, subregion=None, savefig=False):
+    c, d = get_country_data(country, region=region, subregion=subregion)
 
     fig, axes = plt.subplots(5, 1, figsize=(10, 15), sharex=False)
     ax = axes[0]
@@ -363,7 +374,6 @@ def overview(country, region=None, subregion=None, savefig=False):
         axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
         axes[i].yaxis.set_ticks_position('both')
 
-    
 
     title = f"Overview {c.country}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
