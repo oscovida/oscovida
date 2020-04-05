@@ -176,7 +176,8 @@ Discussion and contributions are welcome.
   
 ### Plot 7: Comparison of daily new deaths with other countries
 
-* As Plot 6, but for deaths not cases.
+* As Plot 6, but for deaths not cases. For South Korea, there are not enough
+  deaths per day to show a meaningful line here.
 
 
 # What about other countries and plots for those?
