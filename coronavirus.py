@@ -503,6 +503,11 @@ def overview(country, region=None, subregion=None, savefig=False):
     if not subregion and not region: # i.e. not a region of Germany 
         axes_compare, res_c, res_d = make_compare_plot(country)
         return_axes = np.concatenate([axes, axes_compare])
+        if savefig:
+            filename = os.path.join("figures", c.country.replace(" ", "-").replace(",", "-") + '2.svg')
+            fig = plt.gcf()
+            fig.savefig(filename)
+
     else:
         return_axes = axes
 
