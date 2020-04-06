@@ -381,7 +381,7 @@ def align_sets_at(v0, df):
 
     return res
 
-def compare_data(countrynames, rolling=7):
+def get_compare_data(countrynames, rolling=7):
     """Given a list of country names, return two dataframes: one with cases and one with deaths
     where
     - each column is one country
@@ -436,7 +436,7 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
 def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea, South",
                                                   "Spain", "United Kingdom", "Iran"],
                      v0c=10, v0d=3):
-    df_c, df_d = compare_data([main_country] + compare_with)
+    df_c, df_d = get_compare_data([main_country] + compare_with)
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
