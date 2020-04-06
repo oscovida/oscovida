@@ -203,7 +203,7 @@ data.
 
 * If your country of interest is not listed, you can [execute the notebook to
   modify the commands to show other countries
-  here](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  here](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=index.ipynb)
   
 # What about errors in the data?
 
