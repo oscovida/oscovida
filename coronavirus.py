@@ -160,7 +160,7 @@ def germany_get_region(state=None, landkreis=None):
     assert state or landkreis, "Need to provide a value for state or landkreis"
 
     if state and landkreis:
-        raise NotImplementedError
+        raise NotImplementedError("Try to use 'None' for the state.")
         """We need to check if this is important."""
 
     if state:
