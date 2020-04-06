@@ -61,7 +61,7 @@ def get_country(country):
     cases = fetch_cases()
 
     assert country in deaths.index, f"{country} not in available countries. These are {sorted(deaths.index)}"
-        
+
     # Some countries report sub areas (i.e. multiple rows per country) such as China, France, United Kingdom
     # Denmark. In that case, we sum over all regions.
     tmp = deaths.loc[country]
@@ -72,7 +72,7 @@ def get_country(country):
         d.rename(country, inplace=True)
     else:
         raise ValueError("Unknown data set structure for deaths {country}:", tmp)
-        
+
     tmp = cases.loc[country]
     if len(tmp.shape) == 1:
         c = cases.loc[country]
@@ -89,23 +89,23 @@ def get_country(country):
     # sanity check: how many do we drop?
     if c.index.isnull().sum() > 3:
         print(f"about to drop {c.index.isnull().sum()} entries due to NaT in index", c)
-    c = c[c.index.notnull()] 
+    c = c[c.index.notnull()]
 
     if d.index.isnull().sum() > 3:
         print(f"about to drop {d.index.isnull().sum()} entries due to NaT in index", d)
-    d = d[d.index.notnull()] 
-    
+    d = d[d.index.notnull()]
+
     # check there are no NaN is in the data
     assert c.isnull().sum() == 0, f"{c.isnull().sum()} NaNs in {c}"
     assert d.isnull().sum() == 0, f"{d.isnull().sum()} NaNs in {d}"
-    
+
     # label data
     c.country = country
     c.label = "cases"
-    
+
     d.country = country
     d.label = "deaths"
-    
+
     return c, d
 
 
@@ -113,7 +113,7 @@ def get_country(country):
 def fetch_data_germany():
     """Data source is https://npgeo-corona-npgeo-de.hub.arcgis.com . The text on the
     webpage implies that the data comes from the Robert Koch Institute. """
-    
+
     datasource = "https://opendata.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0.csv"
     t0 = time.time()
     print(f"Please be patient - downloading data from {datasource} ...")
@@ -123,7 +123,7 @@ def fetch_data_germany():
 
     ## create new column 'landkreis' and get rid of "SK " and "LK " for this
     ## - this is too simplistic. We have fields like "Region Hannover"
-    # germany['landkreis'] = germany['Landkreis'].apply(lambda s: s[3:]) 
+    # germany['landkreis'] = germany['Landkreis'].apply(lambda s: s[3:])
 
     # (at least) the last data from the Robert-Koch-Institute (RKI) seems not to be
     # fully reported the day after. For example, on 3 April, the number of cases
@@ -172,7 +172,7 @@ def germany_get_region(state=None, landkreis=None):
         land.index.name = 'date'
         land.sort_index(inplace=True)
 
-        # group over multiple rows for the same date 
+        # group over multiple rows for the same date
         # (this will also group over the different landkreise in the state)
         cases = land["AnzahlFall"].groupby('date').agg('sum').cumsum()
         cases.country = f'Germany-{state}'
@@ -225,8 +225,8 @@ def plot_change_bar(ax, series, color, rolling=None):
         rolling_label = ""
         bar_alpha = 1.0
 
-    label = series.country + " new " + series.label 
-    ax.bar(change.index, change.values, color=color, label=label, alpha=bar_alpha, 
+    label = series.country + " new " + series.label
+    ax.bar(change.index, change.values, color=color, label=label, alpha=bar_alpha,
            linewidth=LW)
     if rolling:
         ax.plot(rolling_series.index, rolling_series.values, color=color, label=label + rolling_label,
@@ -239,30 +239,30 @@ def plot_doubling_time(ax, series, color, minchange=10):
     # only keep values where there is a change of a minumum number
     sel = series.diff() <= minchange
     series.drop(series[sel].index, inplace=True)
-    
+
     # we assume we have one value for every day - should check XXX
     q2_div_q1 = series.pct_change() + 1  # computes q2/q1
     q2_div_q1.replace(np.inf, np.nan, inplace=True)  # get rid of x/0 results
     q2_div_q1.dropna(inplace=True)
     dtime = double_time_exponential(q2_div_q1, t2_minus_t1=1)
     dtime.dropna(inplace=True)
-    label = series.country + " new " + series.label 
+    label = series.country + " new " + series.label
     ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=label)
-    
+
     # need rolling average to smooth out weekly variations
     rolling = dtime.rolling(7, center=True).mean()
-        
+
     # good to take maximum value from here
     ymax = min(rolling.max()*1.5, 500)
     if np.isnan(ymax):
         # This happens is rolling is empty, for example for deaths in Austria, Singapore
         # print(f"Can't plot doublingtime line for {series.label} in {series.country} due to too small numbers")
         ymax = 10
-        
+
     # some countries require special care
     if series.country == 'China':
-            ymax = 100        
-        
+            ymax = 100
+
     ax.set_ylim(0, ymax)
     ax.plot(dtime.index, rolling, "-", color=color, alpha=1.0, label=label + ' 7-day rolling mean',
             linewidth=LW)
@@ -278,34 +278,34 @@ def plot_growth_factor(ax, series, color, minchange=10):
     # only keep values where there is a change of a minumum number
     sel = series.diff() <= minchange
     series.drop(series[sel].index, inplace=True)
-    
+
     f = series.diff(1).pct_change() + 1  # compute ratio of subsequent daily changes
                                          # use change over a week
     # division by zero may lead to np.inf in the data: get rid of that
     f.replace(np.inf, np.nan, inplace=True)
     f.dropna(inplace=True)
-    
+
     # for very small case numbers, we get large growth factors (for example 1 death one day, followed by 7 the next)
-    # we drop those high values. 
+    # we drop those high values.
     sel = f > 5
     f.drop(f[sel].index, inplace=True)
     values_dropped = sel.sum()
     if values_dropped >= 5:
         print(f"Dropping {values_dropped} from growth factor plot ({series.country}, {series.label})")
-    
+
     label = series.country + " " + series.label + " growth factor"
     ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
     rolling = f.rolling(7, center=True).mean()
     rolling.dropna(inplace=True)
     label = series.country + " " + series.label + " growth factor 7-day mean"
     ax.plot(rolling.index, rolling.values, '-', color=color, label=label, linewidth=LW)
-    
+
     ## looks much nicer - should we use this?
     # rolling2 = rolling.rolling(7, center=True).mean()
     # rolling2.dropna(inplace=True)
     # label = series.country + " " + series.label + " growth factor 7-day mean"
     # ax.plot(rolling2.index, rolling2.values, '-', color='C4', label=label, linewidth=LW)
-    
+
     ax.legend()
     ax.set_ylabel("growth factor")
     ax.set_ylim(0, 2)  # should generally be below 1
@@ -352,23 +352,23 @@ def day0atleast(v0, series):
     except IndexError:  # means no days found for which series.values > v0
         print(f"Haven't found value > {v0} is Series {series.name}")
         result = pd.Series()
-        return result 
+        return result
 
-    # compute timedelta  
+    # compute timedelta
     timedelta = series.index - day0
     # convert to int as index
     t = pd.to_numeric(timedelta.astype("timedelta64[D]").astype(int))
     # Assemble new series
     result = pd.Series(index=t, data=series.values)
-    
-    return result
-    
 
-    
+    return result
+
+
+
 
 def align_sets_at(v0, df):
     """Accepts data frame, and aligns so that all enttries close to v0 are on the same row.
-    
+
     Returns new dataframe with integer index (reprenting days after v0).
     """
     res = pd.DataFrame()
@@ -391,12 +391,12 @@ def get_compare_data(countrynames, rolling=7):
     """
     df_c = pd.DataFrame()
     df_d = pd.DataFrame()
-    
+
     for countryname in countrynames:
         c, d = get_country(countryname)
 
         df_c[countryname + ' cases'] = c.diff().rolling(rolling, center=True).mean()
-        df_d[countryname + ' deaths'] = d.diff().rolling(rolling, center=True).mean()        
+        df_d[countryname + ' deaths'] = d.diff().rolling(rolling, center=True).mean()
 
     return df_c, df_d
 
@@ -420,7 +420,7 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
             tmp = df[col].dropna()
             if len(tmp) > 0:   # possible we have no data points
                 x, y = tmp.index[-1], tmp.values[-1]
-                ax.annotate(col, xy=(x + labeloffset, y), textcoords='data') 
+                ax.annotate(col, xy=(x + labeloffset, y), textcoords='data')
                 ax.plot([x], [y], "o" + color, alpha=alpha)
     # ax.legend()
     ax.set_ylabel(yaxislabel)
@@ -441,18 +441,18 @@ def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea
     res_d = align_sets_at(v0d, df_d)
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
-    plot_logdiff_time(ax, res_c, f"days since {v0c} cases", "daily new cases", 
+    plot_logdiff_time(ax, res_c, f"days since {v0c} cases", "daily new cases",
                       v0=v0c, highlight={main_country + " cases":"C1"})
     ax = axes[1]
-    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths", "daily new deaths", 
+    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths", "daily new deaths",
                       v0=v0d, highlight={main_country + " deaths":"C0"})
 
     fig.tight_layout(pad=1)
     title = f"Daily cases (top) and deaths (below) for {main_country}"
     axes[0].set_title(title)
-    
+
     return axes, res_c, res_d
-    
+
 
 
 
@@ -500,7 +500,7 @@ def overview(country, region=None, subregion=None, savefig=False):
     if savefig:
         fig.savefig(filename)
 
-    if not subregion and not region: # i.e. not a region of Germany 
+    if not subregion and not region: # i.e. not a region of Germany
         axes_compare, res_c, res_d = make_compare_plot(country)
         return_axes = np.concatenate([axes, axes_compare])
         if savefig:
