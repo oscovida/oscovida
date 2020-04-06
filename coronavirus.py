@@ -12,6 +12,8 @@ import pandas as pd
 from matplotlib import rcParams
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
+# need many figures for index.ipynb and germany.ipynb
+rcParams['figure.max_open_warning'] = 50
 
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
@@ -350,7 +352,7 @@ def day0atleast(v0, series):
     try:
         day0 = series[series > v0].index[0]
     except IndexError:  # means no days found for which series.values > v0
-        print(f"Haven't found value > {v0} is Series {series.name}")
+        # print(f"Haven't found value > {v0} is Series {series.name}")
         result = pd.Series()
         return result
 
@@ -395,8 +397,8 @@ def get_compare_data(countrynames, rolling=7):
     for countryname in countrynames:
         c, d = get_country(countryname)
 
-        df_c[countryname + ' cases'] = c.diff().rolling(rolling, center=True).mean()
-        df_d[countryname + ' deaths'] = d.diff().rolling(rolling, center=True).mean()
+        df_c[countryname] = c.diff().rolling(rolling, center=True).mean()  # cases 
+        df_d[countryname] = d.diff().rolling(rolling, center=True).mean()  # deaths
 
     return df_c, df_d
 
@@ -445,10 +447,10 @@ def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
     plot_logdiff_time(ax, res_c, f"days since {v0c} cases", "daily new cases",
-                      v0=v0c, highlight={main_country + " cases":"C1"})
+                      v0=v0c, highlight={main_country:"C1"})
     ax = axes[1]
     plot_logdiff_time(ax, res_d, f"days since {v0d} deaths", "daily new deaths",
-                      v0=v0d, highlight={main_country + " deaths":"C0"})
+                      v0=v0d, highlight={main_country:"C0"})
 
     fig.tight_layout(pad=1)
     title = f"Daily cases (top) and deaths (below) for {main_country}"
@@ -458,6 +460,115 @@ def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea
 
 
 
+###################### Compare plots for Germany
+
+def label_from_region_subregion(region_subregion):
+    region, subregion = unpack_region_subregion(region_subregion)
+    if subregion:
+        label = f"{region}-{subregion}"
+    else:
+        label = f"{region}"
+    return label
+
+
+def test_label_from_region_subregion():
+    assert label_from_region_subregion(("Hamburg", None)) == "Hamburg"
+    assert label_from_region_subregion("Hamburg") == "Hamburg"
+    assert label_from_region_subregion(("Schleswig Holstein", "Pinneberg")) == "Schleswig Holstein-Pinneberg"
+
+
+
+
+def unpack_region_subregion(region_subregion):
+    """Convention for regions in Germany (could also be useful for other countries later):
+
+    - region_subregion is either
+      - a tuple of strings (region, subregion) or
+      - a string "region"
+
+    Return a a tuple (region, subregion), where subregion is None if not provided.
+    """
+    if isinstance(region_subregion, tuple):
+        if len(region_subregion) == 1:
+            region = region_subregion[0]
+            subregion = None
+        elif len(region_subregion) == 2:
+            region, subregion = region_subregion
+        else:
+            raise ValueError("region_subregion must be single value or 2-valued tuple", region_subregion)
+    else:
+        # assume it is just the region
+        assert isinstance(region_subregion, str)
+        region, subregion = region_subregion, None
+    return region, subregion
+
+test_label_from_region_subregion()
+
+def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
+    """Given a region_subregion for Germany, and a list of region_subregion to compare with,
+    return two dataframes: one with cases and one with deaths
+    where
+    - each column is one country
+    - data in the column is the diff of accumulated numbers
+    - any zero values are removed for italy (data error)
+    - apply some smoothing
+
+    See unpack_region_subregion for details on region_subregion.
+    """
+    df_c = pd.DataFrame()
+    df_d = pd.DataFrame()
+
+    for reg_subreg in [region_subregion] + compare_with_local:
+
+        region, subregion = unpack_region_subregion(reg_subreg)
+        c, d = germany_get_region(state=region, landkreis=subregion)
+
+        label = label_from_region_subregion((region, subregion))
+        df_c[label] = c.diff().rolling(rolling, center=True).mean()  # cases
+        df_d[label] = d.diff().rolling(rolling, center=True).mean()  # deaths
+
+    return df_c, df_d
+
+
+def make_compare_plot_germany(region_subregion,
+                              compare_with=[], #"China", "Italy", "Germany"],
+                              compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
+                                                  'Brandenburg', 'Bremen', 'Hamburg',
+                                                  'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
+                                                  'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland',
+                                                  'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein',  'Thüringen'],
+                              v0c=10, v0d=1):
+
+    region, subregion = unpack_region_subregion(region_subregion)
+    df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local)
+
+    df_c2, df_d2 = get_compare_data(compare_with)
+
+    # need to get index into same timezone before merging
+    df_d1.set_index(df_d1.index.tz_localize(None), inplace=True)
+    df_c1.set_index(df_c1.index.tz_localize(None), inplace=True)
+
+    df_c = pd.merge(df_c1, df_c2, how='outer', left_index=True, right_index=True)
+    df_d = pd.merge(df_d1, df_d2, how='outer', left_index=True, right_index=True)
+
+    res_c = align_sets_at(v0c, df_c)
+    res_d = align_sets_at(v0d, df_d)
+
+    fig, axes = plt.subplots(2, 1, figsize=(10, 6))
+    ax=axes[0]
+    plot_logdiff_time(ax, res_c, f"days since {v0c} cases", "daily new cases",
+                      v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
+    ax = axes[1]
+    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths", "daily new deaths",
+                      v0=v0d, highlight={res_d.columns[0]:"C0"},
+                      labeloffset=0.5)
+
+    fig.tight_layout(pad=1)
+
+    title = f"Daily cases (top) and deaths (below) for Germany: {label_from_region_subregion((region, subregion))}"
+    axes[0].set_title(title)
+
+    return axes, res_c, res_d
 
 
 #######################
@@ -506,12 +617,15 @@ def overview(country, region=None, subregion=None, savefig=False):
     if not subregion and not region: # i.e. not a region of Germany
         axes_compare, res_c, res_d = make_compare_plot(country)
         return_axes = np.concatenate([axes, axes_compare])
-        if savefig:
-            filename = os.path.join("figures", c.country.replace(" ", "-").replace(",", "-") + '2.svg')
-            fig = plt.gcf()
-            fig.savefig(filename)
 
-    else:
-        return_axes = axes
+    elif country=="Germany":   # Germany specific plots
+        axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
+        return_axes = np.concatenate([axes, axes_compare])
+
+    fig2 = plt.gcf()
+
+    if savefig:
+        filename = os.path.join("figures", c.country.replace(" ", "-").replace(",", "-") + '2.svg')
+        fig2.savefig(filename)
 
     return return_axes, c, d
