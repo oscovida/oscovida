@@ -4,23 +4,32 @@
 
 ## Available materials
 
-* Plots (discussion to be added), see
-  [index.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
-  and scroll down, an example for South Korea is shown below
+* Plots for strongly affected countries (discussion below), see
+  [index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb))
+  An example for South Korea is shown below
+
+* Plots for states in Germany (and Pinneberg) - experimental: 
+  [germany.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb)
+  ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb))
+  
 
 * Jupyter notebooks that create these plots and make the data available in
   pandas dataframes.
 
 * Ability to [execute the notebooks in the cloud, to modify them, or inspect the
   trends in other
-  countries](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
-  and scroll down, an example for South Korea is shown below)
+  countries](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  
 
-## Data source
+## Data source and processing
 
-- We use
-  [data](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data)
-  from the Johns Hopkins university
+- We use data 
+  from the [Johns Hopkins university](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data)
+  for countries, 
+- and from the [German Robert Koch Insitute (RKI)](https://npgeo-corona-npgeo-de.hub.arcgis.com/)
+  for data within Germany.
+- All computational steps and code are available [here](https://github.com/fangohr/coronavirus-2020/blob/master/coronavirus.py) -- contributions and corrections welcome.
 
 ## Motivation
 
@@ -41,6 +50,15 @@ With the plots and data available here, we hope to contribute to this.
 
 Discussion and contributions are welcome.
 
+### Preparing for later stages of the outbreaks
+
+Once the epidemic growth of infections is brought under control, we will need to
+find need a fine balance between measures (such as social distancing) and
+permitting work and live as was possible before the pandemic to avoid repeated
+exponential growth of infections. We can start to see this in the data for
+countries such as China and South Korea. We need to learn to better read these
+data.
+
 ### Enable citizen science
 
 * The [source code](https://github.com/fangohr/coronavirus-2020) that creates
@@ -50,22 +68,22 @@ Discussion and contributions are welcome.
 * Using Jupyter Notebooks and the https://mybinder.org project, anyone with a
   web browser can execute the source (to create the same or new plots) from
   within a webbrowser, by clicking [this
-  link](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb).
+  link](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
 
 ## Plans
 
-* Extend this to provide data for Landkreise within Germany, and other more
-  local data.
-
-* Further plots to compare slowdowns of the outbreak in different regions.
-
 * Make plots more interactive (plotly?)
+
+* Offer German translation?
+
+* Create a URL per country / region
 
 ## Discussion of example plots
 
 ![south-korea data](figures/Korea--South.svg)
+![south-korea data 2](figures/Korea--South2.svg)
 
-* Discussion of plots from the top (number 1) to the bottom (number 4)
+* Discussion of plots from the top (number 1) to the bottom (number 7)
 
 ### Plot 1: accumulated cases and deaths as function of time
 * Shows how many people have been confirmed to be infected (blue) or have died (red) as a function of time.
@@ -94,7 +112,23 @@ Discussion and contributions are welcome.
   time delay, and reduced by a fraction (the [case fatality
   rate](https://en.wikipedia.org/wiki/Case_fatality_rate)).
 
-### Plot 4:
+### Plot 4: growth factors
+* The growth factor is the ratio of new cases (or deaths) today relative to new
+  cases (or deaths) yesterday
+* Blue (red) dots show these ratios for cases (deaths), and are computed as the
+  ratio over a week to reduce noise
+* The solid line is a 7-day rolling mean over these points to provide smoother data.
+* As long as the growth value is greater than 1.0, the number of new infections
+  is increasing
+* If the growth value would is exactly 1.0, we have the same number of new
+  infections every day
+* The growth factor needs to be below 1.0 for the spread to slow down.
+* As this number is computed on the relative change from yesterday to today, we
+  can get high fluctuations where the numbers of new cases and deaths is small
+  (imagine there was 1 case yesterday, and 7 cases today, this would give a
+  growth factor of 7). 
+
+### Plot 5: Doubling times
 * This plot computes the doubling time of the cases (blue) and deaths (red),
   assuming that the growth of cases and deaths as shown in plot 1 is
   exponential.
@@ -134,15 +168,42 @@ Discussion and contributions are welcome.
   * There is no red curve for the doubling time of deaths as there have
     been too few deaths to be useful for the analysis.
 
+
+### Plot 6: Comparison of daily new cases with other countries
+
+* X-axis shows the number of days since a particular number of new cases (such
+  as 10) have occurred in that country, and the y-axis the number of new cases
+  for that day.
+  
+* We see that countries follow similar paths, with the common properties that
+  the curve increases until the number of cases per day peaks, and then the
+  curve comes down again.
+  
+* The y-axis is logarithmic.
+
+* Due to the logarithmic y-axis, this visualisation can help to understand at
+  what stage in the outbreak an area is (despite the different size of the
+  countries and numbers of cases).
+  
+### Plot 7: Comparison of daily new deaths with other countries
+
+* As Plot 6, but for deaths not cases. For South Korea, there are not enough
+  deaths per day to show a meaningful line here.
+
+
 # What about other countries and plots for those?
 
 * More plots for countries with high numbers of reported infections in 
-  [index.ipynb](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  [index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
   (needs scrolling down to find plots).
+  
+* Plots for states in Germany (and Pinneberg):
+  [germany.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb)
+  ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb))
 
 * If your country of interest is not listed, you can [execute the notebook to
   modify the commands to show other countries
-  here](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb)
+  here](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=index.ipynb)
   
 # What about errors in the data?
 
