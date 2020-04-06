@@ -13,6 +13,10 @@
   - try running average on top
   - maybe can add this to daily change plots?
 - [ ] write test that attempts to generate plots for all countries in Johns Hopkins data
+- [ ] write test that attempts to generate plots for all countries in RKI data
+- [ ] unit tests
+- [ ] tidy up code
+  - [ ] rename data fetch and get functions acccording to where the data comes from
 
 * Minor fixes
 - label subplots in index.ipynb (1, 2, 3, 4 ?)
@@ -60,7 +64,7 @@ Useful plots:
 Jupyter notebooks that can 
 - [X] be seen as static data and be interesting in their own right
   - [ ] or have plain html for faster loading and being more accessible to a broader audience?
-    - could also have static pages for all countries
+  - [ ] could also have static pages for all countries
 - [X] executable through Binder (open science aspect)
 
 * Related resources
