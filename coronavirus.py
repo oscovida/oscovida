@@ -432,7 +432,8 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
     ax.set_xlabel(xaxislabel)
     ax.set_yscale('log')
     # ax.set_xscale('log')   # also interesting
-    ax.set_ylim(bottom=v0)
+    ax.set_ylim(bottom=v0)  # remove setting limit?, following
+                              # https://github.com/fangohr/coronavirus-2020/issues/3
     ax.set_xlim(left=-1)  #ax.set_xlim(-1, df.index.max())
     ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
     ax.yaxis.set_ticks_position('both')
