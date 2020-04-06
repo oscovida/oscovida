@@ -27,7 +27,7 @@
 - We use data 
   from the [Johns Hopkins university](https://github.com/CSSEGISandData/COVID-19/tree/master/csse_covid_19_data)
   for countries, 
-- and from [German sources (RKI)](https://npgeo-corona-npgeo-de.hub.arcgis.com/)
+- and from the [German Robert Koch Insitute (RKI)](https://npgeo-corona-npgeo-de.hub.arcgis.com/)
   for data within Germany.
 - All computational steps and code are available [here](https://github.com/fangohr/coronavirus-2020/blob/master/coronavirus.py) -- contributions and corrections welcome.
 
@@ -50,6 +50,15 @@ With the plots and data available here, we hope to contribute to this.
 
 Discussion and contributions are welcome.
 
+### Preparing for later stages of the outbreaks
+
+Once the epidemic growth of infections is brought under control, we will need to
+find need a fine balance between measures (such as social distancing) and
+permitting work and live as was possible before the pandemic to avoid repeated
+exponential growth of infections. We can start to see this in the data for
+countries such as China and South Korea. We need to learn to better read these
+data.
+
 ### Enable citizen science
 
 * The [source code](https://github.com/fangohr/coronavirus-2020) that creates
@@ -66,6 +75,8 @@ Discussion and contributions are welcome.
 * Make plots more interactive (plotly?)
 
 * Offer German translation?
+
+* Create a URL per country / region
 
 ## Discussion of example plots
 
