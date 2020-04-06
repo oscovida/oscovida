@@ -406,13 +406,16 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
                       highlight={}, other_lines_alpha=0.4):
     """highlight is dictionary: {country_name : color}"""
     for i, col in enumerate(df.columns):
+        # print(f"plot_logdiff: Processing {i} {col}")
         if col in highlight:
+            # print(f"Found highlight: {col}")
             alpha = 1.0
             color = highlight[col]
             linewidth = 4
         else:
             alpha = other_lines_alpha
-            color = style + 'C' + str(i)
+            # have only 10 colours
+            color = style + 'C' + str(i % 10)
             linewidth = 2
 
         ax.plot(df.index, df[col].values, color, label=col, linewidth=linewidth, alpha=alpha)
