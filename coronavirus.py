@@ -431,7 +431,7 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
     ax.set_ylabel(yaxislabel)
     ax.set_xlabel(xaxislabel)
     ax.set_yscale('log')
-    # ax.set_xscale('log')   # also interesting
+    # ax.set_xscale('log')    # also interesting
     ax.set_ylim(bottom=v0)  # remove setting limit?, following
                               # https://github.com/fangohr/coronavirus-2020/issues/3
     ax.set_xlim(left=-1)  #ax.set_xlim(-1, df.index.max())
@@ -442,15 +442,18 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
 def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea, South",
                                                   "Spain", "United Kingdom", "Iran"],
                      v0c=10, v0d=3):
-    df_c, df_d = get_compare_data([main_country] + compare_with)
+    rolling = 7
+    df_c, df_d = get_compare_data([main_country] + compare_with, rolling=rolling)
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
-    plot_logdiff_time(ax, res_c, f"days since {v0c} cases", "daily new cases",
+    plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
+                      "daily new cases\n(rolling 7-day mean)",
                       v0=v0c, highlight={main_country:"C1"})
     ax = axes[1]
-    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths", "daily new deaths",
+    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
+                      "daily new deaths\n(rolling 7-day mean)",
                       v0=v0d, highlight={main_country:"C0"})
 
     fig.tight_layout(pad=1)
@@ -539,11 +542,10 @@ def make_compare_plot_germany(region_subregion,
                                                   'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland',
                                                   'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein',  'Thüringen'],
                               v0c=10, v0d=1):
-
+    rolling = 7
     region, subregion = unpack_region_subregion(region_subregion)
-    df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local)
-
-    df_c2, df_d2 = get_compare_data(compare_with)
+    df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local, rolling=rolling)
+    df_c2, df_d2 = get_compare_data(compare_with, rolling=rolling)
 
     # need to get index into same timezone before merging
     df_d1.set_index(df_d1.index.tz_localize(None), inplace=True)
@@ -557,10 +559,12 @@ def make_compare_plot_germany(region_subregion,
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
-    plot_logdiff_time(ax, res_c, f"days since {v0c} cases", "daily new cases",
+    plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
+                      "daily new cases\n(rolling 7-day mean)",
                       v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
     ax = axes[1]
-    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths", "daily new deaths",
+    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
+                      "daily new deaths\n(rolling 7-day mean)",
                       v0=v0d, highlight={res_d.columns[0]:"C0"},
                       labeloffset=0.5)
 
