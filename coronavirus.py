@@ -565,7 +565,7 @@ def make_compare_plot_germany(region_subregion,
     ax = axes[1]
     plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
                       "daily new deaths\n(rolling 7-day mean)",
-                      v0=v0d, highlight={res_d.columns[0]:"C0"},
+                      v0=0.1, highlight={res_d.columns[0]:"C0"},
                       labeloffset=0.5)
 
     fig.tight_layout(pad=1)
