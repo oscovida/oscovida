@@ -111,6 +111,20 @@ def get_country(country):
     return c, d
 
 
+def compose_dataframe_summary(cases, deaths):
+    """Used in per-country template to show data table.
+    Could be extended.
+
+    Expects series of cases and deaths (time-alignd)
+    """
+    df = pd.DataFrame()
+    df["total cases"] = cases
+    df["daily new cases"] = cases.diff()
+    df["total deaths"] = deaths
+    df["daily new deaths"] = deaths.diff()
+    return df
+    
+
 @lru_cache(maxsize=1)
 def fetch_data_germany():
     """Data source is https://npgeo-corona-npgeo-de.hub.arcgis.com . The text on the
