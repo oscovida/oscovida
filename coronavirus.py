@@ -240,7 +240,7 @@ def plot_change_bar(ax, series, color, rolling=None):
 def plot_doubling_time(ax, series, color, minchange=10):
     # only keep values where there is a change of a minumum number
     sel = series.diff() <= minchange
-    series.drop(series[sel].index, inplace=True)
+    series.drop(series[sel].index, inplace=False)
 
     # we assume we have one value for every day - should check XXX
     q2_div_q1 = series.pct_change() + 1  # computes q2/q1
@@ -279,7 +279,7 @@ def plot_growth_factor(ax, series, color, minchange=10):
     """
     # only keep values where there is a change of a minumum number
     sel = series.diff() <= minchange
-    series.drop(series[sel].index, inplace=True)
+    series.drop(series[sel].index, inplace=False)
 
     f = series.diff(1).pct_change() + 1  # compute ratio of subsequent daily changes
                                          # use change over a week
