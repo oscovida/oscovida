@@ -578,9 +578,16 @@ def make_compare_plot_germany(region_subregion,
                       "daily new cases\n(rolling 7-day mean)",
                       v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
     ax = axes[1]
+
+    res_d_0 = res_d[res_d.index >= 0]   # from "day 0" only
+    # if we have values in between 0.1 and 1, set the lower `y_limit` on the graph to 0.1
+    if res_d_0[(res_d_0 > 0.1) & (res_d_0 < 1)].any().any():    # there must be a more elegant check
+        y_limit = 0.1
+    else:
+        y_limit = v0d
     plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
                       "daily new deaths\n(rolling 7-day mean)",
-                      v0=v0d, highlight={res_d.columns[0]:"C0"},
+                      v0=y_limit, highlight={res_d.columns[0]:"C0"},
                       labeloffset=0.5)
 
     fig.tight_layout(pad=1)
