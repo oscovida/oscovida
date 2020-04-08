@@ -2,9 +2,9 @@
 https://github.com/fangohr/coronavirus-2020"""
 
 
-from functools import lru_cache
 import os
 import time
+import joblib
 import numpy as np
 import pandas as pd
 
@@ -26,6 +26,16 @@ LW = 3   # line width
 
 base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/"
 
+# set up joblib memory to avoid re-fetching files
+joblib_location = "./cachedir"
+joblib_memory = joblib.Memory(joblib_location, verbose=0)
+
+
+def clear_cache():
+    """Need to run this before new data for the day is created"""
+    joblib_memory.clear()
+
+
 def double_time_exponential(q2_div_q1, t2_minus_t1=None):
     """ See https://en.wikipedia.org/wiki/Doubling_time"""
     if t2_minus_t1 is None:
@@ -37,14 +47,14 @@ def report_download(url, df):
     print(f"Downloaded data: last data point {df.columns[-1]} from {url}")
 
 
-@lru_cache(maxsize=1)
+@joblib_memory.cache
 def fetch_deaths():
     url = os.path.join(base_url, "time_series_covid19_" + "deaths" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
     return df
 
-@lru_cache(maxsize=1)
+@joblib_memory.cache
 def fetch_cases():
     url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
@@ -111,7 +121,21 @@ def get_country(country):
     return c, d
 
 
-@lru_cache(maxsize=1)
+def compose_dataframe_summary(cases, deaths):
+    """Used in per-country template to show data table.
+    Could be extended.
+
+    Expects series of cases and deaths (time-alignd)
+    """
+    df = pd.DataFrame()
+    df["total cases"] = cases
+    df["daily new cases"] = cases.diff()
+    df["total deaths"] = deaths
+    df["daily new deaths"] = deaths.diff()
+    return df
+    
+
+@joblib_memory.cache
 def fetch_data_germany():
     """Data source is https://npgeo-corona-npgeo-de.hub.arcgis.com . The text on the
     webpage implies that the data comes from the Robert Koch Institute. """

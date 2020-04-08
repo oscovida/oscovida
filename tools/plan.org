@@ -1,0 +1,32 @@
+* TODOs
+- [X] cache download in file
+- [X] check date? -> run clear_cache() once a day before generating new data
+- [X] reduce printed output?
+- [ ] style with PaNOSC logo
+- [X] add binder links
+- [ ] generate index page
+- [ ] add binderlink to index page?
+- push to webpage
+- [ ] make faster
+* country
+
+countryname.ipynb [template-country.ipynb]
+
+** Germany
+germany.ipynb [template-country.ipynb]
+germany_schleswig-holstein.ipynb [template-germany.ipynb]
+germany_schleswig-holstein_pinneberg.ipynb [template-germany.ipynb]
+
+
+
+* Open questions Germany
+** Laender
+- For Hamburg, there is only one entry in the table (Hamburg, SK Hamburg)
+- Would be nice to get a summary for Bayern - this is missing at the moment?
+
+** Bug?
+- the daily changes in log scale plot shows strips in y-direction, for example
+  wwwroot/Germany-Baden-Württemberg-LK-Alb-Donau-Kreis.html
+ 
+What is this? (accidentally dropping rows inplace?)
+
