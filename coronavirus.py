@@ -28,14 +28,14 @@ base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/css
 
 # set up joblib memory to avoid re-fetching files
 joblib_location = "./cachedir"
-joblib_memory = joblib.Memory(joblib_location, verbose=1)
+joblib_memory = joblib.Memory(joblib_location, verbose=0)
 
 
 def clear_cache():
     """Need to run this before new data for the day is created"""
     joblib_memory.clear()
 
-    
+
 def double_time_exponential(q2_div_q1, t2_minus_t1=None):
     """ See https://en.wikipedia.org/wiki/Doubling_time"""
     if t2_minus_t1 is None:
