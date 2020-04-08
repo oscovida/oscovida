@@ -171,9 +171,9 @@ data.
 
 ### Plot 6: Comparison of daily new cases with other countries
 
-* X-axis shows the number of days since a particular number of new cases (such
-  as 10) have occurred in that country, and the y-axis the number of new cases
-  for that day.
+* X-axis shows the number of days since a particular number of new cases per day
+  (such as 10) have occurred in that country, and the y-axis the number of new
+  cases for that day.
   
 * We see that countries follow similar paths, with the common properties that
   the curve increases until the number of cases per day peaks, and then the
@@ -184,6 +184,10 @@ data.
 * Due to the logarithmic y-axis, this visualisation can help to understand at
   what stage in the outbreak an area is (despite the different size of the
   countries and numbers of cases).
+  
+* The curve shows as 7-day rolling mean to provide a smoother line than the
+  noisier individual data points (in particular with fewer cases per day). This
+  leads to non-integer values.
   
 ### Plot 7: Comparison of daily new deaths with other countries
 
