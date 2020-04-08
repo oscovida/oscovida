@@ -1,7 +1,7 @@
 * TODOs
 - [X] cache download in file
 - [X] check date? -> run clear_cache() once a day before generating new data
-- reduce printed output?
+- [X] reduce printed output?
 - style with PaNOSC logo
 - add binder links
 - push to webpage
