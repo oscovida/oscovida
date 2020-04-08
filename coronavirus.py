@@ -248,6 +248,18 @@ def plot_doubling_time(ax, series, color, minchange=10):
     q2_div_q1.dropna(inplace=True)
     dtime = double_time_exponential(q2_div_q1, t2_minus_t1=1)
     dtime.dropna(inplace=True)
+
+    # exceptions:
+    #
+    # UK: data point on 15 March 2020 for only 1 new case, results in huge spike in doubling time (~790 days)
+    # drop this
+    if series.country == "United Kingdom" and series.label=="cases":
+        # print(dtime)
+        sel = dtime > 50
+        dtime.drop(dtime[sel].index, inplace=True)
+        print(f"Dropping UK data at {dtime[sel].index}, values are {dtime[sel]}")
+    # end of exceptions
+
     label = series.country + " new " + series.label
     ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=label)
 
