@@ -469,7 +469,10 @@ def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea
 def label_from_region_subregion(region_subregion):
     region, subregion = unpack_region_subregion(region_subregion)
     if subregion:
-        label = f"{region}-{subregion}"
+        if region:
+            label = f"{region}-{subregion}"
+        else:
+            label = f"{subregion}"
     else:
         label = f"{region}"
     return label
