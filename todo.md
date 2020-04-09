@@ -68,7 +68,7 @@ Functionality
 -   \[ \] use plotly instead of matplotlib for more interactive
     experience in static html?
 
-See also \[ideas.md\](ideas.md).
+See also [ideas.md](ideas.md).
 
 Low priority / crazy?
 =====================
