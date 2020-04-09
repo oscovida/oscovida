@@ -1,3 +1,11 @@
+# general strategy:
+#
+# markdown files index.md and about.md are the source files
+#
+# create html from these files.
+
+
+
 all: index.html about.html rsync
 
 index.html: index.md
@@ -13,3 +21,8 @@ rsync:
 	  rsync -auv index.html about.html ../wwwroot
 	  rsync -auv figures/* ../wwwroot/figures
 	  @echo" Copied files into ../wwwroot"
+
+clean:
+	  # delete derived files
+	  rm -rf about.html index.html
+
