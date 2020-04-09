@@ -9,6 +9,7 @@ about.html: about.md
 
 
 rsync:
-	  rsync -auv index.html about.html ../wwwroot
 	  mkdir -p ../wwwroot/figures
+	  rsync -auv index.html about.html ../wwwroot
 	  rsync -auv figures/* ../wwwroot/figures
+	  @echo" Copied files into ../wwwroot"

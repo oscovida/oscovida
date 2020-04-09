@@ -15,11 +15,7 @@ Dashboard: [![Voila](https://mybinder.org/badge_logo.svg)](https://mybinder.org/
 [index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
 ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb))
 
-* Plots for states in Germany (and Pinneberg) - experimental: 
-  [germany.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb)
-  ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb))
-  
-* An example plot for South Korea is shown below, following by a brief discussion/description of the different plots.
+* An example plot for South Korea is shown below, followed by a brief discussion/description of the different plots.
 
 * All of the plots and tables can be recomputed using the Binder service (link
   in each webpage, or use [go here and select the relevant notebook
