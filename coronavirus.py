@@ -2,6 +2,7 @@
 https://github.com/fangohr/coronavirus-2020"""
 
 
+import datetime
 import os
 import time
 import joblib
@@ -48,17 +49,31 @@ def report_download(url, df):
 
 
 @joblib_memory.cache
+def fetch_deaths_last_execution():
+    """Use to remember at what time and date the last set of deaths was downloaded"""
+    return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+
+@joblib_memory.cache
+def fetch_cases_last_execution():
+    return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+
+@joblib_memory.cache
 def fetch_deaths():
     url = os.path.join(base_url, "time_series_covid19_" + "deaths" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
+    fetch_deaths_last_execution()
     return df
+
 
 @joblib_memory.cache
 def fetch_cases():
     url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
+    fetch_cases_last_execution()
     return df
 
 
@@ -133,7 +148,11 @@ def compose_dataframe_summary(cases, deaths):
     df["total deaths"] = deaths
     df["daily new deaths"] = deaths.diff()
     return df
-    
+
+
+@joblib_memory.cache
+def fetch_data_germany_last_execution():
+    return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
 @joblib_memory.cache
 def fetch_data_germany():
@@ -177,6 +196,7 @@ def fetch_data_germany():
     last_day = g2.index.max()
     sel = g2.index == last_day
     cleaned = g2.drop(g2[sel].index, inplace=False)
+    fetch_data_germany_last_execution()
     return cleaned
 
 
