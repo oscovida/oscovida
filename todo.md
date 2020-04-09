@@ -67,6 +67,9 @@ Functionality
 
 -   \[ \] use plotly instead of matplotlib for more interactive
     experience in static html?
+-   \[ \] The Johns Hopkins data has regional data for some countries (UK,
+    France, US). Where available, it would be good to show those as regions, in
+    addition to one page that shows a sum of all of these numbers.
 
 See also [ideas.md](ideas.md).
 
