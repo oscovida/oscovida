@@ -1,5 +1,7 @@
 [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=index.ipynb)
 
+Dashboard: [![Voila](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?urlpath=voila%2Frender%2Fdashboard.ipynb)
+
 # Coronavirus 2020 - how effective are our measures to slow down the virus?
 
 ## Available materials
