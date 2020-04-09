@@ -77,11 +77,11 @@ monitor such indicators for some time (months or years?) to come.
 
 Contributions are welcome
 
-* We gather some [ideas.md] for further analysis and features that would be nice
+* We gather some [ideas](ideas.md) for further analysis and features that would be nice
   or useful.
 
 * For those with programming and software engineering skills, there is a 
-  [document info.md](info.md) with more details about the project and a [todo list](todo.md). 
+  document [info.md](info.md) with more details about the project and a [todo list](todo.md). 
 
 * Bugs and ideas can be reported as a ["New issue"](https://github.com/fangohr/coronavirus-2020/issues) -- a github
   account is necessary.
@@ -234,7 +234,15 @@ Contributions are welcome
 # Disclaimer
 
 The plots and code here has been put together by volunteers who have no training
-in epidemiology. You are welcome to use the material at your own risk. 
-The [license is available](LICENSE).
+in epidemiology. THere are likely to be errors in the processing. You are welcome
+to use the material at your own risk. The [license is available](LICENSE).
 
 
+# Acknowledgements
+
+- Johns Hopkins University provides data for countries
+- Robert Koch Institute provides data for within Germany
+- Open source and scientific computing community for the data tools
+- Github for hosting repository and html files
+- Project Jupyter for the Notebook and Binder service
+- The H2020 project Photon and Neutron Open Science Cloud ([PaNOSC](https://www.panosc.eu/))
