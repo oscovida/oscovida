@@ -6,23 +6,23 @@ Dashboard: [![Voila](https://mybinder.org/badge_logo.svg)](https://mybinder.org/
 
 ## Available materials
 
-* Plots for strongly affected countries (discussion below), see
-  [index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
-  ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb))
-  An example for South Korea is shown below
+* [Plots and basic data tables for all countries for which the Johns Hopkins University provides data](https://fangohr.github.io/coronavirus/index.html)
+
+* [Plots and basic data tables for all "Kreise" in Germany (based on data from Robert Koch Institute)](https://fangohr.github.io/coronavirus/index-germany.html)
+
+* Selected Plots for strongly affected countries (discussion below), see
+[index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
+([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb))
 
 * Plots for states in Germany (and Pinneberg) - experimental: 
   [germany.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb)
   ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb))
   
+* An example plot for South Korea is shown below, following by a brief discussion/description of the different plots.
 
-* Jupyter notebooks that create these plots and make the data available in
-  pandas dataframes.
-
-* Ability to [execute the notebooks in the cloud, to modify them, or inspect the
-  trends in other
-  countries](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
-  
+* All of the plots and tables can be recomputed using the Binder service (link
+  in each webpage, or use [go here and select the relevant notebook
+  yourself](https://mybinder.org/v2/gh/fangohr/coronavirus/master).
 
 ## Data source and processing
 
@@ -38,15 +38,16 @@ Dashboard: [![Voila](https://mybinder.org/badge_logo.svg)](https://mybinder.org/
 ### Understanding the situation
 
 The reporting in the media on the #COVID19 situation is not always providing
-sufficient context to interpret the numbers: we hear many reports about how many
-people have been confirmed to be infected by the virus, or have died. 
+sufficient context to interpret the numbers: we hear many news reports about how
+many people have been confirmed to be infected by the virus, or have died on a
+particular day.
 
 The relevant questions are though: how do these numbers compare to yesterday,
 and the week before? Can we see and understand how quickly infections are
 spreading? Can we see if the containment measures of people staying at home,
 schools and universities closing etc are showing any effect and if so, how
 strong is it? What can we learn from countries that have managed to reduce the
-number of new infections?
+number of new infections? 
 
 With the plots and data available here, we hope to contribute to this.
 
@@ -55,11 +56,13 @@ Discussion and contributions are welcome.
 ### Preparing for later stages of the outbreaks
 
 Once the epidemic growth of infections is brought under control, we will need to
-find need a fine balance between measures (such as social distancing) and
-permitting work and live as was possible before the pandemic to avoid repeated
-exponential growth of infections. We can start to see this in the data for
-countries such as China and South Korea. We need to learn to better read these
-data.
+find a fine balance between measures (such as social distancing, closure of
+schools, restaurants, shops, etc) and permitting work and live as was possible
+before the pandemic to avoid repeated exponential growth of infections. 
+
+We can start to see this in the data for countries such as China and South
+Korea. We need to learn to better read these data. It will be essential to
+monitor such indicators for some time (months or years?) to come.
 
 ### Enable citizen science
 
@@ -67,20 +70,25 @@ data.
   the plots is available here, can be inspected, downloaded, modified and
   improved.
 
-* Using Jupyter Notebooks and the https://mybinder.org project, anyone with a
-  web browser can execute the source (to create the same or new plots) from
-  within a webbrowser, by clicking [this
-  link](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
+* Using [Jupyter Notebooks](https://jupyter.org/) and the [MyBinder
+  project](https://mybinder.org) project, anyone with a web browser can execute
+  the source (to create the same or new plots) from within a web browser, by
+  clicking [this link](https://mybinder.org/v2/gh/fangohr/coronavirus/master).
 
-## Plans
+## Plans and contributions
 
-* Make plots more interactive (plotly?)
+Contributions are welcome
 
-* Offer German translation?
+* We gather some [ideas](ideas.md) for further analysis and features that would be nice
+  or useful.
 
-* Create a URL per country / region
+* For those with programming and software engineering skills, there is a 
+  document [info.md](info.md) with more details about the project and a [todo list](todo.md). 
 
-## Discussion of example plots
+* Bugs and ideas can be reported as a ["New issue"](https://github.com/fangohr/coronavirus-2020/issues) -- a github
+  account is necessary.
+
+# Discussion of example plots
 
 ![south-korea data](figures/Korea--South.svg)
 ![south-korea data 2](figures/Korea--South2.svg)
@@ -197,20 +205,6 @@ data.
   deaths per day to show a meaningful line here.
 
 
-# What about other countries and plots for those?
-
-* More plots for countries with high numbers of reported infections in 
-  [index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
-  (needs scrolling down to find plots).
-  
-* Plots for states in Germany (and Pinneberg):
-  [germany.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb)
-  ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb))
-
-* If your country of interest is not listed, you can [execute the notebook to
-  modify the commands to show other countries
-  here](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=index.ipynb)
-  
 # What about errors in the data?
 
 * The data we have available is likely to be in accurate:
@@ -224,11 +218,11 @@ data.
     there may be delays for other reasons.
   
 * Despite the errors in the data, we can try to learn something from it as long
-  as we remember the data is not representing the full trush of the situation
+  as we remember the data is not representing the full truth of the situation
   but just the measurement that we have available.
   
-  * For some plots on this page, we have omitted data lines or points because
-    there were not enough numbers and data points to estimate anything.
+  * For some plots, we have omitted data lines or points because there were not
+    enough numbers and data points to estimate anything.
     
   * Some data points appear random or as outliers - for some we understand the
     reasons, for others not.
@@ -236,11 +230,21 @@ data.
 * It is possible we have made errors in our processing of the numbers. The
   source code is available for anyone to check. (Please feedback any
   observations.)
-    
+
+
+
 # Disclaimer
 
 The plots and code here has been put together by volunteers who have no training
-in epidemiology. You are welcome to use the material at your own risk. 
-The [license is available](LICENSE).
+in epidemiology. THere are likely to be errors in the processing. You are welcome
+to use the material at your own risk. The [license is available](LICENSE).
 
 
+# Acknowledgements
+
+- Johns Hopkins University provides data for countries
+- Robert Koch Institute provides data for within Germany
+- Open source and scientific computing community for the data tools
+- Github for hosting repository and html files
+- Project Jupyter for the Notebook and Binder service
+- The H2020 project Photon and Neutron Open Science Cloud ([PaNOSC](https://www.panosc.eu/))
