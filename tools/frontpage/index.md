@@ -15,3 +15,14 @@ Welcome to the Open Science COVID19 tracker:
 
 Find [more details here](about.html)
 
+
+Example plots of data
+---------------------------
+
+
+![south-korea data](figures/Korea--South.svg)
+![south-korea data 2](figures/Korea--South2.svg)
+
+
+A discussion of these visualisations [is available](about.html).
+
