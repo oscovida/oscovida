@@ -1,6 +1,7 @@
+joblib
 pandas
 seaborn
 matplotlib
 numpy
 scipy
-iminuit
+voila

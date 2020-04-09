@@ -2,9 +2,10 @@
 https://github.com/fangohr/coronavirus-2020"""
 
 
-from functools import lru_cache
+import datetime
 import os
 import time
+import joblib
 import numpy as np
 import pandas as pd
 
@@ -26,6 +27,16 @@ LW = 3   # line width
 
 base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/"
 
+# set up joblib memory to avoid re-fetching files
+joblib_location = "./cachedir"
+joblib_memory = joblib.Memory(joblib_location, verbose=0)
+
+
+def clear_cache():
+    """Need to run this before new data for the day is created"""
+    joblib_memory.clear()
+
+
 def double_time_exponential(q2_div_q1, t2_minus_t1=None):
     """ See https://en.wikipedia.org/wiki/Doubling_time"""
     if t2_minus_t1 is None:
@@ -37,18 +48,32 @@ def report_download(url, df):
     print(f"Downloaded data: last data point {df.columns[-1]} from {url}")
 
 
-@lru_cache(maxsize=1)
+@joblib_memory.cache
+def fetch_deaths_last_execution():
+    """Use to remember at what time and date the last set of deaths was downloaded"""
+    return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+
+@joblib_memory.cache
+def fetch_cases_last_execution():
+    return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+
+@joblib_memory.cache
 def fetch_deaths():
     url = os.path.join(base_url, "time_series_covid19_" + "deaths" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
+    fetch_deaths_last_execution()
     return df
 
-@lru_cache(maxsize=1)
+
+@joblib_memory.cache
 def fetch_cases():
     url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
+    fetch_cases_last_execution()
     return df
 
 
@@ -111,7 +136,25 @@ def get_country(country):
     return c, d
 
 
-@lru_cache(maxsize=1)
+def compose_dataframe_summary(cases, deaths):
+    """Used in per-country template to show data table.
+    Could be extended.
+
+    Expects series of cases and deaths (time-alignd)
+    """
+    df = pd.DataFrame()
+    df["total cases"] = cases
+    df["daily new cases"] = cases.diff()
+    df["total deaths"] = deaths
+    df["daily new deaths"] = deaths.diff()
+    return df
+
+
+@joblib_memory.cache
+def fetch_data_germany_last_execution():
+    return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+@joblib_memory.cache
 def fetch_data_germany():
     """Data source is https://npgeo-corona-npgeo-de.hub.arcgis.com . The text on the
     webpage implies that the data comes from the Robert Koch Institute. """
@@ -153,6 +196,7 @@ def fetch_data_germany():
     last_day = g2.index.max()
     sel = g2.index == last_day
     cleaned = g2.drop(g2[sel].index, inplace=False)
+    fetch_data_germany_last_execution()
     return cleaned
 
 
@@ -240,7 +284,7 @@ def plot_change_bar(ax, series, color, rolling=None):
 def plot_doubling_time(ax, series, color, minchange=10):
     # only keep values where there is a change of a minumum number
     sel = series.diff() <= minchange
-    series.drop(series[sel].index, inplace=True)
+    series.drop(series[sel].index, inplace=False)
 
     # we assume we have one value for every day - should check XXX
     q2_div_q1 = series.pct_change() + 1  # computes q2/q1
@@ -248,6 +292,18 @@ def plot_doubling_time(ax, series, color, minchange=10):
     q2_div_q1.dropna(inplace=True)
     dtime = double_time_exponential(q2_div_q1, t2_minus_t1=1)
     dtime.dropna(inplace=True)
+
+    # exceptions:
+    #
+    # UK: data point on 15 March 2020 for only 1 new case, results in huge spike in doubling time (~790 days)
+    # drop this
+    if series.country == "United Kingdom" and series.label=="cases":
+        # print(dtime)
+        sel = dtime > 50
+        dtime.drop(dtime[sel].index, inplace=True)
+        print(f"Dropping UK data at {dtime[sel].index}, values are {dtime[sel]}")
+    # end of exceptions
+
     label = series.country + " new " + series.label
     ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=label)
 
@@ -279,7 +335,7 @@ def plot_growth_factor(ax, series, color, minchange=10):
     """
     # only keep values where there is a change of a minumum number
     sel = series.diff() <= minchange
-    series.drop(series[sel].index, inplace=True)
+    series.drop(series[sel].index, inplace=False)
 
     f = series.diff(1).pct_change() + 1  # compute ratio of subsequent daily changes
                                          # use change over a week
@@ -431,8 +487,9 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
     ax.set_ylabel(yaxislabel)
     ax.set_xlabel(xaxislabel)
     ax.set_yscale('log')
-    # ax.set_xscale('log')   # also interesting
-    ax.set_ylim(bottom=v0)
+    # ax.set_xscale('log')    # also interesting
+    ax.set_ylim(bottom=v0)  # remove setting limit?, following
+                              # https://github.com/fangohr/coronavirus-2020/issues/3
     ax.set_xlim(left=-1)  #ax.set_xlim(-1, df.index.max())
     ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
     ax.yaxis.set_ticks_position('both')
@@ -441,15 +498,18 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
 def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea, South",
                                                   "Spain", "United Kingdom", "Iran"],
                      v0c=10, v0d=3):
-    df_c, df_d = get_compare_data([main_country] + compare_with)
+    rolling = 7
+    df_c, df_d = get_compare_data([main_country] + compare_with, rolling=rolling)
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
-    plot_logdiff_time(ax, res_c, f"days since {v0c} cases", "daily new cases",
+    plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
+                      "daily new cases\n(rolling 7-day mean)",
                       v0=v0c, highlight={main_country:"C1"})
     ax = axes[1]
-    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths", "daily new deaths",
+    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
+                      "daily new deaths\n(rolling 7-day mean)",
                       v0=v0d, highlight={main_country:"C0"})
 
     fig.tight_layout(pad=1)
@@ -465,7 +525,10 @@ def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea
 def label_from_region_subregion(region_subregion):
     region, subregion = unpack_region_subregion(region_subregion)
     if subregion:
-        label = f"{region}-{subregion}"
+        if region:
+            label = f"{region}-{subregion}"
+        else:
+            label = f"{subregion}"
     else:
         label = f"{region}"
     return label
@@ -538,11 +601,10 @@ def make_compare_plot_germany(region_subregion,
                                                   'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland',
                                                   'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein',  'Thüringen'],
                               v0c=10, v0d=1):
-
+    rolling = 7
     region, subregion = unpack_region_subregion(region_subregion)
-    df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local)
-
-    df_c2, df_d2 = get_compare_data(compare_with)
+    df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local, rolling=rolling)
+    df_c2, df_d2 = get_compare_data(compare_with, rolling=rolling)
 
     # need to get index into same timezone before merging
     df_d1.set_index(df_d1.index.tz_localize(None), inplace=True)
@@ -556,11 +618,20 @@ def make_compare_plot_germany(region_subregion,
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
-    plot_logdiff_time(ax, res_c, f"days since {v0c} cases", "daily new cases",
+    plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
+                      "daily new cases\n(rolling 7-day mean)",
                       v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
     ax = axes[1]
-    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths", "daily new deaths",
-                      v0=v0d, highlight={res_d.columns[0]:"C0"},
+
+    res_d_0 = res_d[res_d.index >= 0]   # from "day 0" only
+    # if we have values in between 0.1 and 1, set the lower `y_limit` on the graph to 0.1
+    if res_d_0[(res_d_0 > 0.1) & (res_d_0 < 1)].any().any():    # there must be a more elegant check
+        y_limit = 0.1
+    else:
+        y_limit = v0d
+    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
+                      "daily new deaths\n(rolling 7-day mean)",
+                      v0=y_limit, highlight={res_d.columns[0]:"C0"},
                       labeloffset=0.5)
 
     fig.tight_layout(pad=1)
