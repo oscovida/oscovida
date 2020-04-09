@@ -21,6 +21,8 @@ General
     -   \[ \] function names, interfaces, documentation
         -   for example rename data fetch and get functions according to
             where the data comes from
+    -   \[ \] split plotting routines into (i) calculation of entities, and 
+            (ii) plotting
 
 Webpage generation
 ------------------
