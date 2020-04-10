@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 
 AUTHOR = 'OSCT team'
-SITENAME = 'Open Science COVID19 Tracker'
+SITENAME = 'OSCA (Open Science COVID19 Analysis)'
 SITEURL = ''
 
 PATH = 'content'
@@ -31,5 +31,20 @@ SOCIAL = (('You can add links in your config file', '#'),
 
 DEFAULT_PAGINATION = False
 
+
+THEME = "/Users/fangohr/pelican-themes/bootstrap2"
+THEME = "/Users/fangohr/pelican-themes/plumage"
+
+#DISPLAY_CATEGORIES_ON_MENU = False
+
+#PLUGIN_PATHS = ['/path/to/git/pelican-plugins', ]
+#PLUGINS = ['i18n_subsites', ]
+#JINJA_ENVIRONMENT = {
+#    'extensions': ['jinja2.ext.i18n'],
+#}
+
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
+
+
+LOAD_CONTENT_CACHE = False

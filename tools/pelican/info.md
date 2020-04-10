@@ -29,3 +29,20 @@ Done. Your new project is available at /Users/fangohr/git/coronavirus-2020-pelic
 
 
 
+## use
+
+make html
+
+-> create static html
+
+make regenarate
+
+-> creates static html on demand, and serves pages at localhost:8000
+
+
+# Pelican themes
+
+## install
+
+git clone --recursive https://github.com/getpelican/pelican-themes ~/pelican-themes
+
