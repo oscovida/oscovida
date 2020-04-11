@@ -20,9 +20,7 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 # Blogroll
-LINKS = (('Pelican', 'http://getpelican.com/'),
-         ('Python.org', 'http://python.org/'),
-         ('Jinja2', 'http://jinja.pocoo.org/'),
+LINKS = (("PaNOSC project", "http://panosc.eu"),
          ('You can modify those links in your config file', '#'),)
 
 # Social widget
@@ -34,16 +32,10 @@ DEFAULT_PAGINATION = False
 STATIC_PATHS = ['content/pages']
 # ARTICLE_PATHS = ['content']
 
-THEME = "/Users/fangohr/pelican-themes/bootstrap2"
+# THEME = "/Users/fangohr/pelican-themes/bootstrap2"
 THEME = "/Users/fangohr/pelican-themes/plumage"
 
 #DISPLAY_CATEGORIES_ON_MENU = False
-
-#PLUGIN_PATHS = ['/path/to/git/pelican-plugins', ]
-#PLUGINS = ['i18n_subsites', ]
-#JINJA_ENVIRONMENT = {
-#    'extensions': ['jinja2.ext.i18n'],
-#}
 
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
