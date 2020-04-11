@@ -32,6 +32,7 @@ Webpage generation
 -   \[ \] style webpages
     -   more modern font?
     -   with PaNOSC logo
+    - partly done with pelican
 -   \[ \] Germany: add overview plots for each Bundesland:
     -   For Hamburg, there is only one entry in the table (Hamburg, SK
         Hamburg), so we have this
@@ -61,6 +62,7 @@ Bugs
     y-direction, for example
     <https://fangohr.github.io/coronavirus/Germany-Baden-W%C3%BCrttemberg-LK-Alb-Donau-Kreis.html>
     What is this? (accidentally dropping rows inplace?)
+-   \[ \] Pelican rendering: tag links in https://fangohr.github.io/coronavirus/germany.html don't work (needs to use absolute URL in pelicanconf.py?)
 
 Functionality
 =============

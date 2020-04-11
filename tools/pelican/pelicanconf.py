@@ -42,6 +42,6 @@ THEME = "/Users/fangohr/pelican-themes/plumage"
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
 
-# HF: Relative URLS: this seems to work, although using absolute ones migth be better.
+# HF: Relative URLS: this seems to work; needs more testing
 
 LOAD_CONTENT_CACHE = False
