@@ -31,6 +31,8 @@ SOCIAL = (('You can add links in your config file', '#'),
 
 DEFAULT_PAGINATION = False
 
+STATIC_PATHS = ['content/pages']
+# ARTICLE_PATHS = ['content']
 
 THEME = "/Users/fangohr/pelican-themes/bootstrap2"
 THEME = "/Users/fangohr/pelican-themes/plumage"
@@ -45,6 +47,5 @@ THEME = "/Users/fangohr/pelican-themes/plumage"
 
 # Uncomment following line if you want document-relative URLs when developing
 #RELATIVE_URLS = True
-
 
 LOAD_CONTENT_CACHE = False
