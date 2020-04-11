@@ -74,6 +74,7 @@ Functionality
 -   \[ \] The Johns Hopkins data has regional data for some countries (UK,
     France, US). Where available, it would be good to show those as regions, in
     addition to one page that shows a sum of all of these numbers.
+-   \[ \] for tables in country over view pages, drop the rows with zeros at the beginning.
 
 See also [ideas.md](ideas.md).
 
