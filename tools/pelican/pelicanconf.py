@@ -40,6 +40,6 @@ THEME = "/Users/fangohr/pelican-themes/plumage"
 #DISPLAY_CATEGORIES_ON_MENU = False
 
 # Uncomment following line if you want document-relative URLs when developing
-#RELATIVE_URLS = True
+RELATIVE_URLS = True
 
 LOAD_CONTENT_CACHE = False

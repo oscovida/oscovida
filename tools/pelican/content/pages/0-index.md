@@ -3,16 +3,16 @@ URL: index.html
 save_as: index.html
 
 Welcome to the Open Science COVID19 Analysis page! Read about our
-[motivation](motivation), [data sources](data-sources), [team](team). Use our analysis plots of COVID19
+[motivation](motivation.html), [data sources](data-sources.html), [team](team.html). Use our analysis plots of COVID19
 cases and deaths to better understand the development of the pandemic and
-measures taken. Or use [our code and extend the analysis](open-science) for your own
+measures taken. Or use [our code and extend the analysis](open-science.html) for your own
 purposes, or to share here.
 
-For [each country in the world](world), we provide a standard set of analysis plots for which [are explained here](plots).
+For [each country in the world](world.html), we provide a standard set of analysis plots for which [are explained here](plots.html).
 
-For [Germany (492 Landkreise)](germany) we show data for all 492 Landkreise.
+For [Germany (492 Landkreise)](germany.html) we show data for all 492 Landkreise.
 
-Some [more interactive](interactive-plots) elements are in preparation.
+Some [more interactive](interactive-plots.html) elements are in preparation.
 
 --------------------
 
@@ -20,7 +20,7 @@ Some [more interactive](interactive-plots) elements are in preparation.
 
 ------------------
 
-If you want to [contribute](contribute), please get in touch.
+If you want to [contribute](contribute.html), please get in touch.
 
 # Disclaimer
 
