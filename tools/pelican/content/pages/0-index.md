@@ -8,7 +8,7 @@ cases and deaths to better understand the development of the pandemic and
 measures taken. Or use [our code and extend the analysis](open-science) for your own
 purposes, or to share here.
 
-For [each country in the world](torld), we provide a standard set of analysis plots for which [are explained here](plots).
+For [each country in the world](world), we provide a standard set of analysis plots for which [are explained here](plots).
 
 For [Germany (492 Landkreise)](germany) we show data for all 492 Landkreise.
 
