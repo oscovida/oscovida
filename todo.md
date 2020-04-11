@@ -62,7 +62,9 @@ Bugs
     y-direction, for example
     <https://fangohr.github.io/coronavirus/Germany-Baden-W%C3%BCrttemberg-LK-Alb-Donau-Kreis.html>
     What is this? (accidentally dropping rows inplace?)
--   \[ \] Pelican rendering: tag links in https://fangohr.github.io/coronavirus/germany.html don't work (needs to use absolute URL in pelicanconf.py?)
+-   \[ \] Pelican rendering: tag links in
+    https://fangohr.github.io/coronavirus/germany.html don't work (needs to use
+    absolute URL in pelicanconf.py? Path is wrong by "coronavirus")
 
 Functionality
 =============
