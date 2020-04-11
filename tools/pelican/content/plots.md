@@ -5,14 +5,13 @@ slug: plots
 tags: data, plots
 
 
-# Discussion of plots
-
-![south-korea data](figures/Korea--South.svg)
-![south-korea data 2](figures/Korea--South2.svg)
-
-* Discussion of plots from the top (number 1) to the bottom (number 7)
+We discuss the plots from the top (number 1) to the bottom (number 7) that are
+available for [every country](pages/world).
 
 ### Plot 1: accumulated cases and deaths as function of time
+
+![south-korea data]({attach}fig-south-korea1.png)
+
 * Shows how many people have been confirmed to be infected (blue) or have died (red) as a function of time.
 * The y-axis is logarithmic, that means from one grid line to the next, the
   value represented increases by a factor of 10. (Axis labels: 10<sup>2</sup>=
@@ -22,6 +21,8 @@ tags: data, plots
 * The interesting question is: how fast do they grow?
 
 ### Plot 2: daily changes in cases
+![south-korea data]({attach}fig-south-korea2.png)
+
 * Shows how many new confirmed cases are reported per day, shown as blue bars.
 * Blue lines shows a seven day (rolling) average over the bar data - this
   produces smoother data, and in particular removes the effect of the weekend
@@ -33,6 +34,8 @@ tags: data, plots
   decreased to around 100 per day for the second half of March.
 
 ### Plot 3: daily changes in deaths
+![south-korea data]({attach}fig-south-korea3.png)
+
 * Red bars shows how many new deaths were reported for each day.
 * Red line shows a seven day (rolling) average over the bar data.
 * The number of deaths is expected to follow the number of infections with some
@@ -40,6 +43,8 @@ tags: data, plots
   rate](https://en.wikipedia.org/wiki/Case_fatality_rate)).
 
 ### Plot 4: growth factors
+![south-korea data]({attach}fig-south-korea4.png)
+
 * The growth factor is the ratio of new cases (or deaths) today relative to new
   cases (or deaths) yesterday
 * Blue (red) dots show these ratios for cases (deaths), and are computed as the
@@ -56,6 +61,8 @@ tags: data, plots
   growth factor of 7). 
 
 ### Plot 5: Doubling times
+![south-korea data]({attach}fig-south-korea5.png)
+
 * This plot computes the doubling time of the cases (blue) and deaths (red),
   assuming that the growth of cases and deaths as shown in plot 1 is
   exponential.
@@ -97,6 +104,7 @@ tags: data, plots
 
 
 ### Plot 6: Comparison of daily new cases with other countries
+![south-korea data]({attach}fig-south-korea6.png)
 
 * X-axis shows the number of days since a particular number of new cases per day
   (such as 10) have occurred in that country, and the y-axis the number of new
@@ -117,6 +125,7 @@ tags: data, plots
   leads to non-integer values.
   
 ### Plot 7: Comparison of daily new deaths with other countries
+![south-korea data]({attach}fig-south-korea7.png)
 
 * As Plot 6, but for deaths not cases. For South Korea, there are not enough
   deaths per day to show a meaningful line here.
