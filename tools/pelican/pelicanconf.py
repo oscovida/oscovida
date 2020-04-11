@@ -19,6 +19,8 @@ TRANSLATION_FEED_ATOM = None
 AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
+OUTPUT_PATH = "../wwwroot"
+
 # Blogroll
 LINKS = (("PaNOSC project", "http://panosc.eu"),
          ('You can modify those links in your config file', '#'),)
