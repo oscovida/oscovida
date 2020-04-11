@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
-AUTHOR = 'OSCT team'
+AUTHOR = 'OSCA team'
 SITENAME = 'OSCA (Open Science COVID19 Analysis)'
-SITEURL = ''
+SITEURL = 'https://fangohr.github.io/coronavirus'
 
 PATH = 'content'
 
@@ -26,8 +26,8 @@ LINKS = (("PaNOSC project", "http://panosc.eu"),
          ('You can modify those links in your config file', '#'),)
 
 # Social widget
-SOCIAL = (('You can add links in your config file', '#'),
-          ('Another social link', '#'),)
+SOCIAL = (('PaNOSC', 'https://twitter.com/Panosc_eu'),
+          ('ProfCompMod', 'https://twitter.com/ProfCompMod'))          
 
 DEFAULT_PAGINATION = False
 
@@ -41,5 +41,7 @@ THEME = "/Users/fangohr/pelican-themes/plumage"
 
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
+
+# HF: Relative URLS: this seems to work, although using absolute ones migth be better.
 
 LOAD_CONTENT_CACHE = False
