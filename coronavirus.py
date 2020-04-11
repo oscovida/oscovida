@@ -690,7 +690,13 @@ def overview(country, region=None, subregion=None, savefig=False):
         return_axes = np.concatenate([axes, axes_compare])
 
     elif country=="Germany":   # Germany specific plots
-        axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
+        # On 11 April, Mecklenburg Vorpommern data was missing from data set.
+        # We thus compare only against those Laender, that are in the data set:
+        germany = fetch_data_germany()
+        laender = list(germany['Bundesland'].drop_duplicates().sort_values())
+        print("lander = {laender)}")
+        axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion),
+                                                               compare_with_local=laender)
         return_axes = np.concatenate([axes, axes_compare])
 
     fig2 = plt.gcf()
