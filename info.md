@@ -88,6 +88,22 @@ coronavirus-2020/tools/wwwroot
     data on the binder service (fetching of the German data set varies
     between 1s and 60 seconds).
 
+
+coronavirus-2020/tools/pelican
+-----------------------------------
+
+Base directory of Pelican (static html generator) package.
+
+- run `make html` here to create html in `../wwwroot`.
+
+- the `generate-countries.ipynb` notebook creates files `germany.md` and `world.md` in pelican/contents
+
+- `tools/pelican/contents`:
+  - keeps markdown or rstfiles that pelican will turn into articles automatically 
+  
+- `tools/pelican/contents/pages`:
+  - keeps static files (such as the welcome page), will also be turned to html
+
 coronavirus-2020/archive
 ------------------------
 
