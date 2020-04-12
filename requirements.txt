@@ -1,8 +1,9 @@
 joblib
-pandas
-seaborn
 matplotlib
 numpy
-scipy
-voila
+pandas
 pelican
+pytest
+scipy
+seaborn
+voila
