@@ -96,7 +96,7 @@ def get_country(country):
         d = deaths.loc[country]
     elif len(tmp.shape) == 2:   # China, France, United Kingdom, ...
         d = deaths.loc[country].sum()
-        d.rename(country, inplace=True)
+        d.rename("deaths", inplace=True)
     else:
         raise ValueError("Unknown data set structure for deaths {country}:", tmp)
 
@@ -105,7 +105,7 @@ def get_country(country):
         c = cases.loc[country]
     elif len(tmp.shape) == 2:
         c = cases.loc[country].sum()
-        c.rename(country, inplace=True)
+        c.rename("cases", inplace=True)
     else:
         raise ValueError("Unknown data set structure for cases {country}:", tmp)
 
