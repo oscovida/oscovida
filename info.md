@@ -97,7 +97,28 @@ coronavirus-2020/archive
 coronavirus-2020/dev
 --------------------
 
+1. clone git@github.com:fangohr/coronavirus-2020.git into your chose directory X
+
+2. Get the repository that keeps the static webpages (using github pages)
+
+"cd tools && git@github.com:fangohr/coronavirus-2020.git wwwroot"
+
+3. update notebooks by running (in X/tools)
+
+   jupyter-notebook generate-countries.html 
+   
+4. in X/tools/pelican, run "make html" to update html pages
+
+5. in wwwroot, run "git add *; git commit *", then git pushed
+
+6. upates shoudl appear at https://fangohr.github.io/coronavirus/ a few minutes later
 -   ongoing development
+
+Procedure to update data and webpages
+==============================================
+
+
+
 
 Related resources
 =================
