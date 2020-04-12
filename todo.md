@@ -12,7 +12,7 @@ General
 -   \[ \] unit tests
 -   \[ \] set up basic continuous integration (Travis?)
     -   possible system test could be
-        -   \[ \] running of `overview` function for a number of
+        -   \[X\] running of `overview` function for a number of
             countries
         -   \[ \] populating html from
             template-country.ipynb/template-germany.ipynb for a few
