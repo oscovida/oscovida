@@ -2,7 +2,7 @@ Most content has moved to the temporary website https://fangohr.github.io/corona
 
 The remaining content here is only for developers.
 
-
+[![Build Status](https://travis-ci.org/fangohr/coronavirus-2020.svg?branch=master)](https://travis-ci.org/fangohr/coronavirus-2020)
 
 
 --------------------------------
