@@ -35,7 +35,7 @@ STATIC_PATHS = ['content/pages']
 # ARTICLE_PATHS = ['content']
 
 # THEME = "/Users/fangohr/pelican-themes/bootstrap2"
-THEME = "/Users/fangohr/pelican-themes/plumage"
+THEME = "themes/plumage"
 
 #DISPLAY_CATEGORIES_ON_MENU = False
 
