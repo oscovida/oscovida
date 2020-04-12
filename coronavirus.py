@@ -96,7 +96,7 @@ def get_country(country):
         d = deaths.loc[country]
     elif len(tmp.shape) == 2:   # China, France, United Kingdom, ...
         d = deaths.loc[country].sum()
-        d.rename(country, inplace=True)
+        d.rename("deaths", inplace=True)
     else:
         raise ValueError("Unknown data set structure for deaths {country}:", tmp)
 
@@ -105,7 +105,7 @@ def get_country(country):
         c = cases.loc[country]
     elif len(tmp.shape) == 2:
         c = cases.loc[country].sum()
-        c.rename(country, inplace=True)
+        c.rename("cases", inplace=True)
     else:
         raise ValueError("Unknown data set structure for cases {country}:", tmp)
 
@@ -690,7 +690,12 @@ def overview(country, region=None, subregion=None, savefig=False):
         return_axes = np.concatenate([axes, axes_compare])
 
     elif country=="Germany":   # Germany specific plots
-        axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
+        # On 11 April, Mecklenburg Vorpommern data was missing from data set.
+        # We thus compare only against those Laender, that are in the data set:
+        germany = fetch_data_germany()
+        laender = list(germany['Bundesland'].drop_duplicates().sort_values())
+        axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion),
+                                                               compare_with_local=laender)
         return_axes = np.concatenate([axes, axes_compare])
 
     fig2 = plt.gcf()

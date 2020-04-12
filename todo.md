@@ -12,7 +12,7 @@ General
 -   \[ \] unit tests
 -   \[ \] set up basic continuous integration (Travis?)
     -   possible system test could be
-        -   \[ \] running of `overview` function for a number of
+        -   \[X\] running of `overview` function for a number of
             countries
         -   \[ \] populating html from
             template-country.ipynb/template-germany.ipynb for a few
@@ -32,6 +32,7 @@ Webpage generation
 -   \[ \] style webpages
     -   more modern font?
     -   with PaNOSC logo
+    - partly done with pelican
 -   \[ \] Germany: add overview plots for each Bundesland:
     -   For Hamburg, there is only one entry in the table (Hamburg, SK
         Hamburg), so we have this
@@ -61,6 +62,9 @@ Bugs
     y-direction, for example
     <https://fangohr.github.io/coronavirus/Germany-Baden-W%C3%BCrttemberg-LK-Alb-Donau-Kreis.html>
     What is this? (accidentally dropping rows inplace?)
+-   \[ \] Pelican rendering: tag links in
+    https://fangohr.github.io/coronavirus/germany.html don't work (needs to use
+    absolute URL in pelicanconf.py? Path is wrong by "coronavirus")
 
 Functionality
 =============
@@ -70,6 +74,7 @@ Functionality
 -   \[ \] The Johns Hopkins data has regional data for some countries (UK,
     France, US). Where available, it would be good to show those as regions, in
     addition to one page that shows a sum of all of these numbers.
+-   \[ \] for tables in country over view pages, drop the rows with zeros at the beginning.
 
 See also [ideas.md](ideas.md).
 
