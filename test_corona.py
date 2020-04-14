@@ -12,6 +12,8 @@ def mock_get_country(country="China"):
     deaths = cases.copy(deep=True)
     deaths.values[:] = cases.values * 0.1
     deaths.country = "China"
+    deaths.label='deaths'
+    cases.label='cases'
     return cases, deaths
 
 
@@ -19,6 +21,8 @@ def test_mock_get_country():
     cases, deaths = mock_get_country()
     assert cases.shape == (80,)
     assert deaths.shape == (80,)
+    assert deaths.label == 'deaths'
+    assert deaths.country == 'China'
 
 
 def test_overview():
