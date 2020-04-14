@@ -308,7 +308,7 @@ def plot_doubling_time(ax, series, color, minchange=10):
     ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=label)
 
     # need rolling average to smooth out weekly variations
-    rolling = dtime.rolling(7, center=True).mean()
+    rolling = dtime.rolling(7, min_periods=1, center=True).mean()
 
     # good to take maximum value from here
     ymax = min(rolling.max()*1.5, 500)
