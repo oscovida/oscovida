@@ -8,9 +8,9 @@ cases and deaths to better understand the development of the pandemic and
 measures taken. Or use [our code and extend the analysis](open-science.html) for your own
 purposes, or to share here.
 
-For [each country in the world](world.html), we provide a standard set of analysis plots for which [are explained here](plots.html).
+* For [all countries in the world](world.html), we provide a standard set of analysis plots for which [are explained here](plots.html).
 
-For [Germany (492 Landkreise)](germany.html) we show data for all 492 Landkreise.
+* For [Germany (492 Landkreise)](germany.html) we show data for all 492 Landkreise.
 
 Some [more interactive](interactive-plots.html) elements are in preparation.
 

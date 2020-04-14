@@ -17,6 +17,7 @@ General
         -   \[ \] populating html from
             template-country.ipynb/template-germany.ipynb for a few
             countries /regions
+        -   \[X\] set up travis
 -   \[ \] tidy up code
     -   \[ \] function names, interfaces, documentation
         -   for example rename data fetch and get functions according to
@@ -30,9 +31,8 @@ Webpage generation
 -   \[ \] add binderlink to index page (something like \"binder\" behind
     each entry?)
 -   \[ \] style webpages
-    -   more modern font?
-    -   with PaNOSC logo
-    - partly done with pelican
+    -   \[X\] more modern font?
+    -   \[ \] with PaNOSC logo
 -   \[ \] Germany: add overview plots for each Bundesland:
     -   For Hamburg, there is only one entry in the table (Hamburg, SK
         Hamburg), so we have this
@@ -54,7 +54,7 @@ Webpage generation
 -   \[ \] document and refactor everything
 
 Bugs
-====
+----
 
 -   \[ \] adjust plot size to make sure headline shows in svg/pdf files
     when saved
@@ -67,14 +67,26 @@ Bugs
     absolute URL in pelicanconf.py? Path is wrong by "coronavirus")
 
 Functionality
-=============
+------------
 
--   \[ \] use plotly instead of matplotlib for more interactive
-    experience in static html?
+-   \[ \] for tables in country over view pages, drop the rows with zeros at the beginning. [HIGH, SMALL]
+-   \[ \] show states for Germany in beginning of https://fangohr.github.io/coronavirus/germany.html [HIGH
 -   \[ \] The Johns Hopkins data has regional data for some countries (UK,
     France, US). Where available, it would be good to show those as regions, in
-    addition to one page that shows a sum of all of these numbers.
--   \[ \] for tables in country over view pages, drop the rows with zeros at the beginning.
+    addition to one page that shows a sum of all of these numbers.) [HIGH]
+-   \[ \] offer links to detailes pages for countries / regions with highest numers
+-   \[ \] make lines smoother, for example growth, doubling time
+    -  \[ \] base data on integrated feature (for example smoothed line for daily cases), rather that day-to-day values which fluctuate
+    -  \[ \] allow rolling averages if some data points are missing
+-   \[ \] use plotly instead of matplotlib for more interactive
+    experience in static html?
+-   \[ \] decide on name for project and host somewhere more official (Hans) [HIGH]
+
+
+
+
+
+
 
 See also [ideas.md](ideas.md).
 
