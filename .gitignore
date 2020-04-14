@@ -3,3 +3,4 @@ __pycache__
 tools/wwwroot
 cachedir
 tools/coronavirus.py
+.DS_Store
