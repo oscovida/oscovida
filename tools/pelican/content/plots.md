@@ -6,7 +6,7 @@ tags: data, plots
 
 
 We discuss the plots from the top (number 1) to the bottom (number 7) that are
-available for [every country](pages/world).
+available for [every country](world.html).
 
 ### Plot 1: accumulated cases and deaths as function of time
 
