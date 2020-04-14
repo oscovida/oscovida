@@ -76,9 +76,48 @@ def test_compute_plot1():
     assert abs(smooth[0].sum() - 82664.7) < 1
     assert abs(smooth2[0].sum() - 82914.7) < 1
 
- 
+
 def test_plot_change_bar():
     cases, deaths = mock_get_country()
     fig, ax = plt.subplots()
     ax = c.plot_change_bar(ax, cases, 'C1')
     fig.savefig('test-plot1.pdf')
+
+
+def test_compute_growth_factor():
+    cases, deaths = mock_get_country()
+    f, smooth = c.compute_growth_factor(cases)
+    assert isinstance(f[0], pd.Series)
+    assert isinstance(smooth[0], pd.Series)
+    assert isinstance(f[1], str)
+    assert isinstance(smooth[1], str)
+
+    assert f[0].shape == (79,)
+    assert smooth[0].shape == (79,)
+
+    # assure that we haven't changed the data significantly; some change can come from
+    # - nans, where the rolling function will 'create' a data point (but no nan's in this data set)
+    # - missing points at the boundary, or interpolation at the boundary not based on 7 points.
+    #
+    # We just take the current values and assume they are correct. If the smoothing parameters
+    # are changed, then these need to be updated.
+    assert abs(f[0].dropna().sum() - 77.3) < 0.1  # original data, should be the same as cases[-1]
+    assert abs(smooth[0].sum() - 78.6) < 0.1
+
+
+
+def test_plot_growth_factor():
+    cases, deaths = mock_get_country()
+    fig, ax = plt.subplots()
+    ax = c.plot_growth_factor(ax, cases, 'C1')
+    fig.savefig('test-growth_factor.pdf')
+
+
+def test_plot_growth_factor_fetch_data():
+    """Similar to test above, but using fresh data"""
+    for country in ["Korea, South", "China", "Germany"]:
+        cases, deaths = c.get_country(country)
+        fig, ax = plt.subplots()
+        c.plot_growth_factor(ax, cases, 'C1');
+        c.plot_growth_factor(ax, deaths, 'C0');
+        fig.savefig(f'test-growth-factor-{country}.pdf')
