@@ -261,7 +261,7 @@ def plot_time_step(ax, series, style="-", logscale=True):
     return ax
 
 
-def compute_plot1(series):
+def compute_daily_change(series):
     """returns (change, smooth, smooth2)
 
     where 'change' is a tuple of (series, label)
@@ -298,7 +298,7 @@ def compute_plot1(series):
     return change, smooth, smooth2
 
 
-def plot_change_bar(ax, series, color):
+def plot_daily_change(ax, series, color):
     """ Given a series of data and matplotlib axis ax, plot the
     - difference in the series data from day to day as bars and plot a smooth
     - line to show the overall development
@@ -308,7 +308,7 @@ def plot_change_bar(ax, series, color):
     label = series.country + " new " + series.label
 
     (change, change_label) , (smooth, smooth_label), \
-        (smooth2, smooth2_label) = compute_plot1(series)
+        (smooth2, smooth2_label) = compute_daily_change(series)
 
     ax.bar(change.index, change.values, color=color,
            label=label, alpha=bar_alpha, linewidth=LW)
@@ -695,12 +695,12 @@ def overview(country, region=None, subregion=None, savefig=False):
     plot_time_step(ax=ax, series=d, style="-C0")
 
     ax = axes[1]
-    plot_change_bar(ax=ax, series=c, color="C1")
+    plot_daily_change(ax=ax, series=c, color="C1")
     if country == "China":
         ax.set_ylim(0, 5000)
 
     ax = axes[2]
-    plot_change_bar(ax=ax, series=d, color="C0")
+    plot_daily_change(ax=ax, series=d, color="C0")
 
     ax = axes[3]
     plot_growth_factor(ax, series=d, color="C0")
