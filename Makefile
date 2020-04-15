@@ -10,6 +10,6 @@ test:
 	python3 -m pytest -v
 
 test-pycodestyle:
-	python3 -m pycodestyle --filename=.*.py --show-pep8
+	python3 -m pycodestyle .
 
 test-all: test test-pycodestyle
