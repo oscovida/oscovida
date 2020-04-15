@@ -52,36 +52,48 @@ def test_get_country_data():
     assert d2.label == "deaths"
 
 
-def test_compute_plot1():
+def test_compute_daily_change():
     cases, deaths = mock_get_country()
-    change, smooth, smooth2 = c.compute_plot1(cases)
-    assert isinstance(change[0], pd.Series)
-    assert isinstance(smooth[0], pd.Series)
-    assert isinstance(smooth2[0], pd.Series)
-    assert isinstance(change[1], str)
-    assert isinstance(smooth[1], str)
-    assert isinstance(smooth2[1], str)
+    change, smooth, smooth2 = c.compute_daily_change(cases)
+    assert isinstance(change[0], pd.Series)  # data
+    assert isinstance(smooth[0], pd.Series)  # data
+    assert isinstance(smooth2[0], pd.Series)  # data
+    assert isinstance(change[1], str)  # label
+    assert isinstance(smooth[1], str)  # label
+    assert isinstance(smooth2[1], str)  # label
 
     assert change[0].shape == (79,)
     assert smooth[0].shape == (79,)
     assert smooth2[0].shape == (79,)
 
-    # assure that we haven't changed the data significantly; some change can come from
+    # The daily diffs should sum up to be the same as the total number in the
+    # original series minus the first data point3
+    # The total number is the last data point in the input series, i.e. cases[-1]
+    change_data = change[0]
+    assert abs(change_data.sum() + cases[0] - cases[-1]) < 1e-8
+
+    # for the mock data: cases[-1] - cases[0] is 82393. Explicitely done:
+    assert abs(change_data.sum() - 82393) < 1e-8  
+
+    # assure that we haven't changed the data significantly when averaging and smoothing:
+    # some change can come from
     # - nans, where the rolling function will 'create' a data point (but no nan's in this data set)
     # - missing points at the boundary, or interpolation at the boundary not based on 7 points.
     #
     # We just take the current values and assume they are correct. If the smoothing parameters
     # are changed, then these need to be updated.
-    assert abs(change[0].sum() - 82393) < 0.1  # original data, should be the same as cases[-1]
-    assert abs(smooth[0].sum() - 82664.7) < 1
-    assert abs(smooth2[0].sum() - 82914.7) < 1
+    smooth_data = smooth[0]
+    assert abs(smooth_data.sum() - 82664.7) < 1
+    smooth2_data = smooth2[0]
+    assert abs(smooth2_data.sum() - 82914.7) < 1
 
 
-def test_plot_change_bar():
+ 
+def test_plot_daily_change():
     cases, deaths = mock_get_country()
     fig, ax = plt.subplots()
-    ax = c.plot_change_bar(ax, cases, 'C1')
-    fig.savefig('test-plot1.pdf')
+    ax = c.plot_daily_change(ax, cases, 'C1')
+    fig.savefig('test-plot_daily_change.pdf')
 
 
 def test_compute_growth_factor():
@@ -121,3 +133,4 @@ def test_plot_growth_factor_fetch_data():
         c.plot_growth_factor(ax, cases, 'C1');
         c.plot_growth_factor(ax, deaths, 'C0');
         fig.savefig(f'test-growth-factor-{country}.pdf')
+
