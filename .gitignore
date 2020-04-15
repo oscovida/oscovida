@@ -4,3 +4,5 @@ tools/wwwroot
 cachedir
 tools/coronavirus.py
 .DS_Store
+.venv/
+.vscode/
