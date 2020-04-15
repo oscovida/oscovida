@@ -81,4 +81,4 @@ def test_plot_daily_change():
     cases, deaths = mock_get_country()
     fig, ax = plt.subplots()
     ax = c.plot_daily_change(ax, cases, 'C1')
-    fig.savefig('test-plot1.pdf')
+    fig.savefig('test-plot_daily_change.pdf')
