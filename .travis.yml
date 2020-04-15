@@ -1,8 +1,15 @@
-sudo: required
+language: python
+python:
+  - 3.8
+  - 3.7
+  - 3.6
 
-services:
-  - docker
+env:
+  global:
+    - MPLBACKEND=agg
+
+install:
+  - make dev-install
 
 script:
-  - make travis
-
+  - make test-all
