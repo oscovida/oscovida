@@ -88,6 +88,22 @@ coronavirus-2020/tools/wwwroot
     data on the binder service (fetching of the German data set varies
     between 1s and 60 seconds).
 
+
+coronavirus-2020/tools/pelican
+-----------------------------------
+
+Base directory of Pelican (static html generator) package.
+
+- run `make html` here to create html in `../wwwroot`.
+
+- the `generate-countries.ipynb` notebook creates files `germany.md` and `world.md` in pelican/contents
+
+- `tools/pelican/contents`:
+  - keeps markdown or rstfiles that pelican will turn into articles automatically 
+  
+- `tools/pelican/contents/pages`:
+  - keeps static files (such as the welcome page), will also be turned to html
+
 coronavirus-2020/archive
 ------------------------
 
@@ -97,7 +113,28 @@ coronavirus-2020/archive
 coronavirus-2020/dev
 --------------------
 
+1. clone git@github.com:fangohr/coronavirus-2020.git into your chose directory X
+
+2. Get the repository that keeps the static webpages (using github pages)
+
+"cd tools && git@github.com:fangohr/coronavirus-2020.git wwwroot"
+
+3. update notebooks by running (in X/tools)
+
+   jupyter-notebook generate-countries.html 
+   
+4. in X/tools/pelican, run "make html" to update html pages
+
+5. in wwwroot, run "git add *; git commit *", then git pushed
+
+6. upates shoudl appear at https://fangohr.github.io/coronavirus/ a few minutes later
 -   ongoing development
+
+Procedure to update data and webpages
+==============================================
+
+
+
 
 Related resources
 =================

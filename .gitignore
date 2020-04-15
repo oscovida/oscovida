@@ -1,3 +1,10 @@
 .ipynb_checkpoints
 __pycache__
+<<<<<<< HEAD
 cachedir/
+=======
+tools/wwwroot
+cachedir
+tools/coronavirus.py
+.DS_Store
+>>>>>>> f6717e9ea8bc410b06e2f05f2e28d94155a80295
