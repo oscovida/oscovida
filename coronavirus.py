@@ -381,7 +381,7 @@ def compute_growth_factor(series):
 
     # start from smooth diffs as used in plot 1
     (change, change_label) , (smooth, smooth_label), \
-        (smooth2, smooth2_label) = compute_plot1(series)
+        (smooth2, smooth2_label) = compute_daily_change(series)
 
     # Compute ratio of yesterday to day
     f = smooth.pct_change() + 1  # compute ratio of subsequent daily changes
