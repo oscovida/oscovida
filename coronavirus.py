@@ -303,7 +303,7 @@ def plot_daily_change(ax, series, color):
     - difference in the series data from day to day as bars and plot a smooth
     - line to show the overall development
     """
-    
+
     bar_alpha = 0.2
     label = series.country + " new " + series.label
 
@@ -368,60 +368,61 @@ def plot_doubling_time(ax, series, color, minchange=10):
     ax.set_ylabel("doubling time [days]")
     return ax, rolling, dtime
 
+def compute_growth_factor(series):
+    """returns (growth, smooth)
 
-def plot_growth_factor(ax, series, color, minchange=10):
+    where 'growth' is a tuple of (series, label)
+    and smooth is a tuple of (series, label).
+    
+    'growth' returns the raw data (with nan's dropped)
+    'smooth' makes the data smoother
+
+    """
+
+    # start from smooth diffs as used in plot 1
+    (change, change_label) , (smooth, smooth_label), \
+        (smooth2, smooth2_label) = compute_daily_change(series)
+
+    # Compute ratio of yesterday to day
+    f = smooth.pct_change() + 1  # compute ratio of subsequent daily changes
+                                 # f for growth Factor
+    label = ""
+    growth = (f, label)
+
+    # division by zero may lead to np.inf in the data: get rid of that
+    f.replace(np.inf, np.nan, inplace=True)  # seems not to affect plot
+
+    # Compute smoother version for line in plots
+    f_smoothed = f.rolling(7, center=True, win_type='gaussian', min_periods=3).mean(std=2)
+    smooth_label = f"Gaussian window (stddev=2 days)"
+
+    smoothed = f_smoothed, smooth_label
+
+    return growth, smoothed
+
+
+
+def plot_growth_factor(ax, series, color):
     """relative change of number of new cases/deaths from day to day
     See https://youtu.be/Kas0tIxDvrg?t=330, 5:30 onwards
     """
-    # only keep values where there is a change of a minumum number
-    sel = series.diff() <= minchange
-    series.drop(series[sel].index, inplace=False)
 
-    f = series.diff(1).pct_change() + 1  # compute ratio of subsequent daily changes
-                                         # use change over a week
-    # division by zero may lead to np.inf in the data: get rid of that
-    f.replace(np.inf, np.nan, inplace=True)
-    f.dropna(inplace=True)
+    # get smooth data from plot 1 to base this plot on
+    (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
 
-    # for very small case numbers, we get large growth factors (for example 1 death one day, followed by 7 the next)
-    # we drop those high values.
-    sel = f > 5
-    f.drop(f[sel].index, inplace=True)
-    values_dropped = sel.sum()
-    if values_dropped >= 5:
-        print(f"Dropping {values_dropped} from growth factor plot ({series.country}, {series.label})")
-
-    label = series.country + " " + series.label + " growth factor"
+    label = series.country + " " + series.label + " growth factor (based on smooth daily change)" + f_label
     ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
-    rolling = f.rolling(7, center=True).mean()
-    rolling.dropna(inplace=True)
-    label = series.country + " " + series.label + " growth factor 7-day mean"
-    ax.plot(rolling.index, rolling.values, '-', color=color, label=label, linewidth=LW)
 
-    ## looks much nicer - should we use this?
-    # rolling2 = rolling.rolling(7, center=True).mean()
-    # rolling2.dropna(inplace=True)
-    # label = series.country + " " + series.label + " growth factor 7-day mean"
-    # ax.plot(rolling2.index, rolling2.values, '-', color='C4', label=label, linewidth=LW)
+    label = series.country + " " + series.label + " growth factor " + smoothed_label
+    ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color, label=label, linewidth=LW)
 
     ax.legend()
     ax.set_ylabel("growth factor")
-    ax.set_ylim(0, 2)  # should generally be below 1
+    ax.set_ylim(0.5, 1.5)  # should generally be below 1
     ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3') # label="critical value"
-    return ax, rolling, f
+    return ax
 
 
-def test_plot_growth_factor():
-    c, d = get_country("Korea, South")
-    c, d = get_country("China")
-
-    #c, d = get_country("Germany")
-    #c, d = get_country("Italy")
-    fix, ax = plt.subplots()
-    plot_growth_factor(ax, c, 'C1');
-    _, rolling, f = plot_growth_factor(ax, d, 'C0');
-    return rolling, f
-# rolling, f = test_plot_growth_factor()
 
 def get_country_data(country, region=None, subregion=None):
     """Given the name of a country, get the Johns Hopkins data for cases and  deaths,
