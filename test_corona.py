@@ -52,9 +52,9 @@ def test_get_country_data():
     assert d2.label == "deaths"
 
 
-def test_compute_plot1():
+def test_compute_daily_change():
     cases, deaths = mock_get_country()
-    change, smooth, smooth2 = c.compute_plot1(cases)
+    change, smooth, smooth2 = c.compute_daily_change(cases)
     assert isinstance(change[0], pd.Series)
     assert isinstance(smooth[0], pd.Series)
     assert isinstance(smooth2[0], pd.Series)
@@ -77,8 +77,8 @@ def test_compute_plot1():
     assert abs(smooth2[0].sum() - 82914.7) < 1
 
  
-def test_plot_change_bar():
+def test_plot_daily_change():
     cases, deaths = mock_get_country()
     fig, ax = plt.subplots()
-    ax = c.plot_change_bar(ax, cases, 'C1')
+    ax = c.plot_daily_change(ax, cases, 'C1')
     fig.savefig('test-plot1.pdf')
