@@ -260,25 +260,65 @@ def plot_time_step(ax, series, style="-", logscale=True):
     ax.set_ylabel("total numbers")
     return ax
 
-def plot_change_bar(ax, series, color, rolling=None):
-    change = series.diff().dropna()   # lose one point at beginning
 
-    if rolling:
-        rolling_label = f" {rolling}-day rolling mean"
-        rolling_series = change.rolling(rolling, center=True).mean()
-        bar_alpha = 0.2
-    else:
-        rolling_label = ""
-        bar_alpha = 1.0
+def compute_daily_change(series):
+    """returns (change, smooth, smooth2)
 
+    where 'change' is a tuple of (series, label)
+    and smooth is a tuple of (series, label).
+    and smooth2 is a tuple of (series, label).
+
+    'change' returns the raw data (with nan's dropped)
+    'smooth' makes the data smoother
+    'smooth2' does some additional smoothing - more artistic than scientific
+
+    The 'change' under consideration, is the day-to-day change of the series.
+    We assume that there is one entry per day in the Series.
+
+    """
+    diff = series.diff().dropna()
+    label = ""
+    change = diff, label
+
+    # smoothed curve
+    smooth_label = f"Gaussian window (stddev=3 days)"
+    rolling_series = diff.rolling(9, center=True,
+                                  win_type='gaussian',
+                                  min_periods=1).mean(std=3)
+    smooth = rolling_series, smooth_label
+
+    # extra smoothing for better visual effects
+    rolling_series2 = rolling_series.rolling(4, center=True,
+                                             win_type='gaussian',
+                                             min_periods=1).mean(std=2)
+    label = "Smoothed " + smooth_label
+
+    smooth2 = rolling_series2, label
+
+    return change, smooth, smooth2
+
+
+def plot_daily_change(ax, series, color):
+    """ Given a series of data and matplotlib axis ax, plot the
+    - difference in the series data from day to day as bars and plot a smooth
+    - line to show the overall development
+    """
+
+    bar_alpha = 0.2
     label = series.country + " new " + series.label
-    ax.bar(change.index, change.values, color=color, label=label, alpha=bar_alpha,
-           linewidth=LW)
-    if rolling:
-        ax.plot(rolling_series.index, rolling_series.values, color=color, label=label + rolling_label,
-                linewidth=LW)
+
+    (change, change_label) , (smooth, smooth_label), \
+        (smooth2, smooth2_label) = compute_daily_change(series)
+
+    ax.bar(change.index, change.values, color=color,
+           label=label, alpha=bar_alpha, linewidth=LW)
+
+    ax.plot(smooth2.index, smooth2.values, color=color,
+            label=label + " " + smooth2_label, linewidth=LW)
+
     ax.legend()
     ax.set_ylabel('daily change')
+
     return ax
 
 def plot_doubling_time(ax, series, color, minchange=10):
@@ -328,60 +368,61 @@ def plot_doubling_time(ax, series, color, minchange=10):
     ax.set_ylabel("doubling time [days]")
     return ax, rolling, dtime
 
+def compute_growth_factor(series):
+    """returns (growth, smooth)
 
-def plot_growth_factor(ax, series, color, minchange=10):
+    where 'growth' is a tuple of (series, label)
+    and smooth is a tuple of (series, label).
+    
+    'growth' returns the raw data (with nan's dropped)
+    'smooth' makes the data smoother
+
+    """
+
+    # start from smooth diffs as used in plot 1
+    (change, change_label) , (smooth, smooth_label), \
+        (smooth2, smooth2_label) = compute_daily_change(series)
+
+    # Compute ratio of yesterday to day
+    f = smooth.pct_change() + 1  # compute ratio of subsequent daily changes
+                                 # f for growth Factor
+    label = ""
+    growth = (f, label)
+
+    # division by zero may lead to np.inf in the data: get rid of that
+    f.replace(np.inf, np.nan, inplace=True)  # seems not to affect plot
+
+    # Compute smoother version for line in plots
+    f_smoothed = f.rolling(7, center=True, win_type='gaussian', min_periods=3).mean(std=2)
+    smooth_label = f"Gaussian window (stddev=2 days)"
+
+    smoothed = f_smoothed, smooth_label
+
+    return growth, smoothed
+
+
+
+def plot_growth_factor(ax, series, color):
     """relative change of number of new cases/deaths from day to day
     See https://youtu.be/Kas0tIxDvrg?t=330, 5:30 onwards
     """
-    # only keep values where there is a change of a minumum number
-    sel = series.diff() <= minchange
-    series.drop(series[sel].index, inplace=False)
 
-    f = series.diff(1).pct_change() + 1  # compute ratio of subsequent daily changes
-                                         # use change over a week
-    # division by zero may lead to np.inf in the data: get rid of that
-    f.replace(np.inf, np.nan, inplace=True)
-    f.dropna(inplace=True)
+    # get smooth data from plot 1 to base this plot on
+    (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
 
-    # for very small case numbers, we get large growth factors (for example 1 death one day, followed by 7 the next)
-    # we drop those high values.
-    sel = f > 5
-    f.drop(f[sel].index, inplace=True)
-    values_dropped = sel.sum()
-    if values_dropped >= 5:
-        print(f"Dropping {values_dropped} from growth factor plot ({series.country}, {series.label})")
-
-    label = series.country + " " + series.label + " growth factor"
+    label = series.country + " " + series.label + " growth factor (based on smooth daily change)" + f_label
     ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
-    rolling = f.rolling(7, center=True).mean()
-    rolling.dropna(inplace=True)
-    label = series.country + " " + series.label + " growth factor 7-day mean"
-    ax.plot(rolling.index, rolling.values, '-', color=color, label=label, linewidth=LW)
 
-    ## looks much nicer - should we use this?
-    # rolling2 = rolling.rolling(7, center=True).mean()
-    # rolling2.dropna(inplace=True)
-    # label = series.country + " " + series.label + " growth factor 7-day mean"
-    # ax.plot(rolling2.index, rolling2.values, '-', color='C4', label=label, linewidth=LW)
+    label = series.country + " " + series.label + " growth factor " + smoothed_label
+    ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color, label=label, linewidth=LW)
 
     ax.legend()
     ax.set_ylabel("growth factor")
-    ax.set_ylim(0, 2)  # should generally be below 1
+    ax.set_ylim(0.5, 1.5)  # should generally be below 1
     ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3') # label="critical value"
-    return ax, rolling, f
+    return ax
 
 
-def test_plot_growth_factor():
-    c, d = get_country("Korea, South")
-    c, d = get_country("China")
-
-    #c, d = get_country("Germany")
-    #c, d = get_country("Italy")
-    fix, ax = plt.subplots()
-    plot_growth_factor(ax, c, 'C1');
-    _, rolling, f = plot_growth_factor(ax, d, 'C0');
-    return rolling, f
-# rolling, f = test_plot_growth_factor()
 
 def get_country_data(country, region=None, subregion=None):
     """Given the name of a country, get the Johns Hopkins data for cases and  deaths,
@@ -453,7 +494,7 @@ def get_compare_data(countrynames, rolling=7):
     for countryname in countrynames:
         c, d = get_country(countryname)
 
-        df_c[countryname] = c.diff().rolling(rolling, center=True).mean()  # cases 
+        df_c[countryname] = c.diff().rolling(rolling, center=True).mean()  # cases
         df_d[countryname] = d.diff().rolling(rolling, center=True).mean()  # deaths
 
     return df_c, df_d
@@ -654,12 +695,12 @@ def overview(country, region=None, subregion=None, savefig=False):
     plot_time_step(ax=ax, series=d, style="-C0")
 
     ax = axes[1]
-    plot_change_bar(ax=ax, series=c, rolling=7, color="C1")
+    plot_daily_change(ax=ax, series=c, color="C1")
     if country == "China":
         ax.set_ylim(0, 5000)
 
     ax = axes[2]
-    plot_change_bar(ax=ax, series=d, rolling=7, color="C0")
+    plot_daily_change(ax=ax, series=d, color="C0")
 
     ax = axes[3]
     plot_growth_factor(ax, series=d, color="C0")
