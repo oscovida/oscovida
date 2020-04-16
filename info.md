@@ -41,10 +41,10 @@ Other files:
 -   [ideas.md](ideas.md): things that could be done; might need some evaluation
     first
 
-coronavirus-2020/tools
-----------------------
+coronavirus-2020/notebooks
+--------------------------
 
-contains tools to create static webpages at
+contains notebooks to create static webpages at
 <https://fangohr.github.io/coronavirus>, (repository to host webpages is
 <https://github.com/fangohr/coronavirus-2020>)
 
@@ -60,8 +60,8 @@ Hack: to run `generate-countries.ipynb` we copy at the beginning, the
 `coronavirus.py` file from the parent directory. Important to remember
 that the authorative file is in the parent directory.
 
-coronavirus-2020/tools/wwwroot
-------------------------------
+coronavirus-2020/notebooks/wwwroot
+----------------------------------
 
 -   rootdirectory of <https://fangohr.github.io/coronavirus> and
     repository
@@ -89,8 +89,8 @@ coronavirus-2020/tools/wwwroot
     between 1s and 60 seconds).
 
 
-coronavirus-2020/tools/pelican
------------------------------------
+coronavirus-2020/notebooks/pelican
+----------------------------------
 
 Base directory of Pelican (static html generator) package.
 
@@ -98,10 +98,10 @@ Base directory of Pelican (static html generator) package.
 
 - the `generate-countries.ipynb` notebook creates files `germany.md` and `world.md` in pelican/contents
 
-- `tools/pelican/contents`:
+- `notebooks/pelican/contents`:
   - keeps markdown or rstfiles that pelican will turn into articles automatically 
   
-- `tools/pelican/contents/pages`:
+- `notebooks/pelican/contents/pages`:
   - keeps static files (such as the welcome page), will also be turned to html
 
 coronavirus-2020/archive
@@ -117,13 +117,13 @@ coronavirus-2020/dev
 
 2. Get the repository that keeps the static webpages (using github pages)
 
-"cd tools && git@github.com:fangohr/coronavirus-2020.git wwwroot"
+"cd notebooks && git clone https://github.com/fangohr/coronavirus.git wwwroot"
 
-3. update notebooks by running (in X/tools)
+3. update notebooks by running (in X/notebooks)
 
    jupyter-notebook generate-countries.html 
    
-4. in X/tools/pelican, run "make html" to update html pages
+4. in X/notebooks/pelican, run "make html" to update html pages
 
 5. in wwwroot, run "git add *; git commit *", then git pushed
 

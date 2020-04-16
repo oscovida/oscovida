@@ -1,6 +1,6 @@
 .ipynb_checkpoints
 __pycache__
-tools/wwwroot
 cachedir
-tools/coronavirus.py
+notebooks/.*
+notebooks/wwwroot
 .DS_Store
