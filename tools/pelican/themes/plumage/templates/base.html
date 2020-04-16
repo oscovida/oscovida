@@ -300,5 +300,9 @@
     <script src="{{ SITEURL }}/theme/js/application.js"></script>
     {% block extra_js %}{% endblock %}
 
+    <script>
+      document.getElementsByTagName("table")[0].setAttribute("id", "data_table");
+    </script>
+
   </body>
 </html>
