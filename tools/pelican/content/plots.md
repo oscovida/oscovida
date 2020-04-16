@@ -24,8 +24,9 @@ available for [every country](world.html).
 ![south-korea data]({attach}fig-south-korea2.png)
 
 * Shows how many new confirmed cases are reported per day, shown as blue bars.
-* Blue lines shows a seven day (rolling) average over the bar data - this
-  produces smoother data, and in particular removes the effect of the weekend
+* Blue lines shows a seven day (rolling) average over the bar data (using a Gaussian
+  window with a standard deviation of 3 days) - this
+  produces smoother data. It also helps to removes the effect of the weekend
   (in some countries reported numbers drop during and just after the weekend)
 * We would like to see these numbers of daily changes decrease from day to day.
   The faster they go down the better. 
@@ -47,18 +48,20 @@ available for [every country](world.html).
 
 * The growth factor is the ratio of new cases (or deaths) today relative to new
   cases (or deaths) yesterday
-* Blue (red) dots show these ratios for cases (deaths), and are computed as the
-  ratio over a week to reduce noise
+* Blue (red) dots show these ratios for cases (deaths), and are computed based 
+  on the smoothed data shown in plot 2 and 3.
 * The solid line is a 7-day rolling mean over these points to provide smoother data.
 * As long as the growth value is greater than 1.0, the number of new infections
-  is increasing
+  is increasing.
 * If the growth value would is exactly 1.0, we have the same number of new
-  infections every day
+  infections every day.
 * The growth factor needs to be below 1.0 for the spread to slow down.
-* As this number is computed on the relative change from yesterday to today, we
-  can get high fluctuations where the numbers of new cases and deaths is small
-  (imagine there was 1 case yesterday, and 7 cases today, this would give a
-  growth factor of 7). 
+* As the growth factor does not depend on the total number of new cases/deaths
+  (but only on the relative change from yesterday to today), we can get high
+  fluctuations where the numbers of new cases and deaths is small (imagine there
+  was 1 case yesterday, and 7 cases today, this would give a growth factor of
+  7). In short: where the number of daily new cases/deaths is small, the growth
+  factor can appear to change quickly.
 
 ### Plot 5: Doubling times
 ![south-korea data]({attach}fig-south-korea5.png)
