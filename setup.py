@@ -50,6 +50,7 @@ setup(name="coronavirus-2020",
               'coverage',
               'nbval',
               'testpath',
+              'pycodestyle',
           ]
       },
       python_requires='>=3.6',
