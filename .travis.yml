@@ -12,4 +12,4 @@ install:
   - make dev-install
 
 script:
-  - make test-all
+  - make test
