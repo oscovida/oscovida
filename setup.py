@@ -42,6 +42,7 @@ setup(name="coronavirus-2020",
           'voila',
           'pelican',
           'seaborn',
+          'tabulate'
       ],
       extras_require={
           'test': [
