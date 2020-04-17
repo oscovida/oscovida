@@ -117,7 +117,7 @@ coronavirus-2020/dev
 
 2. Get the repository that keeps the static webpages (using github pages)
 
-"cd tools && git@github.com:fangohr/coronavirus-2020.git wwwroot"
+"cd tools && git clone git@github.com:fangohr/coronavirus.git wwwroot"
 
 3. update notebooks by running (in X/tools)
 

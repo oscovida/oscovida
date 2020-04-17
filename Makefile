@@ -1,27 +1,22 @@
-PYTHON?=python3
+# makefile used for testing
 
-CWD  := $(shell pwd)
+install:
+	python3 -m pip install .[test]
+
+dev-install:
+	python3 -m pip install -U -e .[test]
 
 test:
-	$(PYTHON) -m pytest -v
+	python3 -m pytest -v
 
 test-pycodestyle:
-	$(PYTHON) -m pycodestyle --filename=*.py .
+	python3 -m pycodestyle .
 
 test-all: test test-pycodestyle
 
 docker-build:
-	docker build -f tools/docker/Dockerfile -t dockertestimage .
+	docker build -t dockertestimage .
 
 docker-test:
 	@# docker run --rm dockertestimage -v $PWD:/io make test-all
 	docker run --rm -it -v $(CWD):/io dockertestimage make test
-
-travis:
-	make docker-build
-	make docker-test
-
-
-
-
-
