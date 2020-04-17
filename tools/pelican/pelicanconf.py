@@ -68,3 +68,6 @@ available</a>."""
 # under a <a rel='license'
 # href='https://creativecommons.org/licenses/by-nc-sa/4.0/'>Creative Commons
 # Attribution-NonCommercial-ShareAlike 4.0 International license</a>."""
+
+
+GOOGLE_ANALYTICS="UA-163845056-1"
