@@ -321,59 +321,49 @@ def plot_daily_change(ax, series, color):
 
     return ax
 
-def plot_doubling_time(ax, series, color, minchange=10):
+
+def plot_doubling_time(ax, series, color, minchange=1):
     # only keep values where there is a change of a minumum number
-    sel = series.diff() <= minchange
-    series.drop(series[sel].index, inplace=False)
+    # get rid of data points where change is small values
+    (f, f_label) , (change_smoothed, smoothed_label), _ = compute_daily_change(series)
+    sel = change_smoothed < minchange
+    reduced = series.drop(f[sel].index, inplace=False)
+    if len(reduced) <= 1:   # no data left
+        return ax
 
-    # we assume we have one value for every day - should check XXX
-    q2_div_q1 = series.pct_change() + 1  # computes q2/q1
-    q2_div_q1.replace(np.inf, np.nan, inplace=True)  # get rid of x/0 results
-    q2_div_q1.dropna(inplace=True)
-    dtime = double_time_exponential(q2_div_q1, t2_minus_t1=1)
-    dtime.dropna(inplace=True)
 
-    # exceptions:
-    #
-    # UK: data point on 15 March 2020 for only 1 new case, results in huge spike in doubling time (~790 days)
-    # drop this
-    if series.country == "United Kingdom" and series.label=="cases":
-        # print(dtime)
-        sel = dtime > 50
-        dtime.drop(dtime[sel].index, inplace=True)
-        print(f"Dropping UK data at {dtime[sel].index}, values are {dtime[sel]}")
-    # end of exceptions
+    ratio = reduced.pct_change() + 1  # computes q2/q1 =
+    ratio_smooth = reduced.rolling(7, center=True, win_type='gaussian',
+                                   min_periods=7).mean(std=3).pct_change() + 1  # computes q2/q1
+    # compute the actual doubling time
+    dtime = double_time_exponential(ratio, t2_minus_t1=1)
+    dtime_smooth = double_time_exponential(ratio_smooth, t2_minus_t1=1)
 
     label = series.country + " new " + series.label
     ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=label)
 
-    # need rolling average to smooth out weekly variations
-    rolling = dtime.rolling(7, min_periods=1, center=True).mean()
-
     # good to take maximum value from here
-    ymax = min(rolling.max()*1.5, 500)
-    if np.isnan(ymax):
-        # This happens is rolling is empty, for example for deaths in Austria, Singapore
-        # print(f"Can't plot doublingtime line for {series.label} in {series.country} due to too small numbers")
-        ymax = 10
+    dtime_smooth.replace(np.inf, np.nan, inplace=True)  # get rid of x/0 results, which affect max()
+    ymax = min(dtime_smooth.max()*1.5, 5000)  # China has doubling time of 3000 in between
 
-    # some countries require special care
-    if series.country == 'China':
-            ymax = 100
+    ## Adding a little bit of additional smoothing just for visual effects
+    dtime_smooth2 = dtime_smooth.rolling(3, win_type='gaussian', min_periods=1, center=True).mean(std=1)
 
     ax.set_ylim(0, ymax)
-    ax.plot(dtime.index, rolling, "-", color=color, alpha=1.0, label=label + ' 7-day rolling mean',
+    ax.plot(dtime_smooth2.index, dtime_smooth2.values, "-", color=color, alpha=1.0,
+            label=label + ' 7-day rolling mean (stddev=3)',
             linewidth=LW)
     ax.legend()
     ax.set_ylabel("doubling time [days]")
-    return ax, rolling, dtime
+    return ax
+
 
 def compute_growth_factor(series):
     """returns (growth, smooth)
 
     where 'growth' is a tuple of (series, label)
     and smooth is a tuple of (series, label).
-    
+
     'growth' returns the raw data (with nan's dropped)
     'smooth' makes the data smoother
 
