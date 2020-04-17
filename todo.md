@@ -53,8 +53,13 @@ Webpage generation
 -   \[ \] make webpage generation into a service (cronjob?) to run once
     a day and update webpages automatically
 -   \[ \] document and refactor everything
+
+Binder
+-------
 -   \[ \] split Binder repository for ipynb files from html repository:
     - html repo is pretty big, poor binder needs to clone this every time it is used
+-   \[ \] remove inconsolata font from coronavirus.py, or install in binder (so
+    that no font warning is reported when executing the notebook on binder)
 
 Bugs
 ----
@@ -92,7 +97,6 @@ Web page content
 - add license for content and code
 - add panosc logo
 - update plots in plots.html
-
 
 
 
