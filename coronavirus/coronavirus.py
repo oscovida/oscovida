@@ -322,7 +322,7 @@ def plot_daily_change(ax, series, color):
     return ax
 
 
-def plot_doubling_time(ax, series, color, minchange=1):
+def plot_doubling_time(ax, series, color, minchange=0.5, debug=False):
     # only keep values where there is a change of a minumum number
     # get rid of data points where change is small values
     (f, f_label) , (change_smoothed, smoothed_label), _ = compute_daily_change(series)
@@ -334,10 +334,41 @@ def plot_doubling_time(ax, series, color, minchange=1):
 
     ratio = reduced.pct_change() + 1  # computes q2/q1 =
     ratio_smooth = reduced.rolling(7, center=True, win_type='gaussian',
-                                   min_periods=7).mean(std=3).pct_change() + 1  # computes q2/q1
+                                   min_periods=7).mean(std=3).pct_change() + 1
+
+    if debug:
+        print(f"len(ratio) = {len(ratio.dropna())}, {ratio}")
+        print(f"len(ratio_smooth) = {len(ratio_smooth.dropna())}, {ratio_smooth}")
+
+
+    # can have np.inf and np.nan at this point in ratio_smooth
+    # if those are the only values, then we should stop
+    ratio_smooth.replace(np.inf, np.nan, inplace=True)
+    if ratio_smooth.isna().all():
+        return ax
+
+    ratio.replace(np.inf, np.nan, inplace=True)
+    if ratio.isna().all():
+        return ax
+
+    # computes q2/q1
     # compute the actual doubling time
     dtime = double_time_exponential(ratio, t2_minus_t1=1)
     dtime_smooth = double_time_exponential(ratio_smooth, t2_minus_t1=1)
+
+    if debug:
+        print(f"len(dtime) = {len(dtime.dropna())}, {dtime}")
+        print(f"len(dtime_smooth) = {len(dtime_smooth.dropna())}, {dtime_smooth}")
+
+    # can have np.inf and np.nan at this point in dtime_smooth and dtime
+    # if those are the only values, then we should stop
+    dtime_smooth.replace(np.inf, np.nan, inplace=True)
+    if dtime_smooth.isna().all():
+        return ax
+
+    dtime.replace(np.inf, np.nan, inplace=True)
+    if dtime.isna().all():
+        return ax
 
     label = series.country + " new " + series.label
     ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=label)
@@ -665,7 +696,7 @@ def make_compare_plot_germany(region_subregion,
                       v0=y_limit, highlight={res_d.columns[0]:"C0"},
                       labeloffset=0.5)
 
-    fig.tight_layout(pad=1)
+    # fig.tight_layout(pad=1)
 
     title = f"Daily cases (top) and deaths (below) for Germany: {label_from_region_subregion((region, subregion))}"
     axes[0].set_title(title)
@@ -711,7 +742,9 @@ def overview(country, region=None, subregion=None, savefig=False):
     title = f"Overview {c.country}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
 
-    fig.tight_layout(pad=1)
+    # tight_layout gives warnings, for example for Heinsberg
+    # fig.tight_layout(pad=1)
+
     filename = os.path.join("figures", c.country.replace(" ", "-").replace(",", "-") + '.svg')
     if savefig:
         fig.savefig(filename)
