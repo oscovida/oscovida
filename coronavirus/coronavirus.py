@@ -321,59 +321,126 @@ def plot_daily_change(ax, series, color):
 
     return ax
 
-def plot_doubling_time(ax, series, color, minchange=10):
+
+
+def compute_doubling_time(series, minchange=0.5, debug=False):
+
+    """
+    Compute and return doubling time of (assumed exponential) growth, based on two
+    data points. We use data points from subsequent days.
+
+    returns (dtime, smooth)
+
+    Where 'dtime' is a tuple of (series, label)
+    and smooth is a tuple of (series, label).
+
+    'dtime' returns the raw data (with nan's dropped)
+    'smooth' makes the data smoother
+
+    The 'dtime' under consideration, is the day-to-day dtime of the series.
+    We assume that there is one entry per day in the Series.
+
+    If there is not enough data to compute the doubling time, returns
+    ((None, message), (None, None)) where 'message' provides
+    data for debugging the analysis.
+    """
+
     # only keep values where there is a change of a minumum number
-    sel = series.diff() <= minchange
-    series.drop(series[sel].index, inplace=False)
+    # get rid of data points where change is small values
+    (f, f_label) , (change_smoothed, smoothed_label), _ = compute_daily_change(series)
+    sel = change_smoothed < minchange
+    reduced = series.drop(f[sel].index, inplace=False)
+    if len(reduced) <= 1:   # no data left
+        return (None, "no data in reduced data set"), (None, None)
 
-    # we assume we have one value for every day - should check XXX
-    q2_div_q1 = series.pct_change() + 1  # computes q2/q1
-    q2_div_q1.replace(np.inf, np.nan, inplace=True)  # get rid of x/0 results
-    q2_div_q1.dropna(inplace=True)
-    dtime = double_time_exponential(q2_div_q1, t2_minus_t1=1)
-    dtime.dropna(inplace=True)
+    ratio = reduced.pct_change() + 1  # computes q2/q1 =
+    ratio_smooth = reduced.rolling(7, center=True, win_type='gaussian',
+                                   min_periods=7).mean(std=3).pct_change() + 1
 
-    # exceptions:
-    #
-    # UK: data point on 15 March 2020 for only 1 new case, results in huge spike in doubling time (~790 days)
-    # drop this
-    if series.country == "United Kingdom" and series.label=="cases":
-        # print(dtime)
-        sel = dtime > 50
-        dtime.drop(dtime[sel].index, inplace=True)
-        print(f"Dropping UK data at {dtime[sel].index}, values are {dtime[sel]}")
-    # end of exceptions
+    if debug:
+        print(f"len(ratio) = {len(ratio.dropna())}, {ratio}")
+        print(f"len(ratio_smooth) = {len(ratio_smooth.dropna())}, {ratio_smooth}")
 
-    label = series.country + " new " + series.label
-    ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=label)
 
-    # need rolling average to smooth out weekly variations
-    rolling = dtime.rolling(7, min_periods=1, center=True).mean()
+    # can have np.inf and np.nan at this point in ratio
+    # if those are the only values, then we should stop
+    ratio.replace(np.inf, np.nan, inplace=True)
+    if ratio.isna().all():
+        return (None, "Cannot compute ratio"), (None, None)
+
+    ratio_smooth.replace(np.inf, np.nan, inplace=True)
+    if ratio_smooth.isna().all():
+        # no useful data in smooth line, but data for dots is okay
+        # Give up anyway
+        return (None, "Cannot compute smooth ratio"), (None, None)
+
+    # computes q2/q1
+    # compute the actual doubling time
+    dtime = double_time_exponential(ratio, t2_minus_t1=1)
+    dtime_smooth = double_time_exponential(ratio_smooth, t2_minus_t1=1)
+
+    if debug:
+        print(f"len(dtime) = {len(dtime.dropna())}, {dtime}")
+        print(f"len(dtime_smooth) = {len(dtime_smooth.dropna())}, {dtime_smooth}")
+
+    # can have np.inf and np.nan at this point in dtime_smooth and dtime
+    # if those are the only values, then we should stop
+    dtime_smooth.replace(np.inf, np.nan, inplace=True)
+    if dtime_smooth.isna().all():
+        # We could at this point carry on and return the dtime, but not dtime_smooth.
+        # This may not be a common use case and not worth the extra complications.
+        return (None, "Cannot compute doubling time"), (None, None)
+
+    dtime.replace(np.inf, np.nan, inplace=True)
+    if dtime.isna().all():
+        return (None, "Cannot compute smooth doubling time"), (None, None)
+
+    dtime_label = series.country + " new " + series.label
+    dtime_smooth_label = dtime_label + ' 7-day rolling mean (stddev=3)'
+
+    return (dtime, dtime_label), (dtime_smooth, dtime_smooth_label)
+
+
+def plot_doubling_time(ax, series, color, minchange=0.5, debug=False):
+    """Plot doubling time of series, assuming series is accumulated cases/deaths as
+    function of days.
+
+    Returns axis.
+
+    """
+
+    (dtime, dtime_label), (dtime_smooth, dtime_smooth_label) = \
+        compute_doubling_time(series, minchange=minchange, debug=debug)
+
+    if dtime is None:
+        if debug:
+            print(dtime_label)
+        return ax
+
+    ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=dtime_label)
 
     # good to take maximum value from here
-    ymax = min(rolling.max()*1.5, 500)
-    if np.isnan(ymax):
-        # This happens is rolling is empty, for example for deaths in Austria, Singapore
-        # print(f"Can't plot doublingtime line for {series.label} in {series.country} due to too small numbers")
-        ymax = 10
+    dtime_smooth.replace(np.inf, np.nan, inplace=True)  # get rid of x/0 results, which affect max()
+    ymax = min(dtime_smooth.max()*1.5, 5000)  # China has doubling time of 3000 in between
 
-    # some countries require special care
-    if series.country == 'China':
-            ymax = 100
+    ## Adding a little bit of additional smoothing just for visual effects
+    dtime_smooth2 = dtime_smooth.rolling(3, win_type='gaussian', min_periods=1, center=True).mean(std=1)
 
     ax.set_ylim(0, ymax)
-    ax.plot(dtime.index, rolling, "-", color=color, alpha=1.0, label=label + ' 7-day rolling mean',
+    ax.plot(dtime_smooth2.index, dtime_smooth2.values, "-", color=color, alpha=1.0,
+            label=dtime_smooth_label,
             linewidth=LW)
     ax.legend()
     ax.set_ylabel("doubling time [days]")
-    return ax, rolling, dtime
+    return ax
+
 
 def compute_growth_factor(series):
     """returns (growth, smooth)
 
     where 'growth' is a tuple of (series, label)
     and smooth is a tuple of (series, label).
-    
+
     'growth' returns the raw data (with nan's dropped)
     'smooth' makes the data smoother
 
@@ -675,7 +742,7 @@ def make_compare_plot_germany(region_subregion,
                       v0=y_limit, highlight={res_d.columns[0]:"C0"},
                       labeloffset=0.5)
 
-    fig.tight_layout(pad=1)
+    # fig.tight_layout(pad=1)
 
     title = f"Daily cases (top) and deaths (below) for Germany: {label_from_region_subregion((region, subregion))}"
     axes[0].set_title(title)
@@ -721,7 +788,9 @@ def overview(country, region=None, subregion=None, savefig=False):
     title = f"Overview {c.country}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
 
-    fig.tight_layout(pad=1)
+    # tight_layout gives warnings, for example for Heinsberg
+    # fig.tight_layout(pad=1)
+
     filename = os.path.join("figures", c.country.replace(" ", "-").replace(",", "-") + '.svg')
     if savefig:
         fig.savefig(filename)
