@@ -10,6 +10,7 @@ General
 -   \[ \] write test that attempts to generate plots for all countries
     in RKI data
 -   \[ \] unit tests
+-   \[X\] turn python code into package
 -   \[ \] set up basic continuous integration (Travis?)
     -   possible system test could be
         -   \[X\] running of `overview` function for a number of
@@ -45,13 +46,20 @@ Webpage generation
             -   probably best at the beginning of
                 <https://fangohr.github.io/coronavirus/index-germany.html>
                 as a separate section \"Overview Bundeslaender\"
--   \[ \] make webpage generation faster
+-   \[X\] make webpage generation faster
     -   takes about one hour at the moment (\~8 seconds per page, in
         total about 180+410 \~ 600 pages)
     -   can we parallelise?
 -   \[ \] make webpage generation into a service (cronjob?) to run once
     a day and update webpages automatically
 -   \[ \] document and refactor everything
+
+Binder
+-------
+-   \[ \] split Binder repository for ipynb files from html repository:
+    - html repo is pretty big, poor binder needs to clone this every time it is used
+-   \[ \] remove inconsolata font from coronavirus.py, or install in binder (so
+    that no font warning is reported when executing the notebook on binder)
 
 Bugs
 ----
@@ -62,7 +70,7 @@ Bugs
     y-direction, for example
     <https://fangohr.github.io/coronavirus/Germany-Baden-W%C3%BCrttemberg-LK-Alb-Donau-Kreis.html>
     What is this? (accidentally dropping rows inplace?)
--   \[ \] Pelican rendering: tag links in
+-   \[X\] Pelican rendering: tag links in
     https://fangohr.github.io/coronavirus/germany.html don't work (needs to use
     absolute URL in pelicanconf.py? Path is wrong by "coronavirus")
 
@@ -83,8 +91,12 @@ Functionality
 -   \[ \] decide on name for project and host somewhere more official (Hans) [HIGH]
 
 
+Web page content
+======================
 
-
+- add license for content and code
+- add panosc logo
+- update plots in plots.html
 
 
 
