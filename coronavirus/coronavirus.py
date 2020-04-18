@@ -752,12 +752,6 @@ def make_compare_plot_germany(region_subregion,
 
 ###################### Functions needed for Spanish data
 
-spanish_regions = ["Andalucía", "Aragón", "Asturias", "Cantabria", "Ceuta", "Castilla y León",
-                   "Castilla-La Mancha", "Canarias", "Cataluña", "Extremadura", "Galicia",
-                   "Islas Baleares", "Murcia", "Com. Madrid", "Melilla", "Navarra", "País Vasco",
-                   "La Rioja", "Com. Valenciana"]
-
-
 def rename_columns(spanish_data):
     """Rename columns for non-spanish speakers. """
 
@@ -797,6 +791,12 @@ def fetch_data_spain():
 def map_regions(spanish_data):
     """Map the Administrative Region codes from data with proper names. """
     codes = sorted(set(spanish_data['Admin. region code']))
+    
+    spanish_regions = ["Andalucía", "Aragón", "Asturias", "Cantabria", "Ceuta",
+                       "Castilla y León", "Castilla-La Mancha", "Canarias", "Cataluña",
+                       "Extremadura", "Galicia", "Islas Baleares", "Murcia", "Com. Madrid",
+                       "Melilla", "Navarra", "País Vasco", "La Rioja", "Com. Valenciana"]
+    
     regions = dict(zip(codes, spanish_regions))
     spanish_data['Region'] = spanish_data['Admin. region code'].map(regions)
     spanish_data.drop(columns=['Admin. region code'], inplace=True)
@@ -826,6 +826,55 @@ def spain_get_region(region=None):
         deaths.label = 'deaths'
 
         return cases, deaths
+
+
+def make_compare_plot_spain(region_subregion,
+                              compare_with=[], #"China", "Italy", "Germany"],
+                              compare_with_local=["Andalucía", "Aragón", "Asturias", "Cantabria", "Ceuta",
+                                                  "Castilla y León", "Castilla-La Mancha", "Canarias",
+                                                  "Cataluña", "Extremadura", "Galicia", "Islas Baleares",
+                                                  "Murcia", "Com. Madrid", "Melilla", "Navarra", "País Vasco",
+                                                  "La Rioja", "Com. Valenciana"],
+                              v0c=10, v0d=1):
+    rolling = 7
+    region, subregion = unpack_region_subregion(region_subregion)
+    df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local, rolling=rolling)
+    df_c2, df_d2 = get_compare_data(compare_with, rolling=rolling)
+
+    # need to get index into same timezone before merging
+    df_d1.set_index(df_d1.index.tz_localize(None), inplace=True)
+    df_c1.set_index(df_c1.index.tz_localize(None), inplace=True)
+
+    df_c = pd.merge(df_c1, df_c2, how='outer', left_index=True, right_index=True)
+    df_d = pd.merge(df_d1, df_d2, how='outer', left_index=True, right_index=True)
+
+    res_c = align_sets_at(v0c, df_c)
+    res_d = align_sets_at(v0d, df_d)
+
+    fig, axes = plt.subplots(2, 1, figsize=(10, 6))
+    ax=axes[0]
+    plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
+                      "daily new cases\n(rolling 7-day mean)",
+                      v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
+    ax = axes[1]
+
+    res_d_0 = res_d[res_d.index >= 0]   # from "day 0" only
+    # if we have values in between 0.1 and 1, set the lower `y_limit` on the graph to 0.1
+    if res_d_0[(res_d_0 > 0.1) & (res_d_0 < 1)].any().any():    # there must be a more elegant check
+        y_limit = 0.1
+    else:
+        y_limit = v0d
+    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
+                      "daily new deaths\n(rolling 7-day mean)",
+                      v0=y_limit, highlight={res_d.columns[0]:"C0"},
+                      labeloffset=0.5)
+
+    # fig.tight_layout(pad=1)
+
+    title = f"Daily cases (top) and deaths (below) for Germany: {label_from_region_subregion((region, subregion))}"
+    axes[0].set_title(title)
+
+    return axes, res_c, res_d
 
 #######################
 
@@ -883,6 +932,13 @@ def overview(country, region=None, subregion=None, savefig=False):
         laender = list(germany['Bundesland'].drop_duplicates().sort_values())
         axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion),
                                                                compare_with_local=laender)
+        return_axes = np.concatenate([axes, axes_compare])
+    
+    elif country=="Spain":   # Spain specific plots
+        # We thus compare only against those regions, that are in the data set:
+        spain = fetch_data_spain()
+        axes_compare, res_c, red_d = make_compare_plot_spain((region, subregion),
+                                                             compare_with_local=spanish_regions)
         return_axes = np.concatenate([axes, axes_compare])
 
     fig2 = plt.gcf()
