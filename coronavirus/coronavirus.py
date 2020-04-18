@@ -322,15 +322,36 @@ def plot_daily_change(ax, series, color):
     return ax
 
 
-def plot_doubling_time(ax, series, color, minchange=0.5, debug=False):
+
+def compute_doubling_time(series, minchange=0.5, debug=False):
+
+    """
+    Compute and return doubling time of (assumed exponential) growth, based on two
+    data points. We use data points from subsequent days.
+
+    returns (dtime, smooth)
+
+    Where 'dtime' is a tuple of (series, label)
+    and smooth is a tuple of (series, label).
+    
+    'dtime' returns the raw data (with nan's dropped)
+    'smooth' makes the data smoother
+
+    The 'dtime' under consideration, is the day-to-day dtime of the series.
+    We assume that there is one entry per day in the Series.
+
+    If there is not enough data to compute the doubling time, returns
+    ((None, message), (None, None)) where 'message' provides
+    data for debugging the analysis.
+    """
+
     # only keep values where there is a change of a minumum number
     # get rid of data points where change is small values
     (f, f_label) , (change_smoothed, smoothed_label), _ = compute_daily_change(series)
     sel = change_smoothed < minchange
     reduced = series.drop(f[sel].index, inplace=False)
     if len(reduced) <= 1:   # no data left
-        return ax
-
+        return (None, "no data in reduced data set"), (None, None)
 
     ratio = reduced.pct_change() + 1  # computes q2/q1 =
     ratio_smooth = reduced.rolling(7, center=True, win_type='gaussian',
@@ -341,15 +362,17 @@ def plot_doubling_time(ax, series, color, minchange=0.5, debug=False):
         print(f"len(ratio_smooth) = {len(ratio_smooth.dropna())}, {ratio_smooth}")
 
 
-    # can have np.inf and np.nan at this point in ratio_smooth
+    # can have np.inf and np.nan at this point in ratio
     # if those are the only values, then we should stop
-    ratio_smooth.replace(np.inf, np.nan, inplace=True)
-    if ratio_smooth.isna().all():
-        return ax
-
     ratio.replace(np.inf, np.nan, inplace=True)
     if ratio.isna().all():
-        return ax
+        return (None, "Cannot compute ratio"), (None, None)
+
+    ratio_smooth.replace(np.inf, np.nan, inplace=True)
+    if ratio_smooth.isna().all():
+        # no useful data in smooth line, but data for dots is okay
+        # Give up anyway
+        return (None, "Cannot compute smooth ratio"), (None, None)
 
     # computes q2/q1
     # compute the actual doubling time
@@ -364,14 +387,37 @@ def plot_doubling_time(ax, series, color, minchange=0.5, debug=False):
     # if those are the only values, then we should stop
     dtime_smooth.replace(np.inf, np.nan, inplace=True)
     if dtime_smooth.isna().all():
-        return ax
+        # We could at this point carry on and return the dtime, but not dtime_smooth.
+        # This may not be a common use case and not worth the extra complications.
+        return (None, "Cannot compute doubling time"), (None, None)
 
     dtime.replace(np.inf, np.nan, inplace=True)
     if dtime.isna().all():
+        return (None, "Cannot compute smooth doubling time"), (None, None)
+
+    dtime_label = series.country + " new " + series.label
+    dtime_smooth_label = dtime_label + ' 7-day rolling mean (stddev=3)'
+
+    return (dtime, dtime_label), (dtime_smooth, dtime_smooth_label)
+
+
+def plot_doubling_time(ax, series, color, minchange=0.5, debug=False):
+    """Plot doubling time of series, assuming series is accumulated cases/deaths as
+    function of days.
+
+    Returns axis.
+
+    """
+
+    (dtime, dtime_label), (dtime_smooth, dtime_smooth_label) = \
+        compute_doubling_time(series, minchange=minchange, debug=debug)
+
+    if dtime is None:
+        if debug:
+            print(dtime_label)
         return ax
 
-    label = series.country + " new " + series.label
-    ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=label)
+    ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=dtime_label)
 
     # good to take maximum value from here
     dtime_smooth.replace(np.inf, np.nan, inplace=True)  # get rid of x/0 results, which affect max()
@@ -382,7 +428,7 @@ def plot_doubling_time(ax, series, color, minchange=0.5, debug=False):
 
     ax.set_ylim(0, ymax)
     ax.plot(dtime_smooth2.index, dtime_smooth2.values, "-", color=color, alpha=1.0,
-            label=label + ' 7-day rolling mean (stddev=3)',
+            label=dtime_smooth_label,
             linewidth=LW)
     ax.legend()
     ax.set_ylabel("doubling time [days]")
