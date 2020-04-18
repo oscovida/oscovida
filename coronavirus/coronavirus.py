@@ -333,7 +333,7 @@ def compute_doubling_time(series, minchange=0.5, debug=False):
 
     Where 'dtime' is a tuple of (series, label)
     and smooth is a tuple of (series, label).
-    
+
     'dtime' returns the raw data (with nan's dropped)
     'smooth' makes the data smoother
 
