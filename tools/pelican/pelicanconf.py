@@ -2,9 +2,9 @@
 # -*- coding: utf-8 -*- #
 from __future__ import unicode_literals
 
-AUTHOR = 'OSCA team'
-SITENAME = 'OSCA (Open Science COVID19 Analysis)'
-SITEURL = 'https://fangohr.github.io/coronavirus'
+AUTHOR = 'OSCOVIDA team'
+SITENAME = 'OSCOVIDA: Open Science COVID Analysis'
+SITEURL = 'https://oscovida.github.io'
 
 PATH = 'content'
 
@@ -70,4 +70,4 @@ available</a>."""
 # Attribution-NonCommercial-ShareAlike 4.0 International license</a>."""
 
 
-GOOGLE_ANALYTICS="UA-163845056-1"
+
