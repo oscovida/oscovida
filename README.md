@@ -9,9 +9,9 @@ The remaining content here is only for developers.
 
 Temporary links
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=index.ipynb)
+[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=notebooks%2Findex.ipynb)
 
-Dashboard: [![Voila](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?urlpath=voila%2Frender%2Fdashboard.ipynb)
+Dashboard: [![Voila](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?urlpath=voila%2Frender%2Fnotebooks%2Fdashboard.ipynb)
 
 # Coronavirus 2020 - how effective are our measures to slow down the virus?
 

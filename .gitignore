@@ -7,4 +7,9 @@ tools/wwwroot
 cachedir
 tools/coronavirus.py
 .DS_Store
+<<<<<<< HEAD
 >>>>>>> f6717e9ea8bc410b06e2f05f2e28d94155a80295
+=======
+.venv/
+.vscode/
+>>>>>>> 0c6a0f27159bcaab7fc1f8fc41306b2a710b688a
