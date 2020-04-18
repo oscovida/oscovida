@@ -151,7 +151,7 @@ def compose_dataframe_summary(cases, deaths):
 
 
 @joblib_memory.cache
-def fetch_data_germany_last_execution():
+def fetch_data_last_execution():
     return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
 @joblib_memory.cache
@@ -196,7 +196,7 @@ def fetch_data_germany():
     last_day = g2.index.max()
     sel = g2.index == last_day
     cleaned = g2.drop(g2[sel].index, inplace=False)
-    fetch_data_germany_last_execution()
+    fetch_data_last_execution()
     return cleaned
 
 
@@ -749,6 +749,83 @@ def make_compare_plot_germany(region_subregion,
 
     return axes, res_c, res_d
 
+
+###################### Functions needed for Spanish data
+
+spanish_regions = ["Andalucía", "Aragón", "Asturias", "Cantabria", "Ceuta", "Castilla y León",
+                   "Castilla-La Mancha", "Canarias", "Cataluña", "Extremadura", "Galicia",
+                   "Islas Baleares", "Murcia", "Com. Madrid", "Melilla", "Navarra", "País Vasco",
+                   "La Rioja", "Com. Valenciana"]
+
+
+def rename_columns(spanish_data):
+    """Rename columns for non-spanish speakers. """
+
+    return spanish_data.rename(columns={'CCAA': 'Admin. region code',
+                                        'FECHA': 'Date',
+                                        'CASOS': 'Cases',
+                                        'Hospitalizados': 'Hospitalized',
+                                        'UCI': 'ICU',
+                                        'Fallecidos': 'Deceases',
+                                        'Recuperados': 'Recovered'}, inplace=True)
+
+
+#@joblib_memory.cache
+def fetch_data_spain():
+    """Data source is https://covid19.isciii.es. The text on the webpage implies that 
+    the data comes from the Minitry of Health. """
+
+    datasource = "https://covid19.isciii.es/resources/serie_historica_acumulados.csv"
+    t0 = time.time()
+    print(f"Please be patient - downloading data from {datasource} ...")
+    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=4)
+    rename_columns(spain)
+    delta_t = time.time() - t0
+    print(f"Completed downloading {len(spain)} rows in {delta_t:.1f} seconds.")
+
+    g2 = spain.set_index(pd.to_datetime(spain['Date']))
+    g2.drop(columns=['Date'],inplace=True)
+    g2.index.name = 'date'
+    last_day = g2.index[-1]
+    sel = g2.index == last_day
+    cleaned = g2.drop(g2[sel].index, inplace=False)
+    fetch_data_last_execution()
+
+    return cleaned
+
+
+def map_regions(spanish_data):
+    """Map the Administrative Region codes from data with proper names. """
+    codes = sorted(set(spanish_data['Admin. region code']))
+    regions = dict(zip(codes, spanish_regions))
+    spanish_data['Region'] = spanish_data['Admin. region code'].map(regions)
+    spanish_data.drop(columns=['Admin. region code'], inplace=True)
+
+    return spanish_data
+
+
+def spain_get_region(region=None):
+    spain = fetch_data_spain()
+    spain = map_regions(spain)
+    """Returns two time series: (cases, deaths)"""
+    assert region, "Need to provide a value for the administrative region"
+    
+    if region:
+        assert region in spain['Region'].values, \
+            f"{region} not in available Spanish Administrative Regions. These are {sorted(spain['Region'].drop_duplicates())}"
+
+        region = spain[spain['Region'] == region]
+
+        # group over multiple rows for the same region
+        cases = region["Cases"]
+        cases.country = f'Spain-{region}'
+        cases.label = 'cases'
+
+        deaths = region["Deceases"]
+        deaths.country = f'Spain-{region}'
+        deaths.label = 'deaths'
+
+        return cases, deaths
 
 #######################
 
