@@ -25,6 +25,7 @@ General
             where the data comes from
     -   \[ \] split plotting routines into (i) calculation of entities, and 
             (ii) plotting
+-   \[ ]\ make python package available via pip - what name? coronavirus? oscovida?
 
 Webpage generation
 ------------------

@@ -12,15 +12,17 @@ purposes, or to share here.
 
 * For [Germany (492 Landkreise)](germany.html) we show data for all 492 Landkreise.
 
-Some [more interactive](interactive-plots.html) elements are in preparation.
-
 --------------------
 
 ![Plot]({attach}iran1-cases.png)
 
 ------------------
 
-If you want to [contribute](contribute.html), please get in touch.
+If you want to [contribute](contribute.html), please [get in
+touch](mailto:oscovidaproject@gmail.com). Ideas, suggestions and error reports,
+are welcome at our 
+[feedback issue tracker](https://github.com/oscovida/feedback/issues).
+
 
 # Disclaimer
 

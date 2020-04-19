@@ -12,8 +12,7 @@ slug: data-sources
   
 ## Data Analysis
   
-- All computational steps and code are available
-  [here](https://github.com/fangohr/coronavirus-2020/blob/master/coronavirus.py)
+- All computational steps and code are available (see [Open Science](open-science.html))
   -- contributions and corrections welcome.
 
 
