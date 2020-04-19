@@ -22,13 +22,15 @@ AUTHOR_FEED_RSS = None
 OUTPUT_PATH = "../wwwroot"
 
 # Blogroll
-LINKS = (("PaNOSC project", "http://panosc.eu"),
+LINKS = (("PaNOSC project", "https://panosc.eu"),
          )
          # ('You can modify those links in your config file', '#'),)
 
 # Social widget
 SOCIAL = (('PaNOSC', 'https://twitter.com/Panosc_eu'),
-          ('ProfCompMod', 'https://twitter.com/ProfCompMod'))          
+          ('ProfCompMod', 'https://twitter.com/ProfCompMod'))
+          #('Email','oscovidaproject@gmail.com'))
+#          ('Open Science COVID Analysis', 'https://twitter.com/OSCOVIDAproject'))
 
 DEFAULT_PAGINATION = False
 
@@ -56,18 +58,22 @@ LOAD_CONTENT_CACHE = False
 AUTHOR_SAVE_AS = False
 AUTHORS_SAVE_AS = False
 
-COPYRIGHT = """Add License"""
+TAGS_SAVE_AS = 'tags/index.html'
+CATEGORIES_SAVE_AS = 'categories/index.html'
+ARCHIVES_SAVE_AS = 'archives/index.html'
 
-DISCLAIMER = """Plots, data and software here has been put together by volunteers who have
-no training in epidemiology. There are likely to be errors in the processing.
-You are welcome to use the material at your own risk. The
-<a href='https://github.com/fangohr/coronavirus-2020/blob/master/LICENSE'> license is
-available</a>."""
 
-# """Unless contrary mentioned, the content of this site is published
-# under a <a rel='license'
-# href='https://creativecommons.org/licenses/by-nc-sa/4.0/'>Creative Commons
-# Attribution-NonCommercial-ShareAlike 4.0 International license</a>."""
+COPYRIGHT = """You are welcome to share and use the materials here. See <a href="http://oscovida.github.io/license.html">license</a> for details."""
+
+COPYRIGHT = """Unless contrary mentioned, the content of this site is published under a <a rel='license'
+href='https://creativecommons.org/licenses/by/4.0/'>Creative Commons
+Attribution 4.0 International license</a>. See <a href="http://oscovida.github.io/license.html">license</a> for details."""
+
+# The software is licensed under  <a href="https://github.com/fangohr/coronavirus-2020/blob/master/LICENSE">BSD 3-clause license</a>.
+
+DISCLAIMER = """Plots, data and software here are provided <a href="https://github.com/fangohr/coronavirus-2020/blob/master/LICENSE#L20">as-is without any warranties</a> by volunteers. Use the material at your own risk. See <a href="http://oscovida.github.io/license.html">license</a> for details."""
+
+
 
 
 
