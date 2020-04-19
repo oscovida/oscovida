@@ -22,6 +22,6 @@ FEED_ALL_ATOM = 'feeds/all.atom.xml'
 
 # Following items are often useful when publishing
 
-DISQUS_SITENAME = "oscovida"
+#DISQUS_SITENAME = "oscovida"
 #GOOGLE_ANALYTICS = ""
 GOOGLE_ANALYTICS="UA-163845056-1"
