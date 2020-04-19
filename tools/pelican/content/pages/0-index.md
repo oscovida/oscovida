@@ -28,9 +28,7 @@ are welcome at our
 
 The plots and code here has been put together by volunteers who have no training
 in epidemiology. There are likely to be errors in the processing. You are welcome
-to use the material at your own risk. The [license is available](https://github.com/fangohr/coronavirus-2020/blob/master/LICENSE).
-
-![Plot]({attach}germany-doubling-time.png)
+to use the material at your own risk. See [license](license.html) for details.
 
 # Acknowledgements
 
@@ -40,11 +38,16 @@ to use the material at your own risk. The [license is available](https://github.
 - Github for hosting repository and html files
 - Project Jupyter for the Notebook and Binder service
 - The H2020 project Photon and Neutron Open Science Cloud ([PaNOSC](https://www.panosc.eu/))
+- University of Southampton, United Kingdom.
 
 
 ---------------------
 
-![Plot]({attach}belgium7.png)
+<!--![Plot]({attach}belgium7.png)
 
 -------------------------
+
+![Plot]({attach}germany-doubling-time.png)
+
+-->
 
