@@ -7,3 +7,4 @@ tools/coronavirus.py
 .venv/
 .vscode/
 coronavirus_2020.egg-info
+default.profraw
