@@ -602,6 +602,7 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
             tmp = df[col].dropna()
             if len(tmp) > 0:   # possible we have no data points
                 x, y = tmp.index[-1], tmp.values[-1]
+                y = np.NaN if y == 0 else y
                 ax.annotate(col, xy=(x + labeloffset, y), textcoords='data')
                 ax.plot([x], [y], "o" + color, alpha=alpha)
     # ax.legend()
