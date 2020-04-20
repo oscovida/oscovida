@@ -765,6 +765,11 @@ def make_compare_plot_germany(region_subregion,
 
 ###################### Functions needed for Spanish data
 
+spanish_regions = ["Andalucía", "Aragón", "Asturias", "Cantabria", "Ceuta",
+                   "Castilla y León", "Castilla-La Mancha", "Canarias", "Cataluña",
+                   "Extremadura", "Galicia", "Islas Baleares", "Murcia", "Com. Madrid",
+                   "Melilla", "Navarra", "País Vasco", "La Rioja", "Com. Valenciana"]
+
 def rename_columns(spanish_data):
     """Rename columns for non-spanish speakers. """
 
@@ -785,7 +790,7 @@ def fetch_data_spain():
     datasource = "https://covid19.isciii.es/resources/serie_historica_acumulados.csv"
     t0 = time.time()
     print(f"Please be patient - downloading data from {datasource} ...")
-    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=4)
+    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=6)
     rename_columns(spain)
     delta_t = time.time() - t0
     print(f"Completed downloading {len(spain)} rows in {delta_t:.1f} seconds.")
@@ -804,11 +809,6 @@ def fetch_data_spain():
 def map_regions(spanish_data):
     """Map the Administrative Region codes from data with proper names. """
     codes = sorted(set(spanish_data['Admin. region code']))
-    
-    spanish_regions = ["Andalucía", "Aragón", "Asturias", "Cantabria", "Ceuta",
-                       "Castilla y León", "Castilla-La Mancha", "Canarias", "Cataluña",
-                       "Extremadura", "Galicia", "Islas Baleares", "Murcia", "Com. Madrid",
-                       "Melilla", "Navarra", "País Vasco", "La Rioja", "Com. Valenciana"]
     
     regions = dict(zip(codes, spanish_regions))
     spanish_data['Region'] = spanish_data['Admin. region code'].map(regions)
@@ -841,25 +841,21 @@ def spain_get_region(region=None):
         return cases, deaths
 
 
-def make_compare_plot_spain(region_subregion,
+def make_compare_plot_spain(region,
                               compare_with=[], #"China", "Italy", "Germany"],
-                              compare_with_local=["Andalucía", "Aragón", "Asturias", "Cantabria", "Ceuta",
-                                                  "Castilla y León", "Castilla-La Mancha", "Canarias",
-                                                  "Cataluña", "Extremadura", "Galicia", "Islas Baleares",
-                                                  "Murcia", "Com. Madrid", "Melilla", "Navarra", "País Vasco",
-                                                  "La Rioja", "Com. Valenciana"],
+                              compare_with_local=spanish_regions,
                               v0c=10, v0d=1):
     rolling = 7
-    region, subregion = unpack_region_subregion(region_subregion)
-    df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local, rolling=rolling)
-    df_c2, df_d2 = get_compare_data(compare_with, rolling=rolling)
+#    region, subregion = unpack_region_subregion(region_subregion)
+#    df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local, rolling=rolling)
+    df_c, df_d = get_compare_data(compare_with_local, rolling=rolling)
 
     # need to get index into same timezone before merging
-    df_d1.set_index(df_d1.index.tz_localize(None), inplace=True)
-    df_c1.set_index(df_c1.index.tz_localize(None), inplace=True)
+    df_d.set_index(df_d.index.tz_localize(None), inplace=True)
+    df_c.set_index(df_c.index.tz_localize(None), inplace=True)
 
-    df_c = pd.merge(df_c1, df_c2, how='outer', left_index=True, right_index=True)
-    df_d = pd.merge(df_d1, df_d2, how='outer', left_index=True, right_index=True)
+#    df_c = pd.merge(df_c1, df_c2, how='outer', left_index=True, right_index=True)
+#    df_d = pd.merge(df_d1, df_d2, how='outer', left_index=True, right_index=True)
 
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
@@ -884,7 +880,7 @@ def make_compare_plot_spain(region_subregion,
 
     # fig.tight_layout(pad=1)
 
-    title = f"Daily cases (top) and deaths (below) for Germany: {label_from_region_subregion((region, subregion))}"
+    title = f"Daily cases (top) and deaths (below) for Spain: {region}"
     axes[0].set_title(title)
 
     return axes, res_c, res_d
