@@ -1,12 +1,12 @@
 Title: Our motivation
-Date: 2020-04-10 10:20
+Date: 2020-04-19 10:20
 category: About
 slug: motivation
 
 
 ## Motivation
 
-### Understanding the situation
+### 1. Understanding the situation
 
 The reporting in the media on the #COVID19 situation is not always providing
 sufficient context to interpret the numbers: we hear many news reports about how
@@ -24,7 +24,7 @@ With the plots and data available here, we hope to contribute to this.
 
 Discussion and contributions are welcome.
 
-### Preparing for later stages of the outbreaks
+### 2. Preparing for later stages of the outbreaks
 
 Once the epidemic growth of infections is brought under control, we will need to
 find a fine balance between measures (such as social distancing, closure of
@@ -35,7 +35,7 @@ We can start to see this in the data for countries such as China and South
 Korea. We need to learn to better read these data. It will be essential to
 monitor such indicators for some time (months or years?) to come.
 
-### Enable citizen science
+### 3. Enable citizen science
 
 * The [source code](https://github.com/fangohr/coronavirus-2020) that creates
   the plots is available here, can be inspected, downloaded, modified and
@@ -44,7 +44,13 @@ monitor such indicators for some time (months or years?) to come.
 * Using [Jupyter Notebooks](https://jupyter.org/) and the [MyBinder
   project](https://mybinder.org) project, anyone with a web browser can execute
   the source (to create the same or new plots) from within a web browser, by
-  clicking [this link](https://mybinder.org/v2/gh/fangohr/coronavirus/master).
+  clicking [this link](https://mybinder.org/v2/gh/oscovida/oscovida.github.io/master?filepath=ipynb).
 
+* See also [related post on open science](open-science.html).
 
+### 4. Simplify use of the existing data sets for experts
 
+Our project can be used to get access to the COVID19 data from the convenience
+of a Python function; this may help other scientists to build better models or data analysis. 
+
+([Contributions](contribute.html) to our plots and software are welcome.)

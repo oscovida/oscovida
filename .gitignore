@@ -12,4 +12,9 @@ tools/coronavirus.py
 =======
 .venv/
 .vscode/
+<<<<<<< HEAD
 >>>>>>> 0c6a0f27159bcaab7fc1f8fc41306b2a710b688a
+=======
+coronavirus_2020.egg-info
+default.profraw
+>>>>>>> ad2c9c0b89afbfc3748585261aa528cccec67974

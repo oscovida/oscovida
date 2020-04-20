@@ -280,8 +280,10 @@ def compute_daily_change(series):
     label = ""
     change = diff, label
 
-    # smoothed curve
+    # smoothed curve, technical description
     smooth_label = f"Gaussian window (stddev=3 days)"
+    # shorter description
+    smooth_label = f"(rolling mean)"
     rolling_series = diff.rolling(9, center=True,
                                   win_type='gaussian',
                                   min_periods=1).mean(std=3)
@@ -291,9 +293,12 @@ def compute_daily_change(series):
     rolling_series2 = rolling_series.rolling(4, center=True,
                                              win_type='gaussian',
                                              min_periods=1).mean(std=2)
-    label = "Smoothed " + smooth_label
+    # extra smooth curve
+    smooth2_label = "Smoothed " + smooth_label
+    # shorter description
+    smooth2_label = smooth_label
 
-    smooth2 = rolling_series2, label
+    smooth2 = rolling_series2, smooth2_label
 
     return change, smooth, smooth2
 
@@ -397,6 +402,8 @@ def compute_doubling_time(series, minchange=0.5, debug=False):
 
     dtime_label = series.country + " new " + series.label
     dtime_smooth_label = dtime_label + ' 7-day rolling mean (stddev=3)'
+    # simplified label
+    dtime_smooth_label = dtime_label + ' rolling mean'
 
     return (dtime, dtime_label), (dtime_smooth, dtime_smooth_label)
 
@@ -462,6 +469,8 @@ def compute_growth_factor(series):
     # Compute smoother version for line in plots
     f_smoothed = f.rolling(7, center=True, win_type='gaussian', min_periods=3).mean(std=2)
     smooth_label = f"Gaussian window (stddev=2 days)"
+    # simplified label
+    smooth_label = "(rolling mean)"
 
     smoothed = f_smoothed, smooth_label
 
@@ -472,17 +481,21 @@ def compute_growth_factor(series):
 def plot_growth_factor(ax, series, color):
     """relative change of number of new cases/deaths from day to day
     See https://youtu.be/Kas0tIxDvrg?t=330, 5:30 onwards
+
+    Computed based smooth daily change data.
     """
 
     # get smooth data from plot 1 to base this plot on
     (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
 
-    label = series.country + " " + series.label + " growth factor (based on smooth daily change)" + f_label
+    
+    label = series.country + " " + series.label + " growth factor " + f_label
     ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
 
     label = series.country + " " + series.label + " growth factor " + smoothed_label
     ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color, label=label, linewidth=LW)
 
+    # ax.legend(loc='lower left')
     ax.legend()
     ax.set_ylabel("growth factor")
     ax.set_ylim(0.5, 1.5)  # should generally be below 1
