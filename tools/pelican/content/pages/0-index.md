@@ -32,13 +32,14 @@ to use the material at your own risk. See [license](license.html) for details.
 
 # Acknowledgements
 
+- The H2020 project [Photon and Neutron Open Science Cloud PaNOSC)](https://www.panosc.eu/)
+- [University of Southampton](https://www.soton.ac.uk), United Kingdom
 - Johns Hopkins University provides data for countries
 - Robert Koch Institute provides data for within Germany
 - Open source and scientific computing community for the data tools
 - Github for hosting repository and html files
 - Project Jupyter for the Notebook and Binder service
-- The H2020 project Photon and Neutron Open Science Cloud ([PaNOSC](https://www.panosc.eu/))
-- University of Southampton, United Kingdom.
+
 
 
 ---------------------

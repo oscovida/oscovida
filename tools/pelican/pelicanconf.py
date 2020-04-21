@@ -27,7 +27,8 @@ LINKS = (("PaNOSC project", "https://panosc.eu"),
          # ('You can modify those links in your config file', '#'),)
 
 # Social widget
-SOCIAL = (('PaNOSC', 'https://twitter.com/Panosc_eu'),
+SOCIAL = (('Open Science COVID Analysis', 'https://twitter.com/OSCOVIDAproject'),
+          ('PaNOSC', 'https://twitter.com/Panosc_eu'),
           ('ProfCompMod', 'https://twitter.com/ProfCompMod'))
           #('Email','oscovidaproject@gmail.com'))
 #          ('Open Science COVID Analysis', 'https://twitter.com/OSCOVIDAproject'))
