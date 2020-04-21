@@ -134,3 +134,14 @@ def test_plot_growth_factor_fetch_data():
         c.plot_growth_factor(ax, deaths, 'C0');
         fig.savefig(f'test-growth-factor-{country}.pdf')
 
+
+
+def test_compose_dataframe_summary():
+    cases, deaths = mock_get_country()
+
+    table = c.compose_dataframe_summary(cases, deaths)
+    assert table['total cases'][-1] == 548
+
+    # check that most recent data item is last
+    print(table)
+    

@@ -147,6 +147,10 @@ def compose_dataframe_summary(cases, deaths):
     df["daily new cases"] = cases.diff()
     df["total deaths"] = deaths
     df["daily new deaths"] = deaths.diff()
+
+    # change index: latest numbers shown first
+    df = df[::-1]
+
     return df
 
 
