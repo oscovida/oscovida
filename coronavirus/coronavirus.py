@@ -404,10 +404,10 @@ def compute_doubling_time(series, minchange=0.5, debug=False):
     if dtime.isna().all():
         return (None, "Cannot compute smooth doubling time"), (None, None)
 
-    dtime_label = series.country + " new " + series.label
+    dtime_label = series.country + " doubling time " + series.label
     dtime_smooth_label = dtime_label + ' 7-day rolling mean (stddev=3)'
     # simplified label
-    dtime_smooth_label = dtime_label + ' rolling mean'
+    dtime_smooth_label = dtime_label + ' (rolling mean)'
 
     return (dtime, dtime_label), (dtime_smooth, dtime_smooth_label)
 
