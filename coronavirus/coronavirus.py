@@ -147,6 +147,10 @@ def compose_dataframe_summary(cases, deaths):
     df["daily new cases"] = cases.diff()
     df["total deaths"] = deaths
     df["daily new deaths"] = deaths.diff()
+
+    # change index: latest numbers shown first
+    df = df[::-1]
+
     return df
 
 
@@ -400,10 +404,10 @@ def compute_doubling_time(series, minchange=0.5, debug=False):
     if dtime.isna().all():
         return (None, "Cannot compute smooth doubling time"), (None, None)
 
-    dtime_label = series.country + " new " + series.label
+    dtime_label = series.country + " doubling time " + series.label
     dtime_smooth_label = dtime_label + ' 7-day rolling mean (stddev=3)'
     # simplified label
-    dtime_smooth_label = dtime_label + ' rolling mean'
+    dtime_smooth_label = dtime_label + ' (rolling mean)'
 
     return (dtime, dtime_label), (dtime_smooth, dtime_smooth_label)
 
@@ -602,6 +606,7 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
             tmp = df[col].dropna()
             if len(tmp) > 0:   # possible we have no data points
                 x, y = tmp.index[-1], tmp.values[-1]
+                y = np.NaN if y == 0 else y
                 ax.annotate(col, xy=(x + labeloffset, y), textcoords='data')
                 ax.plot([x], [y], "o" + color, alpha=alpha)
     # ax.legend()
