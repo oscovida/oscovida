@@ -205,30 +205,62 @@ def fetch_data_germany():
 
 
 def germany_get_region(state=None, landkreis=None):
+    """ The concept of region and subregion maps to Bundeslaender (or States) and Kreise in Germany:
+    region: state (such as Bavaria, Hamburg, Schleswig Holstein)
+    subregion: kreis (such as Pinneberg, Heinsberg)
+
+    The terminology can be confusing as there are different terms in use:
+
+    region: Bundesland, Land (in english 'state')
+    subregion: Kreis, Landkreis
+
+    If the state is 'RKI', then accumulate data for all landkreise for the whole of Germany.
+
+    This function returns two time series: (cases, deaths)
+    """
+
     germany = fetch_data_germany()
-    """Returns two time series: (cases, deaths)"""
+
     assert state or landkreis, "Need to provide a value for state or landkreis"
 
     if state and landkreis:
         raise NotImplementedError("Try to use 'None' for the state.")
-        """We need to check if this is important."""
+        """Subregion (=Landkreis) is sufficiently unique within Germany."""
 
-    if state:
+    if state == "all regions":  # accumulate data for all of Germany from Robert Koch Institute
+        germany = fetch_data_germany()
+        germany = germany.set_index(pd.to_datetime(germany['Meldedatum']))
+        germany.index.name = 'date'
+        germany.sort_index(inplace=True)
+
+        cases = germany['AnzahlFall'].groupby('date').agg('sum').cumsum()
+        cases.country = f'Germany-{state}'
+        cases.label = 'cases'
+
+        deaths = germany['AnzahlTodesfall'].groupby('date').agg('sum').cumsum()
+        deaths.country = cases.country
+        deaths.label = 'deaths'
+
+        return cases, deaths
+
+    elif state:  # normal states
+        # accumulate data for that state 
         assert state in germany['Bundesland'].values, \
-            f"{state} not in available German states. These are {sorted(germany['Bundesland'].drop_duplicates())}"
+            f"{state} not in available German states. " + \
+            f"These are {sorted(germany['Bundesland'].drop_duplicates())}"
 
         land = germany[germany['Bundesland'] == state]
         land = land.set_index(pd.to_datetime(land['Meldedatum']))
         land.index.name = 'date'
         land.sort_index(inplace=True)
 
-        # group over multiple rows for the same date
+        # group over multiple rows for the same date, cases
         # (this will also group over the different landkreise in the state)
         cases = land["AnzahlFall"].groupby('date').agg('sum').cumsum()
         cases.country = f'Germany-{state}'
         cases.label = 'cases'
 
-        # group over all multiple entries per day
+        # group over all multiple rows for the same date, deaths
         deaths = land["AnzahlTodesfall"].groupby('date').agg('sum').cumsum()
         deaths.country = f'Germany-{state}'
         deaths.label = 'deaths'
