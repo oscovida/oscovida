@@ -9,21 +9,6 @@ The remaining content here is only for developers.
 
 Temporary links
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?filepath=index.ipynb)
-
-Dashboard: [![Voila](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/fangohr/coronavirus-2020/master?urlpath=voila%2Frender%2Fdashboard.ipynb)
-
-# Coronavirus 2020 - how effective are our measures to slow down the virus?
-
-* Selected Plots for strongly affected countries (discussion below), see
-[index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
-([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/index.ipynb))
-
-* Plots for states in Germany (and Pinneberg) - experimental: 
-  [germany.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/germany.ipynb)
-  ([faster version if it works](https://nbviewer.jupyter.org/github/fangohr/coronavirus-2020/blob/master/germany.ipynb))
-  
-
 
 # Disclaimer
 

@@ -6,3 +6,5 @@ tools/coronavirus.py
 .DS_Store
 .venv/
 .vscode/
+coronavirus_2020.egg-info
+default.profraw
