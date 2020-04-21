@@ -94,7 +94,13 @@ coronavirus-2020/tools/pelican
 
 Base directory of Pelican (static html generator) package.
 
-- run `make html` here to create html in `../wwwroot`.
+- run `make html` here to create html in `../wwwroot`. Use this for development. 
+- run `make publish` here to create html that is meant to be pushed to the website:
+  - `make publish` executes the settings is `publishconf.py` after having executed `pelicanconf.py`.
+    As such, we get absolute URL in feeds, we  get feeds with links to new articles. It also adds
+    the google analytics tracker that we don't want for development, and javascript to enable disqus.
+    (Not sure if we want the latter, but we might as well set it up while there is no traffic on the page,
+    and then deactivate if we don't want it.)
 
 - the `generate-countries.ipynb` notebook creates files `germany.md` and `world.md` in pelican/contents
 
@@ -113,25 +119,27 @@ coronavirus-2020/archive
 coronavirus-2020/dev
 --------------------
 
-1. clone git@github.com:fangohr/coronavirus-2020.git into your chose directory X
+1. clone git@github.com:fangohr/coronavirus-2020.git into your chose directory
+   X. This provides the source code.
 
 2. Get the repository that keeps the static webpages (using github pages)
 
-"cd tools && git@github.com:fangohr/coronavirus-2020.git wwwroot"
+"cd tools && git clone git@github.com:oscovida/oscovida.github.io.git wwwroot"
+
+Procedure to update data and webpages
+==============================================
 
 3. update notebooks by running (in X/tools)
 
    jupyter-notebook generate-countries.html 
    
-4. in X/tools/pelican, run "make html" to update html pages
+4. in X/tools/pelican, run ``make html` to update html pages (to develop), `make
+   publish` for the final version
 
-5. in wwwroot, run "git add *; git commit *", then git pushed
+5. in `wwwroot`, run `git add *; git commit *`, then `git push`
 
-6. upates shoudl appear at https://fangohr.github.io/coronavirus/ a few minutes later
--   ongoing development
+6. updates should appear at https://oscovida.github.io a few minutes later
 
-Procedure to update data and webpages
-==============================================
 
 
 
