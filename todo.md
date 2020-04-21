@@ -5,10 +5,10 @@ General
 -------
 
 -   \[ \] PEP8 coronavirus.py (and other files)
--   \[ \] write test that attempts to generate plots for all countries
-    in Johns Hopkins data
--   \[ \] write test that attempts to generate plots for all countries
-    in RKI data
+-   \[X\] write test that attempts to generate plots for all countries
+    in Johns Hopkins data -> `tools/test-plots-for-all-regions.ipynb`
+-   \[X\] write test that attempts to generate plots for all countries
+    in RKI data -> `test-plots-for-all-regions.ipynb`
 -   \[ \] unit tests
 -   \[X\] turn python code into package
 -   \[ \] set up basic continuous integration (Travis?)
@@ -25,7 +25,7 @@ General
             where the data comes from
     -   \[ \] split plotting routines into (i) calculation of entities, and 
             (ii) plotting
--   \[ ]\ make python package available via pip - what name? coronavirus? oscovida?
+-   \[ \] make python package available via pip - what name? coronavirus? oscovida?
 
 Webpage generation
 ------------------
@@ -54,6 +54,7 @@ Webpage generation
 -   \[ \] make webpage generation into a service (cronjob?) to run once
     a day and update webpages automatically
 -   \[ \] document and refactor everything
+-   \[ \] Embed google analytics snippet in html of notebooks (in `html/*`)
 
 Binder
 -------
@@ -65,8 +66,8 @@ Binder
 Bugs
 ----
 
--   \[ \] adjust plot size to make sure headline shows in svg/pdf files
-    when saved
+-   \[X\] adjust plot size to make sure headline shows in svg/pdf files
+    when saved -> latest matplotlib version seems to do this automatically
 -   \[ \] the daily changes in log scale plot shows strips in
     y-direction, for example
     <https://fangohr.github.io/coronavirus/Germany-Baden-W%C3%BCrttemberg-LK-Alb-Donau-Kreis.html>
@@ -89,16 +90,14 @@ Functionality
     -  \[ \] allow rolling averages if some data points are missing
 -   \[ \] use plotly instead of matplotlib for more interactive
     experience in static html?
--   \[ \] decide on name for project and host somewhere more official (Hans) [HIGH]
+-   \[X\] decide on name for project and host somewhere more official (Hans) [HIGH]
 
 
 Web page content
 ======================
 
-- add license for content and code
-- add panosc logo
-- update plots in plots.html
-
+- \[X\] add license for content and code
+- \[X\] add data from other countries
 
 
 See also [ideas.md](ideas.md).
@@ -106,6 +105,5 @@ See also [ideas.md](ideas.md).
 Low priority / crazy?
 =====================
 
--   \[ \] select data set by clicking on landkreis? (possible? Use
-    voila?)
+
 
