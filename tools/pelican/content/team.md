@@ -1,6 +1,6 @@
 Title: Team
 Date: 2020-04-10 21:00
-category: About
+tags: About
 slug: team
 
 Following early work by [Hans Fangohr](http://fangohr.github.io), members of the European research project

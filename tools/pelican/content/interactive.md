@@ -1,6 +1,5 @@
 title: Interactive plots
-category: Data
-tags: plots, GUI, voila
+tags: Plots, GUI, Voila
 save-as: interactive
 date: 2020-04-08 08:30
 status: draft
