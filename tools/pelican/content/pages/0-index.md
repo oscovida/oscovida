@@ -14,7 +14,7 @@ purposes, or to share here.
 
 --------------------
 
-![Plot]({attach}iran1-cases.png)
+![Plot]({attach}fig-homepage-example-plot.svg)
 
 ------------------
 
