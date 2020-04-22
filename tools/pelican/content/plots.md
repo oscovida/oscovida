@@ -1,8 +1,7 @@
 Title: Standard Plots
 Date: 2020-04-09 19:00
-category: About
 slug: plots
-tags: data, plots
+tags: About, Data, Plots
 
 
 We discuss the plots from the top (number 1) to the bottom (number 7) that are

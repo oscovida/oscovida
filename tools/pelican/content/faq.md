@@ -1,8 +1,7 @@
 Title: Frequently Asked Questions (FAQ)
 Date: 2020-04-09 19:00
-category: About
 slug: faq
-tags: data
+tags: Data, About, FAQ
 
 
 # What about errors in the data?
