@@ -1,6 +1,6 @@
 Title: Contributions welcome!
 Date: 2020-04-10 22:00
-category: About
+tags: About
 slug: contribute
 
 * We gather some
