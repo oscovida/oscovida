@@ -1,4 +1,4 @@
-Most content has moved to the temporary website https://fangohr.github.io/coronavirus.
+Most content has moved to the temporary website https://oscovida.github.io
 
 The remaining content here is only for developers.
 
