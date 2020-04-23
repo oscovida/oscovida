@@ -23,7 +23,7 @@ own purposes, or to share here.
 --------------
 
 .. raw:: html
-   :file: front-figure-input-html
+   :file: index-included-for-figure1-html
          
 
 --------------
