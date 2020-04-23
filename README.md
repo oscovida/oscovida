@@ -7,8 +7,6 @@ The remaining content here is only for developers.
 
 --------------------------------
 
-Temporary links
-
 
 # Disclaimer
 
