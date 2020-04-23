@@ -1,7 +1,7 @@
 Standard Plots
 ==============
 
-:Date: 2020-04-09 19:00
+:Date: 2020-04-23 22:00
 :slug: plots
 :tags: About, Data, Plots
 
