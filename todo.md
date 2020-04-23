@@ -26,6 +26,8 @@ General
     -   \[ \] split plotting routines into (i) calculation of entities, and 
             (ii) plotting
 -   \[ \] make python package available via pip - what name? coronavirus? oscovida?
+-   \[ \] tidy up urls: german URLS are sanitised (using sanitise() but world countries are not)
+    - watch link to automatic figure creation in generate-individual-plots.ipynb
 
 Webpage generation
 ------------------
