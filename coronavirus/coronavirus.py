@@ -534,7 +534,7 @@ def day0atleast(v0, series):
         day0 = series[series > v0].index[0]
     except IndexError:  # means no days found for which series.values > v0
         # print(f"Haven't found value > {v0} is Series {series.name}")
-        result = pd.Series()
+        result = pd.Series(dtype=object)
         return result
 
     # compute timedelta

@@ -31,8 +31,10 @@ def get_country_list():
     return sorted(countries.drop_duplicates())
 
 
-def test_germany_overview():
-    subregions = get_germany_subregion_list()
+def test_germany_overview(n=10):
+    """Test n countries """
+
+    subregions = get_germany_subregion_list()[0:n]
 
     # data cleaning: on 13 April, we had a Landkreis "LK Göttingen (alt)"
     # with only one data point. This causes plots to fail, because there
@@ -54,11 +56,11 @@ def test_germany_overview():
         matplotlib.pyplot.close('all')
 
 
-def test_world_overview():
+def test_world_overview(n=10):
     countries = get_country_list()
 
     start_time = time.time()
-    for i, country in enumerate(countries[0:190]):
+    for i, country in enumerate(countries[0:n]):
         print(f"Processing {i+1:3}/{len(countries)} [{time.time()-start_time:4.0f}s] {country}")
         overview(country=country)
         matplotlib.pyplot.close('all')
@@ -66,8 +68,8 @@ def test_world_overview():
 
 
 def main():
-    test_world_overview()
-    test_germany_overview()
+    test_world_overview(n=300)  # test all
+    test_germany_overview(n=500) # test all
 
 
 if __name__ == "__main__":
