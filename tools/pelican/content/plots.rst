@@ -112,8 +112,8 @@ Plot 5: Doubling times
    -  The solid line is a 7-day rolling mean over these data points and
       provides more robust guidance.
 
--  Looking at the solid lines, we may be able to assess the spread of
-   the virus.
+-  Looking at the doubling time shown by the solid lines, we get another
+   indicator to assess the spread of the virus.
 
    -  For many countries, in the early stages of the outbreak, this
       doubling time for confirmed infections (blue line) is somewhere
@@ -124,22 +124,23 @@ Plot 5: Doubling times
       rate of the exponential function becomes smaller, and
       correspondingly the doubling time increases.
 
-   -  We would like to see the doubling time to get larger, as this an
-      indication that the growth of infections and deaths is decreasing.
+   - We would like to see the doubling time to get larger, as this an indication
+      that the growth of infections and deaths is decreasing (ideally infinitely
+      large, when no new infections occur).
 
-   -  Hopefully, we can learn from other countries, what kind of
-      doubling period has to be achieved, to control the number of
-      infected people.
+- The example data for South Korea shows that 
 
--  The example data for South Korea shows that the doubling time grows
-   from around 3 days to around 60 days as the number of daily new
-   infections (plot 2) decreases.
+  - the doubling time for cases grows from around 3 days in the early stages
 
-   -  as the doubling period reaches 60, the number of daily new
-      infections stabilises around 100.
+  - to reach a plateau with a doubling time of around 60 days from 15 March to 1
+    April 2020. During this time, the number of daily new infections (plot 2)
+    stabilises around 100, and the growth factor (blue line in plot 4) is approximately 1.0.
 
-   -  There is no red curve for the doubling time of deaths as there
-      have been too few deaths to be useful for the analysis.
+  - In April, the doubling time increases further, which corresonds to a
+    further reduction of daily new infections (plot 2), and a growth factor
+    (blue line in plot 4) below 1.0.
+
+- Occasionally, the solid lines are omitted if there are not enough data points.
 
 Plot 6: Comparison of daily new cases with other countries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -148,10 +149,7 @@ Plot 6: Comparison of daily new cases with other countries
 
     <img src="{attach}fig-south-korea6.svg" alt="South Korea data">
 
-
-   south-korea data
-
--  X-axis shows the number of days since a particular number of new
+-  The x-axis shows the number of days since a particular number of new
    cases per day (such as 10) have occurred in that country, and the
    y-axis the number of new cases for that day.
 
@@ -168,6 +166,9 @@ Plot 6: Comparison of daily new cases with other countries
 -  The curve shows as 7-day rolling mean to provide a smoother line than
    the noisier individual data points (in particular with fewer cases
    per day). This leads to non-integer values.
+
+- [The curve for China starts at a higher value than 10, as the first recorded
+  value was 548. We could manually correct this.]
 
 Plot 7: Comparison of daily new deaths with other countries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
