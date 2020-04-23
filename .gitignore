@@ -8,3 +8,4 @@ tools/coronavirus.py
 .vscode/
 coronavirus_2020.egg-info
 default.profraw
+tools/generate-individiual-plots.html

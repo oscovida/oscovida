@@ -9,6 +9,17 @@ dev-install:
 test:
 	python3 -m pytest -v
 
+test-pelican:
+	cd tools && jupyter-nbconvert --execute generate-individiual-plots.ipynb
+	cd tools/pelican && make publish
+
+test-html-creation:
+	@echo "This is a slow test."
+	@#cd tools && jupyter-nbconvert --ExecutePreprocessor.timeout=180 --execute --to html test-plots-for-all-regions.ipynb
+	@# cd tools && jupyter-nbconvert --ExecutePreprocessor.timeout=180 --execute --to html generate-countries.ipynb
+	cd tools && python test_figure_creation.py
+
+
 test-pycodestyle:
 	python3 -m pycodestyle .
 
