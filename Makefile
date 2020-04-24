@@ -11,7 +11,7 @@ test:
 
 test-pelican:
 	cd tools && jupyter-nbconvert --execute generate-individiual-plots.ipynb
-	cd tools/pelican && make publish
+	cd tools/pelican && make html
 
 test-html-creation:
 	@echo "This is a slow test."
