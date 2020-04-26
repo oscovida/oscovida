@@ -2,6 +2,7 @@ import datetime
 import json
 import math
 import os
+import pandas as pd
 
 
 
@@ -12,7 +13,67 @@ class MetadataRegion:
     """Object to represent metadata for one region persistently. Behaves mostly
     like a dictionary. Any change is written to disk immediately.
 
+    Intended use:
+    - each MetadataRegion object represents one country.
+    - store for each the location of html and ipynb files
+    - store current deaths and cases
+    - store when last updated
+
+    Use cases:
+
+    - create markdown/html based on this metadata information, not
+      on building a list of files while computing the html
+    - this is good for testing things
+    - and allows to create the html files in different functions/sessions, and to later
+      composed the markdwon/html from the metadata
+    - also useful for more aggressive parallelisation
+
     """
+
+    def get_all():
+        """
+        Class method.
+
+        Return list of names that are stored on disk."""
+        regions = []
+        for fname in os.listdir(MetadataStorageLocation):
+            # check this is a valid file:
+            assert fname.endswith("-meta.json")
+
+            region_name = fname.split("-meta.json")[0]
+            # attempt reading for good measure
+            m = MetadataRegion(region_name)
+            regions.append(region_name)
+        return regions
+
+
+    def get_all_as_dataframe():
+        """
+        Class method.
+
+        Return a Dataframe with all data stored on disk."""
+
+        regions = MetadataRegion.get_all()
+        d = {}
+        for region in regions:
+            index = region
+            m = MetadataRegion(region)
+            d[region] = m.as_dict()
+        df = pd.DataFrame(d).T
+        return df
+
+
+
+    def clear_all():
+        """Class method.
+
+        Clear all entries from disk.
+        """
+        for fname in os.listdir(MetadataStorageLocation):
+            # check this is a valid file:
+            assert fname.endswith("-meta.json")
+            os.remove(os.path.join(MetadataStorageLocation, fname))
+
 
     def __init__(self, country, mode="r"):
         """Expects country string and mode
@@ -70,11 +131,18 @@ class MetadataRegion:
             self._d = json.load(f_in)
 
     def mark_as_updated(self):
-        self._d['__last_modified__'] = repr(datetime.datetime.now())
+        self['__last_modified__'] = repr(datetime.datetime.now())
 
     def _save(self):
         with open(self._storage_path(), 'w') as f_out:
-            json.dump(self._d, f_out)
+            json.dump(self._d, f_out, sort_keys=True, indent=4)
+
+    def keys(self):
+        k = self._d.keys()
+        return k
+
+    def as_dict(self):
+        return self._d
 
     def __getitem__(self, key):
         return self._d[key]
@@ -83,3 +151,21 @@ class MetadataRegion:
         self._d[key] = value
         self._save()
 
+
+
+
+# Stuff to track:
+
+"""
+object-identifier: country name
+
+values:
+- html-name (file)
+- ipynb-name (file)  
+- deaths (current values)
+- cases (current values)
+
+
+
+
+"""
