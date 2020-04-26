@@ -148,6 +148,9 @@ def compose_dataframe_summary(cases, deaths):
     df["total deaths"] = deaths
     df["daily new deaths"] = deaths.diff()
 
+    # drop first row with nan -> otherwise ints are shows as float in table
+    df = df.dropna()
+
     # change index: latest numbers shown first
     df = df[::-1]
 
