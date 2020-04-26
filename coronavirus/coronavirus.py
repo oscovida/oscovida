@@ -328,6 +328,15 @@ def plot_daily_change(ax, series, color):
     ax.legend()
     ax.set_ylabel('daily change')
 
+    # data cleaning: For France, there was a huge spike on 12 April with 26849
+    # new infections. This sets the scale to be too large.
+    # There was also a value of ~-2000 on 22 April. We limit the y-scale to correct
+    # manually for this:
+    if series.country == "France" and series.label == "cases":
+        # get current limits
+        ymin, ymax = ax.get_ylim()
+        ax.set_ylim([max(-500, ymin), min(10000, ymax)])
+
     return ax
 
 
