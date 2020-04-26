@@ -140,7 +140,7 @@ def test_compose_dataframe_summary():
     cases, deaths = mock_get_country()
 
     table = c.compose_dataframe_summary(cases, deaths)
-    assert table['total cases'][-1] == 548
+    assert table['total cases'][-1] == 643
 
     # check that most recent data item is last
     print(table)
