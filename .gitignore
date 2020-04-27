@@ -17,4 +17,8 @@ tools/coronavirus.py
 =======
 coronavirus_2020.egg-info
 default.profraw
+<<<<<<< HEAD
 >>>>>>> ad2c9c0b89afbfc3748585261aa528cccec67974
+=======
+tools/generate-individiual-plots.html
+>>>>>>> c69e433ba1e8a22b2a8fd5f1e00900627b665a6e
