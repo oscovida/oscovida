@@ -69,10 +69,14 @@ class MetadataRegion:
 
         Clear all entries from disk.
         """
-        for fname in os.listdir(MetadataStorageLocation):
-            # check this is a valid file:
-            assert fname.endswith("-meta.json")
-            os.remove(os.path.join(MetadataStorageLocation, fname))
+        if os.path.exists(MetadataStorageLocation):
+            for fname in os.listdir(MetadataStorageLocation):
+                # check this is a valid file:
+                assert fname.endswith("-meta.json")
+                os.remove(os.path.join(MetadataStorageLocation, fname))
+        else:
+            pass  # presumably we run the code in a new place
+
 
 
     def __init__(self, country, mode="r"):
