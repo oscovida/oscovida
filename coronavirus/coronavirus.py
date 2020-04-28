@@ -576,7 +576,7 @@ def align_sets_at(v0, df):
 
     return res
 
-def get_compare_data(countrynames, rolling=7):
+def get_compare_data(countrynames, rolling=7, regions=False):
     """Given a list of country names, return two dataframes: one with cases and one with deaths
     where
     - each column is one country
@@ -587,11 +587,20 @@ def get_compare_data(countrynames, rolling=7):
     df_c = pd.DataFrame()
     df_d = pd.DataFrame()
 
-    for countryname in countrynames:
-        c, d = get_country(countryname)
+    if regions:
+        for region in countrynames:
+            c, d = spain_get_region(region)
 
-        df_c[countryname] = c.diff().rolling(rolling, center=True).mean()  # cases
-        df_d[countryname] = d.diff().rolling(rolling, center=True).mean()  # deaths
+            df_c[region] = c.diff().rolling(rolling, center=True).mean()  # cases
+            df_d[region] = d.diff().rolling(rolling, center=True).mean()  # deaths
+    
+    else:
+
+        for countryname in countrynames:
+            c, d = get_country(countryname)
+
+            df_c[countryname] = c.diff().rolling(rolling, center=True).mean()  # cases
+            df_d[countryname] = d.diff().rolling(rolling, center=True).mean()  # deaths
 
     return df_c, df_d
 
@@ -863,16 +872,11 @@ def make_compare_plot_spain(region,
                               compare_with_local=spanish_regions,
                               v0c=10, v0d=1):
     rolling = 7
-#    region, subregion = unpack_region_subregion(region_subregion)
-#    df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local, rolling=rolling)
-    df_c, df_d = get_compare_data(compare_with_local, rolling=rolling)
 
-    # need to get index into same timezone before merging
-    df_d.set_index(df_d.index.tz_localize(None), inplace=True)
-    df_c.set_index(df_c.index.tz_localize(None), inplace=True)
+    compare_with_local = compare_with_local[::2]
+    compare_with_local.append(region)
 
-#    df_c = pd.merge(df_c1, df_c2, how='outer', left_index=True, right_index=True)
-#    df_d = pd.merge(df_d1, df_d2, how='outer', left_index=True, right_index=True)
+    df_c, df_d = get_compare_data(compare_with_local, rolling=rolling, regions=True)
 
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
