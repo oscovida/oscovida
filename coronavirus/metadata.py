@@ -65,9 +65,10 @@ class MetadataRegion:
 
 
     def clear_all():
-        """Class method.
+        """Clear all entries from disk, and create storage directory if it doesn't exist yet.
 
-        Clear all entries from disk.
+        Class method.
+
         """
         if os.path.exists(MetadataStorageLocation):
             for fname in os.listdir(MetadataStorageLocation):
@@ -75,7 +76,12 @@ class MetadataRegion:
                 assert fname.endswith("-meta.json")
                 os.remove(os.path.join(MetadataStorageLocation, fname))
         else:
-            pass  # presumably we run the code in a new place
+            # presumably we run the code in a new place
+
+            # create path
+            os.makedirs(MetadataStorageLocation)
+            # not creating the path here, can lead to a race condition when
+            # multiple processed try to create it when running in parallel
 
 
 
