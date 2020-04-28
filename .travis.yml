@@ -15,4 +15,4 @@ script:
   - make test
   - make test-pelican
 
-after_success: codecov
+after_success: bash <(curl -s https://codecov.io/bash)
