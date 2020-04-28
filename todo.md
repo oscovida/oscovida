@@ -56,7 +56,7 @@ Webpage generation
 -   \[ \] make webpage generation into a service (cronjob?) to run once
     a day and update webpages automatically
 -   \[ \] document and refactor everything
--   \[ \] Embed google analytics snippet in html of notebooks (in `html/*`)
+-   \[X\] Embed google analytics snippet in html of notebooks (in `html/*`)
 
 Binder
 -------
