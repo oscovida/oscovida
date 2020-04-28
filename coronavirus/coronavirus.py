@@ -807,12 +807,12 @@ def fetch_data_spain():
     datasource = "https://covid19.isciii.es/resources/serie_historica_acumulados.csv"
     t0 = time.time()
     print(f"Please be patient - downloading data from {datasource} ...")
-    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=6)
+    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=19*15+6)
     rename_columns(spain)
     delta_t = time.time() - t0
     print(f"Completed downloading {len(spain)} rows in {delta_t:.1f} seconds.")
 
-    g2 = spain.set_index(pd.to_datetime(spain['Date']))
+    g2 = spain.set_index(pd.to_datetime(spain['Date'], errors="coerce", format="%d/%m/%Y"))
     g2.drop(columns=['Date'],inplace=True)
     g2.index.name = 'date'
     last_day = g2.index[-1]
