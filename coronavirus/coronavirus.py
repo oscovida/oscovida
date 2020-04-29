@@ -798,14 +798,27 @@ spanish_regions = ["Andalucía", "Aragón", "Asturias", "Cantabria", "Ceuta",
 
 def rename_columns(spanish_data):
     """Rename columns for non-spanish speakers. """
+    
+    spanish_data.rename(columns={'CCAA': 'Admin. region code',
+                                 'FECHA': 'Date',
+                                 'CASOS': 'Cases',
+                                 'PCR+': 'Positive PCR test',
+                                 'TestAc+': 'Positive Antibody test',
+                                 'Hospitalizados': 'Hospitalized',
+                                 'UCI': 'ICU',
+                                 'Fallecidos': 'Deceases',
+                                 'Recuperados': 'Recovered'}, inplace=True)
+    
+    # Fill the NaN values with 0
+    spanish_data.fillna(0, inplace=True)
 
-    return spanish_data.rename(columns={'CCAA': 'Admin. region code',
-                                        'FECHA': 'Date',
-                                        'CASOS': 'Cases',
-                                        'Hospitalizados': 'Hospitalized',
-                                        'UCI': 'ICU',
-                                        'Fallecidos': 'Deceases',
-                                        'Recuperados': 'Recovered'}, inplace=True)
+    # We're assuming that, from 15/04/2020, 'Positive test' and 'Positive Antibody test' 
+    # are the new cases
+    spanish_data['New cases'] = (spanish_data['Cases'] + \
+                                 spanish_data['Positive PCR test'] + \
+                                 spanish_data['Positive Antibody test']).astype("int")
+
+    return spanish_data
 
 
 #@joblib_memory.cache
@@ -816,7 +829,7 @@ def fetch_data_spain():
     datasource = "https://covid19.isciii.es/resources/serie_historica_acumulados.csv"
     t0 = time.time()
     print(f"Please be patient - downloading data from {datasource} ...")
-    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=19*15+6)
+    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=6)
     rename_columns(spain)
     delta_t = time.time() - t0
     print(f"Completed downloading {len(spain)} rows in {delta_t:.1f} seconds.")
@@ -856,7 +869,7 @@ def spain_get_region(region=None):
         region = spain[spain['Region'] == region]
 
         # group over multiple rows for the same region
-        cases = region["Cases"]
+        cases = region["New cases"]
         cases.country = f'Spain-{region}'
         cases.label = 'cases'
 
