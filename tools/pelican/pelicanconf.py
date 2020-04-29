@@ -21,14 +21,17 @@ AUTHOR_FEED_RSS = None
 
 MENUITEMS = [("Home", "index.html"),
              ("World", "world.html"),
+             ("All regions", "all-regions.html"),
              ("Germany", "germany.html"),
+             ("US", "us.html"),
              ("Data", "tag-data.html"),
              ("About", "tag-about.html")]
 
 OUTPUT_PATH = "../wwwroot"
 
 # Blogroll
-LINKS = [("PaNOSC project", "www.panosc.eu"),
+LINKS = [("OSCOVIDA", "oscovida.github.io"),
+         ("PaNOSC project", "www.panosc.eu"),
          ('OSCOVIDA', 'mailto:oscovidaproject@gmail.com')]
          # ('You can modify those links in your config file', '#'),)
 

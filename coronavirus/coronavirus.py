@@ -165,7 +165,7 @@ def test_get_US_region_list():
     assert len(x) > 50  # at least 50 states, plus diamond Princess
 
 
-def get_region_US(state, county=None):
+def get_region_US(state, county=None, debug=False):
     """Given a US state name and country, return deaths and cases as a tuple of pandas time
     series. (Johns Hopkins data set)
 
@@ -180,12 +180,14 @@ def get_region_US(state, county=None):
     deaths = fetch_deaths_US()
     cases = fetch_cases_US()
 
-    assert state in deaths['Province_State'], \
+    assert state in deaths['Province_State'].values, \
         f"{state} not in available states. These are {sorted(deaths['Province_State'])}"
 
     if county is None:
-        d = deaths.groupby(state).sum()
-        c = cases.groupby(state).sum()
+        tmpd = deaths.groupby('Province_State').sum()
+        d = tmpd.loc[state]
+        tmpc = cases.groupby('Province_State').sum()
+        c = tmpc.loc[state]
     else:
         raise NotImplementedError("Can't do counties yet.")
     # Some countries report sub areas (i.e. multiple rows per country) such as China, France, United Kingdom
@@ -197,11 +199,13 @@ def get_region_US(state, county=None):
     # drop all rows that don't have data
     # sanity check: how many do we drop?
     if c.index.isnull().sum() > 3:
-        print(f"about to drop {c.index.isnull().sum()} entries due to NaT in index", c)
+        if debug:
+            print(f"about to drop {c.index.isnull().sum()} entries due to NaT in index", c)
     c = c[c.index.notnull()]
 
     if d.index.isnull().sum() > 3:
-        print(f"about to drop {d.index.isnull().sum()} entries due to NaT in index", d)
+        if debug:
+            print(f"about to drop {d.index.isnull().sum()} entries due to NaT in index", d)
     d = d[d.index.notnull()]
 
     # check there are no NaN is in the data
@@ -209,6 +213,7 @@ def get_region_US(state, county=None):
     assert d.isnull().sum() == 0, f"{d.isnull().sum()} NaNs in {d}"
 
     # label data
+    country = f"US-{state}"
     c.country = country
     c.label = "cases"
 
@@ -620,7 +625,7 @@ def get_country_data(country, region=None, subregion=None):
             c, d = germany_get_region(state=region, landkreis=subregion)
     elif country.lower() == 'us' and region != None:
         # load US data
-        c, d = get_region_US(state)
+        c, d = get_region_US(region)
     else:
         c, d = get_country(country)
     return c, d
@@ -923,6 +928,12 @@ def overview(country, region=None, subregion=None, savefig=False):
         axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion),
                                                                compare_with_local=laender)
         return_axes = np.concatenate([axes, axes_compare])
+    elif country=="US" and region is not None:
+        # skip comparison plot for the US states at the moment
+        return_axes = axes
+        return return_axes, c, d
+    else:
+        raise NotImplementedError
 
     fig2 = plt.gcf()
 
