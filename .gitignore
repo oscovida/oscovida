@@ -9,5 +9,9 @@ tools/coronavirus.py
 coronavirus_2020.egg-info
 default.profraw
 tools/generate-individiual-plots.html
+<<<<<<< HEAD
 build/
 dist/
+=======
+coronavirus-metadata
+>>>>>>> 59f3a14a6dd0c0f2f28e733538cf59e89486fcd9
