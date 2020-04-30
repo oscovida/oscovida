@@ -15,13 +15,15 @@ own purposes, or to share here.
 
 We provide a `standard a set of analysis plots <plots.html>`__ for different regions:
 
--  an overview for `each country in the world <world.html>`__
+-  `List of all regions <all-regions.html>`__ (different data sources)
+
+-  `Overview for each country in the world <countries.html>`__ (Johns Hopkins data)
    
--  for the `US <us.html>`__ we show data for each state.
+-  `States in the US <us.html>`__ (Johns Hopkins data)
 
--  For `Germany <germany.html>`__ we show data for all 412 Landkreise.
+-  `Counties (Landkreise) in Germany <germany.html>`__ (Robert Koch Institute data)
 
--  For convenience, all the above regions are searchable from `this all regions page <all-regions.html>`__.
+
 
 --------------
 
