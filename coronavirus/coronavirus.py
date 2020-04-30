@@ -419,6 +419,11 @@ def plot_daily_change(ax, series, color):
     ax.legend()
     ax.set_ylabel('daily change')
 
+    # labels on the right y-axis as well
+    ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
+    ax.yaxis.set_ticks_position('both')
+
+
     # data cleaning: For France, there was a huge spike on 12 April with 26849
     # new infections. This sets the scale to be too large.
     # There was also a value of ~-2000 on 22 April. We limit the y-scale to correct
