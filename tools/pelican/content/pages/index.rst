@@ -13,19 +13,23 @@ to better understand the development of the pandemic and measures taken.
 Or use `our code and extend the analysis <open-science.html>`__ for your
 own purposes, or to share here.
 
--  For `all countries in the world <world.html>`__, we provide a
-   standard set of analysis plots for which `are explained
-   here <plots.html>`__.
+We provide a `standard a set of analysis plots <plots.html>`__ for different regions:
 
--  For `Germany (492 Landkreise) <germany.html>`__ we show data for all
-   492 Landkreise.
+-  `List of all regions <all-regions.html>`__ (different data sources)
+
+-  `Overview for each country in the world <countries.html>`__ (Johns Hopkins data)
+   
+-  `States in the US <us.html>`__ (Johns Hopkins data)
+
+-  `Counties (Landkreise) in Germany <germany.html>`__ (Robert Koch Institute data)
+
+
 
 --------------
 
 .. raw:: html
    :file: index-included-for-figure1-html
          
-
 --------------
 
 If you want to `contribute <contribute.html>`__, please `get in
