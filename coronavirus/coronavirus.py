@@ -67,10 +67,26 @@ def fetch_deaths():
     fetch_deaths_last_execution()
     return df
 
+@joblib_memory.cache
+def fetch_deaths_US():
+    url = os.path.join(base_url, "time_series_covid19_" + "deaths" + "_US.csv")
+    df = pd.read_csv(url, index_col=1)
+    report_download(url, df)
+    # fetch_deaths_last_execution_()
+    return df
+
 
 @joblib_memory.cache
 def fetch_cases():
     url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_global.csv")
+    df = pd.read_csv(url, index_col=1)
+    report_download(url, df)
+    fetch_cases_last_execution()
+    return df
+
+@joblib_memory.cache
+def fetch_cases_US():
+    url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_US.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
     fetch_cases_last_execution()
@@ -134,6 +150,78 @@ def get_country(country):
     d.label = "deaths"
 
     return c, d
+
+
+def get_US_region_list():
+    """return list of strings with US state names"""
+    deaths = fetch_deaths_US()
+    return list(deaths.groupby("Province_State").sum().index)
+
+
+def test_get_US_region_list():
+    x = get_US_region_list()
+    assert x[0] == "Alabama"
+    assert "Hawaii" in x
+    assert len(x) > 50  # at least 50 states, plus diamond Princess
+
+
+def get_region_US(state, county=None, debug=False):
+    """Given a US state name and country, return deaths and cases as a tuple of pandas time
+    series. (Johns Hopkins data set)
+
+    If country is None, then sum over all counties in that state (i.e. return
+    the numbers for the statee)
+
+    """
+
+    if not county is None:
+        raise NotImplementedError("Can only process US states (no counties)")
+
+    deaths = fetch_deaths_US()
+    cases = fetch_cases_US()
+
+    assert state in deaths['Province_State'].values, \
+        f"{state} not in available states. These are {sorted(deaths['Province_State'])}"
+
+    if county is None:
+        tmpd = deaths.groupby('Province_State').sum()
+        d = tmpd.loc[state]
+        tmpc = cases.groupby('Province_State').sum()
+        c = tmpc.loc[state]
+    else:
+        raise NotImplementedError("Can't do counties yet.")
+    # Some countries report sub areas (i.e. multiple rows per country) such as China, France, United Kingdom
+    # Denmark. In that case, we sum over all regions.
+
+    # make date string into timeindex
+    d.index = pd.to_datetime(d.index, errors="coerce", format="%m/%d/%y")
+    c.index = pd.to_datetime(c.index, errors="coerce", format="%m/%d/%y")
+    # drop all rows that don't have data
+    # sanity check: how many do we drop?
+    if c.index.isnull().sum() > 3:
+        if debug:
+            print(f"about to drop {c.index.isnull().sum()} entries due to NaT in index", c)
+    c = c[c.index.notnull()]
+
+    if d.index.isnull().sum() > 3:
+        if debug:
+            print(f"about to drop {d.index.isnull().sum()} entries due to NaT in index", d)
+    d = d[d.index.notnull()]
+
+    # check there are no NaN is in the data
+    assert c.isnull().sum() == 0, f"{c.isnull().sum()} NaNs in {c}"
+    assert d.isnull().sum() == 0, f"{d.isnull().sum()} NaNs in {d}"
+
+    # label data
+    country = f"US-{state}"
+    c.country = country
+    c.label = "cases"
+
+    d.country = country
+    d.label = "deaths"
+
+    return c, d
+
 
 
 def compose_dataframe_summary(cases, deaths):
@@ -535,6 +623,9 @@ def get_country_data(country, region=None, subregion=None):
         else:
             # use German data
             c, d = germany_get_region(state=region, landkreis=subregion)
+    elif country.lower() == 'us' and region != None:
+        # load US data
+        c, d = get_region_US(region)
     else:
         c, d = get_country(country)
     return c, d
@@ -837,6 +928,12 @@ def overview(country, region=None, subregion=None, savefig=False):
         axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion),
                                                                compare_with_local=laender)
         return_axes = np.concatenate([axes, axes_compare])
+    elif country=="US" and region is not None:
+        # skip comparison plot for the US states at the moment
+        return_axes = axes
+        return return_axes, c, d
+    else:
+        raise NotImplementedError
 
     fig2 = plt.gcf()
 
