@@ -29,10 +29,12 @@ MENUITEMS = [("Home", "index.html"),
 
 OUTPUT_PATH = "../wwwroot"
 
+
 # Blogroll
-LINKS = [("OSCOVIDA", "oscovida.github.io"),
-         ("PaNOSC project", "www.panosc.eu"),
-         ('OSCOVIDA', 'mailto:oscovidaproject@gmail.com')]
+FAVICON_LINKS = False  # Favicon retrieval is broken (HF, April 2020)
+LINKS = (("OSCOVIDA", "http://oscovida.github.io"),
+         ("PaNOSC project", "http://www.panosc.eu"),
+         ('OSCOVIDA', 'mailto:oscovidaproject@gmail.com'), )
          # ('You can modify those links in your config file', '#'),)
 
 # Social widget
