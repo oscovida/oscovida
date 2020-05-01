@@ -23,7 +23,7 @@ We provide a `standard a set of analysis plots <plots.html>`__ for different reg
 
 -  `Counties (Landkreise) in Germany <germany.html>`__ (Robert Koch Institute data)
 
-
+Occasionally, we try to `put COVID19 numbers reported in the news into context <tag-numbers-in-news.html>`__.
 
 --------------
 
