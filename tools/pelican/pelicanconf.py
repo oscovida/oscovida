@@ -25,6 +25,7 @@ MENUITEMS = [("Home", "index.html"),
              ("Germany", "germany.html"),
              ("US", "us.html"),
              ("Data", "tag-data.html"),
+             ("Numbers-in-News", "tag-numbers-in-news.html"),
              ("About", "tag-about.html")]
 
 OUTPUT_PATH = "../wwwroot"
@@ -45,7 +46,7 @@ SOCIAL = (('Open Science COVID Analysis', 'https://twitter.com/OSCOVIDAproject')
 
 DEFAULT_PAGINATION = False
 
-STATIC_PATHS = ['content/pages']
+STATIC_PATHS = ['content/pages', 'content/news']
 # ARTICLE_PATHS = ['content']
 
 # THEME = "/Users/fangohr/pelican-themes/bootstrap2"
