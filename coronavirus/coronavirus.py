@@ -736,6 +736,16 @@ def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea
     df_c, df_d = get_compare_data([main_country] + compare_with, rolling=rolling)
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
+
+    # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
+    # for all days. 
+    # For the purpose of this plot, we'll just interpolate between the last and next known values.
+    # We limit the number of fills to 3 days. (Just a guess to avoid accidental
+    # filling of too many NaNs.)
+    
+    res_c = res_c.interpolate(method='linear', limit=3)
+    res_d = res_d.interpolate(method='linear', limit=3)
+
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
     plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
