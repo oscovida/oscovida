@@ -829,11 +829,17 @@ def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
 
 def make_compare_plot_germany(region_subregion,
                               compare_with=[], #"China", "Italy", "Germany"],
-                              compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
-                                                  'Brandenburg', 'Bremen', 'Hamburg',
-                                                  'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
-                                                  'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland',
-                                                  'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein',  'Thüringen'],
+                              compare_with_local =['Bayern', 
+                                                   'Berlin', 'Bremen', 
+                                                   'Hamburg', 'Hessen', 
+                                                   'Nordrhein-Westfalen', 
+                                                   'Sachsen-Anhalt'], 
+    # The 'compare_with_local' subset is chosen to look sensibly on 2 May 2020.
+    #                          compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
+    #                                              'Brandenburg', 'Bremen', 'Hamburg',
+    #                                              'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
+    #                                              'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland',
+    #                                              'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein',  'Thüringen'],
                               v0c=10, v0d=1):
     rolling = 7
     region, subregion = unpack_region_subregion(region_subregion)
