@@ -1,12 +1,12 @@
 Standard Plots
 ==============
 
-:Date: 2020-04-23 22:00
+:Date: 2020-05-03 10:00
 :slug: plots
 :tags: About, Data, Plots
 
 We discuss the plots from the top (number 1) to the bottom (number 7)
-that are available for `every country <world.html>`__.
+that are available for `all regions <all-regions.html>`__.
 
 Plot 1: accumulated cases and deaths as function of time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -59,8 +59,8 @@ Plot 3: daily changes in deaths
    with some time delay, and reduced by a fraction (the `case fatality
    rate <https://en.wikipedia.org/wiki/Case_fatality_rate>`__).
 
-Plot 4: growth factors
-~~~~~~~~~~~~~~~~~~~~~~
+Plot 4: R & growth factor
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 .. raw:: html
@@ -68,9 +68,29 @@ Plot 4: growth factors
     <img src="{attach}fig-south-korea4.svg" alt="South Korea data">
 
 
--  The growth factor is the ratio of new cases (or deaths) today
-   relative to new cases (or deaths) yesterday
--  Blue (red) dots show these ratios for cases (deaths), and are
+Reproduction number R
++++++++++++++++++++++
+
+- The `Reproduction number R (Wikipedia)
+  <https://en.wikipedia.org/wiki/Basic_reproduction_number>`__ expresses how
+  many people are infected from one person with COVID19.
+- If we assume an average infectious period, we can estimate R from the reported
+  new cases. This estimate of R is shown as the yellow line. The estimate or R
+  will be affected by inaccuracies in the reported numbers.
+- Following the Robert Koch Institute, we assume an average infectious period of
+  4 days. This means, for example, for a reproduction number R=2, that on
+  average each infected person will infect 2 other people after 4 days.
+- R needs to be below 1.0 for the total number of infections to
+  shrink. A value of R above 1 will lead to exponential growth.
+- See `this page <reproduction-number.html>`__ for more details.
+    
+
+Daily growth factor
++++++++++++++++++++
+
+-  The growth factor is the ratio of new cases today
+   relative to new cases yesterday
+-  Blue dots show these ratios for cases, and are
    computed based on the smoothed data shown in plot 2 and 3.
 -  The solid line is a 7-day rolling mean over these points to provide
    smoother data.
@@ -79,18 +99,33 @@ Plot 4: growth factors
 -  If the growth value is exactly 1.0, then we have the same number of
    new infections every day.
 -  The growth factor needs to be below 1.0 for the spread to slow down.
--  As the growth factor does not depend on the total number of new
-   cases/deaths (but only on the relative change from yesterday to
-   today), we can get high fluctuations where the numbers of new cases
-   and deaths is small (imagine there was 1 case yesterday, and 7 cases
-   today, this would give a growth factor of 7). In short: where the
-   number of daily new cases/deaths is small, the growth factor can
-   appear to change quickly.
--  **We can use the growth factor as a measure of success for the virus
-   containment**: as long as the growth factor is below 1.0, the spread
-   is slowing down. If the growth factor is greater than one, the number
-   of newly infected people is increasing from day to day; this must be
-   avoided.
+
+
+Assessing success for containment measures
+++++++++++++++++++++++++++++++++++++++++++
+
+- **The reproduction number R and the growth factors are measures of success for
+  the virus containment**: as long as they are below 1.0, the spread
+  is slowing down. If the growth factor is greater than one, the number of newly
+  infected people is increasing from day to day; this must be avoided.
+
+- What is the difference between R and the growth factor? They are computed
+  differently. The growth factor is simpler and more direct: it describes
+  changes in new infections from day to day.
+
+  The reproduction number R is used in epidemiology, and by politicians. It is
+  harder to estimate than the daily growth factor. The daily growth factor and
+  R cannot be compared directly, but both are qualitatively similar: they need
+  to stay under 1.0 for the infections to become fewer over time.
+
+- Growth factor and R do not depend on the total number of new cases (but only
+  on the relative change over time). For that reason we can get high
+  fluctuations where the numbers of new cases is small (imagine there
+  was 1 case yesterday, and 7 cases today, this would give a growth factor of
+  7). In short: where the number of daily new cases is small, the growth
+  factor can appear to change quickly. For the same reason, R and the growth
+  factor are good indicators to assess changes in spread even with small case
+  numbers.
 
 Plot 5: Doubling times
 ~~~~~~~~~~~~~~~~~~~~~~
