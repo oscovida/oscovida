@@ -598,7 +598,7 @@ def plot_growth_factor(ax, series, color):
     # get smooth data from plot 1 to base this plot on
     (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
 
-    
+
     label = series.country + " " + series.label + " growth factor " + f_label
     ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
 
@@ -617,12 +617,12 @@ def plot_growth_factor(ax, series, color):
 #
 def compute_R(daily_change, tau=4):
     """Given a time series s, estimate R based on description from RKI [1].
-    
+
     [1] [Robert Koch Institute: Epidemiologisches Bulletin 17 | 2020 23. April 2020]
     https://www.rki.de/DE/Content/Infekt/EpidBull/Archiv/2020/Ausgaben/17_20.html
 
-    Steps: 
-    
+    Steps:
+
     1. Compute change from day to day
     2. Take tau-day averages (tau=4 is recommended as of April/May 2020)
     3. divide average from days 4 to 7 by averages from day 0 to 3, and use this data point for day[7]
@@ -636,7 +636,7 @@ def compute_R(daily_change, tau=4):
                         # we centre the reported value between the 2-intervals of length tau
                         # that have been used to compute it.
     return R2
-    
+
 
 def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.5, 100]):
     """Given a time series, find the min and max values in the time series within the last n days.
@@ -682,8 +682,11 @@ def plot_reproduction_number(ax, series, color='C1', color_R='C4'):
     """
 
     # data for computation or R
-    change, smooth, smooth2 = compute_daily_change(series)
-    R = compute_R(smooth[0])
+    smooth_diff = series.diff().rolling(7,
+                                        center=True,
+                                        win_type='gaussian').mean(std=4)
+
+    R = compute_R(smooth_diff)
     ax.plot(R.index, R, "-", color=color_R,
             label=series.country + r" estimated R (assume $\tau$=4 days)",
             linewidth=3)
@@ -841,11 +844,11 @@ def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea
     res_d = align_sets_at(v0d, df_d)
 
     # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
-    # for all days. 
+    # for all days.
     # For the purpose of this plot, we'll just interpolate between the last and next known values.
     # We limit the number of fills to 3 days. (Just a guess to avoid accidental
     # filling of too many NaNs.)
-    
+
     res_c = res_c.interpolate(method='linear', limit=3)
     res_d = res_d.interpolate(method='linear', limit=3)
 
@@ -942,11 +945,11 @@ def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
 
 def make_compare_plot_germany(region_subregion,
                               compare_with=[], #"China", "Italy", "Germany"],
-                              compare_with_local =['Bayern', 
-                                                   'Berlin', 'Bremen', 
-                                                   'Hamburg', 'Hessen', 
-                                                   'Nordrhein-Westfalen', 
-                                                   'Sachsen-Anhalt'], 
+                              compare_with_local =['Bayern',
+                                                   'Berlin', 'Bremen',
+                                                   'Hamburg', 'Hessen',
+                                                   'Nordrhein-Westfalen',
+                                                   'Sachsen-Anhalt'],
     # The 'compare_with_local' subset is chosen to look sensibly on 2 May 2020.
     #                          compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
     #                                              'Brandenburg', 'Bremen', 'Hamburg',
@@ -970,7 +973,7 @@ def make_compare_plot_germany(region_subregion,
     res_d = align_sets_at(v0d, df_d)
 
     # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
-    # for all days. 
+    # for all days.
     # For the purpose of this plot, we'll just interpolate between the last and next known values.
     # We limit the number of fills to 3 days. (Just a guess to avoid accidental
     # filling of too many NaNs.)
