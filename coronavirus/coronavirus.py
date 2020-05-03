@@ -685,7 +685,8 @@ def plot_reproduction_number(ax, series, color='C1', color_R='C4'):
     change, smooth, smooth2 = compute_daily_change(series)
     R = compute_R(smooth[0])
     ax.plot(R.index, R, "-", color=color_R,
-            label=r"estimated R (assume $\tau$=4 days)", linewidth=3)
+            label=series.country + r" estimated R (assume $\tau$=4 days)",
+            linewidth=3)
 
     # choose y limits so that all data points of R in the last 28 days are visible
     min_, max_ = min_max_in_past_n_days(R, 28);
@@ -762,7 +763,7 @@ def day0atleast(v0, series):
 def align_sets_at(v0, df):
     """Accepts data frame, and aligns so that all enttries close to v0 are on the same row.
 
-    Returns new dataframe with integer index (reprenting days after v0).
+    Returns new dataframe with integer index (representing days after v0).
     """
     res = pd.DataFrame()
 
@@ -967,6 +968,15 @@ def make_compare_plot_germany(region_subregion,
 
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
+
+    # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
+    # for all days. 
+    # For the purpose of this plot, we'll just interpolate between the last and next known values.
+    # We limit the number of fills to 3 days. (Just a guess to avoid accidental
+    # filling of too many NaNs.)
+    res_c = res_c.interpolate(method='linear', limit=3)
+    res_d = res_d.interpolate(method='linear', limit=3)
+
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
