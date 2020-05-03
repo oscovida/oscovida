@@ -3,6 +3,7 @@ https://github.com/fangohr/coronavirus-2020"""
 
 
 import datetime
+import math
 import os
 import time
 import joblib
@@ -612,6 +613,104 @@ def plot_growth_factor(ax, series, color):
     return ax
 
 
+# Computation or R
+#
+def compute_R(daily_change, tau=4):
+    """Given a time series s, estimate R based on description from RKI [1].
+    
+    [1] [Robert Koch Institute: Epidemiologisches Bulletin 17 | 2020 23. April 2020]
+    https://www.rki.de/DE/Content/Infekt/EpidBull/Archiv/2020/Ausgaben/17_20.html
+
+    Steps: 
+    
+    1. Compute change from day to day
+    2. Take tau-day averages (tau=4 is recommended as of April/May 2020)
+    3. divide average from days 4 to 7 by averages from day 0 to 3, and use this data point for day[7]
+
+    """
+    # change = s.diff()
+    change = daily_change
+    mean4d = change.rolling(tau).mean()
+    R = mean4d / mean4d.shift(tau)
+    R2 = R.shift(-tau)  # this is not the RKI method, but seems more appropriate:
+                        # we centre the reported value between the 2-intervals of length tau
+                        # that have been used to compute it.
+    return R2
+    
+
+def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.5, 100]):
+    """Given a time series, find the min and max values in the time series within the last n days.
+
+    If those values are within the interval `at_least`, then use the values in at_least as the limits.
+    if those values are outside the interval `at_least` then exchange the interval accordingly.
+
+    If the values exceed the min and max value in 'alerts', then print an error message.
+    Return min, max.
+    """
+    if n > len(series):
+        n = len(series)
+
+    series = series.replace(math.inf, math.nan)
+
+    min_ = series[-n:].min()
+    max_ = series[-n:].max()
+
+    if min_ < at_least[0]:
+        min_final = min_
+    else:
+        min_final = at_least[0]
+
+    if max_ > at_least[1]:
+        max_final = max_
+    else:
+        max_final = at_least[1]
+
+    if max_final > alert[1]:
+        print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n", series[-n:])
+    if min_final < alert[0]:
+        print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n", series[-n:])
+
+    # print(f"DDD: min_={min_}, max_={max_}")
+    return min_final, max_final
+
+
+def plot_reproduction_number(ax, series, color='C1', color_R='C4'):
+    """- series is expected to be cases (not deaths)
+    """
+
+    # data for computation or R
+    change, smooth, smooth2 = compute_daily_change(series)
+    R = compute_R(smooth[0])
+    ax.plot(R.index, R, "-", color=color_R,
+            label=r"estimated R (assume $\tau$=4 days, using RKI algorithm)", linewidth=3)
+
+    # choose y limits so that all data points of R in the last 28 days are visible
+    min_, max_ = min_max_in_past_n_days(R, 28);
+    ax.set_ylim([min_, max_]);
+
+    # Plot ylim interval for debugging
+    # ax.plot([R.index.min(), R.index.max()], [min_, min_], 'b-')
+    # ax.plot([R.index.min(), R.index.max()], [max_, max_], 'b-')
+
+     # get smooth data for growth factor from plot 1 to base this plot on
+    (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
+
+    label = series.country + " " + series.label + " daily growth factor " + f_label
+    ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
+
+    label = series.country + " " + series.label + " daily growth factor " + smoothed_label
+    ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color, label=label, linewidth=LW)
+
+    ax.set_ylabel("R & growth factor")
+    # plot line at 0
+    ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3') # label="critical value"
+    ax.legend()
+    return ax
+
+
+
+
+
 
 def get_country_data(country, region=None, subregion=None):
     """Given the name of a country, get the Johns Hopkins data for cases and  deaths,
@@ -896,8 +995,9 @@ def overview(country, region=None, subregion=None, savefig=False):
     plot_daily_change(ax=ax, series=d, color="C0")
 
     ax = axes[3]
-    plot_growth_factor(ax, series=d, color="C0")
-    plot_growth_factor(ax, series=c, color="C1")
+    # plot_growth_factor(ax, series=d, color="C0")
+    # plot_growth_factor(ax, series=c, color="C1")
+    plot_reproduction_number(ax, series=c)
 
     ax = axes[4]
     plot_doubling_time(ax, series=d, color="C0")
