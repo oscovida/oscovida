@@ -838,6 +838,16 @@ def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea
     df_c, df_d = get_compare_data([main_country] + compare_with, rolling=rolling)
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
+
+    # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
+    # for all days. 
+    # For the purpose of this plot, we'll just interpolate between the last and next known values.
+    # We limit the number of fills to 3 days. (Just a guess to avoid accidental
+    # filling of too many NaNs.)
+    
+    res_c = res_c.interpolate(method='linear', limit=3)
+    res_d = res_d.interpolate(method='linear', limit=3)
+
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
     plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
@@ -931,11 +941,17 @@ def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
 
 def make_compare_plot_germany(region_subregion,
                               compare_with=[], #"China", "Italy", "Germany"],
-                              compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
-                                                  'Brandenburg', 'Bremen', 'Hamburg',
-                                                  'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
-                                                  'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland',
-                                                  'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein',  'Thüringen'],
+                              compare_with_local =['Bayern', 
+                                                   'Berlin', 'Bremen', 
+                                                   'Hamburg', 'Hessen', 
+                                                   'Nordrhein-Westfalen', 
+                                                   'Sachsen-Anhalt'], 
+    # The 'compare_with_local' subset is chosen to look sensibly on 2 May 2020.
+    #                          compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
+    #                                              'Brandenburg', 'Bremen', 'Hamburg',
+    #                                              'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
+    #                                              'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland',
+    #                                              'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein',  'Thüringen'],
                               v0c=10, v0d=1):
     rolling = 7
     region, subregion = unpack_region_subregion(region_subregion)
