@@ -666,9 +666,12 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.5, 100])
         max_final = at_least[1]
 
     if max_final > alert[1]:
-        print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n", series[-n:])
+        # print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n", series[-n:])
+        print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n")
     if min_final < alert[0]:
-        print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n", series[-n:])
+        # print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n", series[-n:])
+        print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n")
+
 
     # print(f"DDD: min_={min_}, max_={max_}")
     return min_final, max_final
@@ -682,7 +685,7 @@ def plot_reproduction_number(ax, series, color='C1', color_R='C4'):
     change, smooth, smooth2 = compute_daily_change(series)
     R = compute_R(smooth[0])
     ax.plot(R.index, R, "-", color=color_R,
-            label=r"estimated R (assume $\tau$=4 days, using RKI algorithm)", linewidth=3)
+            label=r"estimated R (assume $\tau$=4 days)", linewidth=3)
 
     # choose y limits so that all data points of R in the last 28 days are visible
     min_, max_ = min_max_in_past_n_days(R, 28);
