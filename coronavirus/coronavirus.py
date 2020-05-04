@@ -652,8 +652,8 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.5, 100])
 
     series = series.replace(math.inf, math.nan)
 
-    min_ = series[-n:].min()
-    max_ = series[-n:].max()
+    min_ = series[-n:].min() - 0.025
+    max_ = series[-n:].max() + 0.025
 
     if min_ < at_least[0]:
         min_final = min_
