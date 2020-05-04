@@ -50,11 +50,11 @@ Acknowledgements
 
 -  The H2020 project `Photon and Neutron Open Science Cloud
    PaNOSC) <https://www.panosc.eu/>`__
--  `University of Southampton <https://www.soton.ac.uk>`__, United
-   Kingdom
+-  `European XFEL <http://www.xfel.eu>`__
+-  `University of Southampton <https://www.soton.ac.uk>`__
 -  Johns Hopkins University provides data for countries
 -  Robert Koch Institute provides data for within Germany
--  Open source and scientific computing community for the data tools
+-  Open source and scientific computing community for the data tools, in particular numpy, scipy, pandas, matplotlib
 -  Github for hosting repository and html files
 -  Project Jupyter for the Notebook and Binder service
 
