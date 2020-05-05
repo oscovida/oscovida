@@ -297,6 +297,17 @@ def fetch_data_germany():
 
 
 def germany_get_region(state=None, landkreis=None):
+    """ Returns cases and deaths time series for Germany:
+
+    If state is given, return sum of cases (as function of time) in that state (state=Bundesland)
+
+    If landkreis is given, return data from just that Landkreis.
+
+    Landkreis seems unique, so there is no need to provide state and Landkreis.
+
+    [Should tidy up names here; maybe go to region and subregion in the function argument name, and
+    translate later.]
+    """
     germany = fetch_data_germany()
     """Returns two time series: (cases, deaths)"""
     assert state or landkreis, "Need to provide a value for state or landkreis"
@@ -975,10 +986,10 @@ def make_compare_plot_germany(region_subregion,
     # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
     # for all days.
     # For the purpose of this plot, we'll just interpolate between the last and next known values.
-    # We limit the number of fills to 3 days. (Just a guess to avoid accidental
+    # We limit the number of fills to 7 days. (Just a guess to avoid accidental
     # filling of too many NaNs.)
-    res_c = res_c.interpolate(method='linear', limit=3)
-    res_d = res_d.interpolate(method='linear', limit=3)
+    res_c = res_c.interpolate(method='linear', limit=7)
+    res_d = res_d.interpolate(method='linear', limit=7)
 
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
