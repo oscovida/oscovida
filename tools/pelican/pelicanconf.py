@@ -20,16 +20,22 @@ AUTHOR_FEED_ATOM = None
 AUTHOR_FEED_RSS = None
 
 MENUITEMS = [("Home", "index.html"),
-             ("World", "world.html"),
+             ("All regions", "all-regions.html"),
+             ("Countries", "countries.html"),
              ("Germany", "germany.html"),
+             ("US", "us.html"),
              ("Data", "tag-data.html"),
+             ("Numbers-in-News", "tag-numbers-in-news.html"),
              ("About", "tag-about.html")]
 
 OUTPUT_PATH = "../wwwroot"
 
+
 # Blogroll
-LINKS = [("PaNOSC project", "www.panosc.eu"),
-         ('OSCOVIDA', 'mailto:oscovidaproject@gmail.com')]
+FAVICON_LINKS = False  # Favicon retrieval is broken (HF, April 2020)
+LINKS = (("OSCOVIDA project", "http://oscovida.github.io"),
+         ("PaNOSC project", "http://www.panosc.eu"),
+         ('OSCOVIDA', 'mailto:oscovidaproject@gmail.com'), )
          # ('You can modify those links in your config file', '#'),)
 
 # Social widget
@@ -40,7 +46,7 @@ SOCIAL = (('Open Science COVID Analysis', 'https://twitter.com/OSCOVIDAproject')
 
 DEFAULT_PAGINATION = False
 
-STATIC_PATHS = ['content/pages']
+STATIC_PATHS = ['content/pages', 'content/news']
 # ARTICLE_PATHS = ['content']
 
 # THEME = "/Users/fangohr/pelican-themes/bootstrap2"
