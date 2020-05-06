@@ -806,7 +806,7 @@ def get_compare_data(countrynames, rolling=7, regions=False):
 
             df_c[region] = c.diff().rolling(rolling, center=True).mean()  # cases
             df_d[region] = d.diff().rolling(rolling, center=True).mean()  # deaths
-    
+
     else:
 
         for countryname in countrynames:
@@ -1036,7 +1036,7 @@ spanish_regions = ["Andalucía", "Aragón", "Asturias", "Cantabria", "Ceuta",
 
 def rename_columns(spanish_data):
     """Rename columns for non-spanish speakers. """
-    
+
     spanish_data.rename(columns={'CCAA': 'Admin. region code',
                                  'FECHA': 'Date',
                                  'CASOS': 'Cases',
@@ -1046,7 +1046,7 @@ def rename_columns(spanish_data):
                                  'UCI': 'ICU',
                                  'Fallecidos': 'Deceases',
                                  'Recuperados': 'Recovered'}, inplace=True)
-    
+
     # Fill the NaN values with 0
     spanish_data.fillna(0, inplace=True)
 
@@ -1086,7 +1086,7 @@ def fetch_data_spain():
 def map_regions(spanish_data):
     """Map the Administrative Region codes from data with proper names. """
     codes = sorted(set(spanish_data['Admin. region code']))
-    
+
     regions = dict(zip(codes, spanish_regions))
     spanish_data['Region'] = spanish_data['Admin. region code'].map(regions)
     spanish_data.drop(columns=['Admin. region code'], inplace=True)
@@ -1099,7 +1099,7 @@ def spain_get_region(region=None):
     spain = map_regions(spain)
     """Returns two time series: (cases, deaths)"""
     assert region, "Need to provide a value for the administrative region"
-    
+
     if region:
         assert region in spain['Region'].values, \
             f"{region} not in available Spanish Administrative Regions. These are {sorted(spain['Region'].drop_duplicates())}"
@@ -1215,22 +1215,20 @@ def overview(country, region=None, subregion=None, savefig=False):
         axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
                                                                # compare_with_local=laender)
         return_axes = np.concatenate([axes, axes_compare])
-<<<<<<< HEAD
-    
+
     elif country=="Spain":   # Spain specific plots
         # We thus compare only against those regions, that are in the data set:
         spain = fetch_data_spain()
         axes_compare, res_c, red_d = make_compare_plot_spain((region, subregion),
                                                              compare_with_local=spanish_regions)
         return_axes = np.concatenate([axes, axes_compare])
-=======
+
     elif country=="US" and region is not None:
         # skip comparison plot for the US states at the moment
         return_axes = axes
         return return_axes, c, d
     else:
         raise NotImplementedError
->>>>>>> 50a88f053f8da2081bdcbf460f51b991a7bb5919
 
     fig2 = plt.gcf()
 
