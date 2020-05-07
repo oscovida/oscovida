@@ -748,6 +748,8 @@ def get_country_data(country, region=None, subregion=None):
     elif country.lower() == 'us' and region != None:
         # load US data
         c, d = get_region_US(region)
+    elif country.lower() == 'es' and region != None:
+        c, d = spain_get_region(region)
     else:
         c, d = get_country(country)
     return c, d
@@ -1067,7 +1069,7 @@ def fetch_data_spain():
     datasource = "https://covid19.isciii.es/resources/serie_historica_acumulados.csv"
     t0 = time.time()
     print(f"Please be patient - downloading data from {datasource} ...")
-    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=6)
+    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=8)
     rename_columns(spain)
     delta_t = time.time() - t0
     print(f"Completed downloading {len(spain)} rows in {delta_t:.1f} seconds.")
@@ -1092,6 +1094,13 @@ def map_regions(spanish_data):
     spanish_data.drop(columns=['Admin. region code'], inplace=True)
 
     return spanish_data
+
+
+def get_ES_region_list():
+    """Return list of strings with Spain's region names"""
+    spain = fetch_data_spain()
+    regions = map_regions(spain)
+    return sorted(set(regions["Region"]))
 
 
 def spain_get_region(region=None):
