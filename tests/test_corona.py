@@ -144,4 +144,10 @@ def test_compose_dataframe_summary():
 
     # check that most recent data item is last
     print(table)
-    
+
+
+def test_get_ES_region_list():
+    x = get_ES_region_list()
+    assert x[0] == "Andalucía"
+    assert "Galicia" in x
+    assert len(x) == 19
