@@ -251,9 +251,13 @@ def fetch_data_germany_last_execution():
     return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
 @joblib_memory.cache
-def fetch_data_germany():
+def fetch_data_germany(include_last_day=False):
     """Data source is https://npgeo-corona-npgeo-de.hub.arcgis.com . The text on the
-    webpage implies that the data comes from the Robert Koch Institute. """
+    webpage implies that the data comes from the Robert Koch Institute.
+
+    By default, we omit the last day with data from the retrieved data sets
+    (see reasoning below in source).
+    """
 
     datasource = "https://opendata.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0.csv"
     t0 = time.time()
@@ -289,9 +293,15 @@ def fetch_data_germany():
     # To make our plots not inaccurate, we'll remove the last data point from the RKI data:
     g2 = germany.set_index(pd.to_datetime(germany['Meldedatum']))
     g2.index.name = 'date'
-    last_day = g2.index.max()
-    sel = g2.index == last_day
-    cleaned = g2.drop(g2[sel].index, inplace=False)
+
+    # get rid of last day in data if desired
+    if include_last_day == False:
+        last_day = g2.index.max()
+        sel = g2.index == last_day
+        cleaned = g2.drop(g2[sel].index, inplace=False)
+    else:
+        cleaned = g2
+
     fetch_data_germany_last_execution()
     return cleaned
 
