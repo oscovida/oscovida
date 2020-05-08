@@ -4,6 +4,7 @@ The remaining content here is only for developers.
 
 [![Build Status](https://travis-ci.org/fangohr/coronavirus-2020.svg?branch=master)](https://travis-ci.org/fangohr/coronavirus-2020)
 
+[![codecov](https://codecov.io/gh/fangohr/coronavirus-2020/branch/master/graph/badge.svg)](https://codecov.io/gh/fangohr/coronavirus-2020)
 
 --------------------------------
 
