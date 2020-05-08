@@ -3,6 +3,7 @@ https://github.com/fangohr/coronavirus-2020"""
 
 
 import datetime
+import math
 import os
 import time
 import joblib
@@ -67,10 +68,26 @@ def fetch_deaths():
     fetch_deaths_last_execution()
     return df
 
+@joblib_memory.cache
+def fetch_deaths_US():
+    url = os.path.join(base_url, "time_series_covid19_" + "deaths" + "_US.csv")
+    df = pd.read_csv(url, index_col=1)
+    report_download(url, df)
+    # fetch_deaths_last_execution_()
+    return df
+
 
 @joblib_memory.cache
 def fetch_cases():
     url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_global.csv")
+    df = pd.read_csv(url, index_col=1)
+    report_download(url, df)
+    fetch_cases_last_execution()
+    return df
+
+@joblib_memory.cache
+def fetch_cases_US():
+    url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_US.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
     fetch_cases_last_execution()
@@ -134,6 +151,78 @@ def get_country(country):
     d.label = "deaths"
 
     return c, d
+
+
+def get_US_region_list():
+    """return list of strings with US state names"""
+    deaths = fetch_deaths_US()
+    return list(deaths.groupby("Province_State").sum().index)
+
+
+def test_get_US_region_list():
+    x = get_US_region_list()
+    assert x[0] == "Alabama"
+    assert "Hawaii" in x
+    assert len(x) > 50  # at least 50 states, plus diamond Princess
+
+
+def get_region_US(state, county=None, debug=False):
+    """Given a US state name and country, return deaths and cases as a tuple of pandas time
+    series. (Johns Hopkins data set)
+
+    If country is None, then sum over all counties in that state (i.e. return
+    the numbers for the statee)
+
+    """
+
+    if not county is None:
+        raise NotImplementedError("Can only process US states (no counties)")
+
+    deaths = fetch_deaths_US()
+    cases = fetch_cases_US()
+
+    assert state in deaths['Province_State'].values, \
+        f"{state} not in available states. These are {sorted(deaths['Province_State'])}"
+
+    if county is None:
+        tmpd = deaths.groupby('Province_State').sum()
+        d = tmpd.loc[state]
+        tmpc = cases.groupby('Province_State').sum()
+        c = tmpc.loc[state]
+    else:
+        raise NotImplementedError("Can't do counties yet.")
+    # Some countries report sub areas (i.e. multiple rows per country) such as China, France, United Kingdom
+    # Denmark. In that case, we sum over all regions.
+
+    # make date string into timeindex
+    d.index = pd.to_datetime(d.index, errors="coerce", format="%m/%d/%y")
+    c.index = pd.to_datetime(c.index, errors="coerce", format="%m/%d/%y")
+    # drop all rows that don't have data
+    # sanity check: how many do we drop?
+    if c.index.isnull().sum() > 3:
+        if debug:
+            print(f"about to drop {c.index.isnull().sum()} entries due to NaT in index", c)
+    c = c[c.index.notnull()]
+
+    if d.index.isnull().sum() > 3:
+        if debug:
+            print(f"about to drop {d.index.isnull().sum()} entries due to NaT in index", d)
+    d = d[d.index.notnull()]
+
+    # check there are no NaN is in the data
+    assert c.isnull().sum() == 0, f"{c.isnull().sum()} NaNs in {c}"
+    assert d.isnull().sum() == 0, f"{d.isnull().sum()} NaNs in {d}"
+
+    # label data
+    country = f"US-{state}"
+    c.country = country
+    c.label = "cases"
+
+    d.country = country
+    d.label = "deaths"
+
+    return c, d
+
 
 
 def compose_dataframe_summary(cases, deaths):
@@ -208,6 +297,17 @@ def fetch_data_germany():
 
 
 def germany_get_region(state=None, landkreis=None):
+    """ Returns cases and deaths time series for Germany:
+
+    If state is given, return sum of cases (as function of time) in that state (state=Bundesland)
+
+    If landkreis is given, return data from just that Landkreis.
+
+    Landkreis seems unique, so there is no need to provide state and Landkreis.
+
+    [Should tidy up names here; maybe go to region and subregion in the function argument name, and
+    translate later.]
+    """
     germany = fetch_data_germany()
     """Returns two time series: (cases, deaths)"""
     assert state or landkreis, "Need to provide a value for state or landkreis"
@@ -330,6 +430,11 @@ def plot_daily_change(ax, series, color):
 
     ax.legend()
     ax.set_ylabel('daily change')
+
+    # labels on the right y-axis as well
+    ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
+    ax.yaxis.set_ticks_position('both')
+
 
     # data cleaning: For France, there was a huge spike on 12 April with 26849
     # new infections. This sets the scale to be too large.
@@ -504,7 +609,7 @@ def plot_growth_factor(ax, series, color):
     # get smooth data from plot 1 to base this plot on
     (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
 
-    
+
     label = series.country + " " + series.label + " growth factor " + f_label
     ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
 
@@ -517,6 +622,111 @@ def plot_growth_factor(ax, series, color):
     ax.set_ylim(0.5, 1.5)  # should generally be below 1
     ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3') # label="critical value"
     return ax
+
+
+# Computation or R
+#
+def compute_R(daily_change, tau=4):
+    """Given a time series s, estimate R based on description from RKI [1].
+
+    [1] [Robert Koch Institute: Epidemiologisches Bulletin 17 | 2020 23. April 2020]
+    https://www.rki.de/DE/Content/Infekt/EpidBull/Archiv/2020/Ausgaben/17_20.html
+
+    Steps:
+
+    1. Compute change from day to day
+    2. Take tau-day averages (tau=4 is recommended as of April/May 2020)
+    3. divide average from days 4 to 7 by averages from day 0 to 3, and use this data point for day[7]
+
+    """
+    # change = s.diff()
+    change = daily_change
+    mean4d = change.rolling(tau).mean()
+    R = mean4d / mean4d.shift(tau)
+    R2 = R.shift(-tau)  # this is not the RKI method, but seems more appropriate:
+                        # we centre the reported value between the 2-intervals of length tau
+                        # that have been used to compute it.
+    return R2
+
+
+def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.5, 100]):
+    """Given a time series, find the min and max values in the time series within the last n days.
+
+    If those values are within the interval `at_least`, then use the values in at_least as the limits.
+    if those values are outside the interval `at_least` then exchange the interval accordingly.
+
+    If the values exceed the min and max value in 'alerts', then print an error message.
+    Return min, max.
+    """
+    if n > len(series):
+        n = len(series)
+
+    series = series.replace(math.inf, math.nan)
+
+    min_ = series[-n:].min() - 0.025
+    max_ = series[-n:].max() + 0.025
+
+    if min_ < at_least[0]:
+        min_final = min_
+    else:
+        min_final = at_least[0]
+
+    if max_ > at_least[1]:
+        max_final = max_
+    else:
+        max_final = at_least[1]
+
+    if max_final > alert[1]:
+        # print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n", series[-n:])
+        print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n")
+    if min_final < alert[0]:
+        # print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n", series[-n:])
+        print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n")
+
+
+    # print(f"DDD: min_={min_}, max_={max_}")
+    return min_final, max_final
+
+
+def plot_reproduction_number(ax, series, color='C1', color_R='C4'):
+    """- series is expected to be cases (not deaths)
+    """
+
+    # data for computation or R
+    smooth_diff = series.diff().rolling(7,
+                                        center=True,
+                                        win_type='gaussian').mean(std=4)
+
+    R = compute_R(smooth_diff)
+    ax.plot(R.index, R, "-", color=color_R,
+            label=series.country + r" estimated R (assume $\tau$=4 days)",
+            linewidth=3)
+
+    # choose y limits so that all data points of R in the last 28 days are visible
+    min_, max_ = min_max_in_past_n_days(R, 28);
+    ax.set_ylim([min_, max_]);
+
+    # Plot ylim interval for debugging
+    # ax.plot([R.index.min(), R.index.max()], [min_, min_], 'b-')
+    # ax.plot([R.index.min(), R.index.max()], [max_, max_], 'b-')
+
+     # get smooth data for growth factor from plot 1 to base this plot on
+    (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
+
+    label = series.country + " " + series.label + " daily growth factor " + f_label
+    ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
+
+    label = series.country + " " + series.label + " daily growth factor " + smoothed_label
+    ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color, label=label, linewidth=LW)
+
+    ax.set_ylabel("R & growth factor")
+    # plot line at 0
+    ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3') # label="critical value"
+    ax.legend()
+    return ax
+
+
+
 
 
 
@@ -535,6 +745,9 @@ def get_country_data(country, region=None, subregion=None):
         else:
             # use German data
             c, d = germany_get_region(state=region, landkreis=subregion)
+    elif country.lower() == 'us' and region != None:
+        # load US data
+        c, d = get_region_US(region)
     else:
         c, d = get_country(country)
     return c, d
@@ -564,7 +777,7 @@ def day0atleast(v0, series):
 def align_sets_at(v0, df):
     """Accepts data frame, and aligns so that all enttries close to v0 are on the same row.
 
-    Returns new dataframe with integer index (reprenting days after v0).
+    Returns new dataframe with integer index (representing days after v0).
     """
     res = pd.DataFrame()
 
@@ -640,6 +853,16 @@ def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea
     df_c, df_d = get_compare_data([main_country] + compare_with, rolling=rolling)
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
+
+    # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
+    # for all days.
+    # For the purpose of this plot, we'll just interpolate between the last and next known values.
+    # We limit the number of fills to 3 days. (Just a guess to avoid accidental
+    # filling of too many NaNs.)
+
+    res_c = res_c.interpolate(method='linear', limit=3)
+    res_d = res_d.interpolate(method='linear', limit=3)
+
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
     plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
@@ -733,11 +956,17 @@ def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
 
 def make_compare_plot_germany(region_subregion,
                               compare_with=[], #"China", "Italy", "Germany"],
-                              compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
-                                                  'Brandenburg', 'Bremen', 'Hamburg',
-                                                  'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
-                                                  'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland',
-                                                  'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein',  'Thüringen'],
+                              compare_with_local =['Bayern',
+                                                   'Berlin', 'Bremen',
+                                                   'Hamburg', 'Hessen',
+                                                   'Nordrhein-Westfalen',
+                                                   'Sachsen-Anhalt'],
+    # The 'compare_with_local' subset is chosen to look sensibly on 2 May 2020.
+    #                          compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
+    #                                              'Brandenburg', 'Bremen', 'Hamburg',
+    #                                              'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
+    #                                              'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland',
+    #                                              'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein',  'Thüringen'],
                               v0c=10, v0d=1):
     rolling = 7
     region, subregion = unpack_region_subregion(region_subregion)
@@ -753,6 +982,15 @@ def make_compare_plot_germany(region_subregion,
 
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
+
+    # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
+    # for all days.
+    # For the purpose of this plot, we'll just interpolate between the last and next known values.
+    # We limit the number of fills to 7 days. (Just a guess to avoid accidental
+    # filling of too many NaNs.)
+    res_c = res_c.interpolate(method='linear', limit=7)
+    res_d = res_d.interpolate(method='linear', limit=7)
+
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
@@ -800,8 +1038,9 @@ def overview(country, region=None, subregion=None, savefig=False):
     plot_daily_change(ax=ax, series=d, color="C0")
 
     ax = axes[3]
-    plot_growth_factor(ax, series=d, color="C0")
-    plot_growth_factor(ax, series=c, color="C1")
+    # plot_growth_factor(ax, series=d, color="C0")
+    # plot_growth_factor(ax, series=c, color="C1")
+    plot_reproduction_number(ax, series=c)
 
     ax = axes[4]
     plot_doubling_time(ax, series=d, color="C0")
@@ -832,11 +1071,17 @@ def overview(country, region=None, subregion=None, savefig=False):
     elif country=="Germany":   # Germany specific plots
         # On 11 April, Mecklenburg Vorpommern data was missing from data set.
         # We thus compare only against those Laender, that are in the data set:
-        germany = fetch_data_germany()
-        laender = list(germany['Bundesland'].drop_duplicates().sort_values())
-        axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion),
-                                                               compare_with_local=laender)
+        # germany = fetch_data_germany()
+        # laender = list(germany['Bundesland'].drop_duplicates().sort_values())
+        axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
+                                                               # compare_with_local=laender)
         return_axes = np.concatenate([axes, axes_compare])
+    elif country=="US" and region is not None:
+        # skip comparison plot for the US states at the moment
+        return_axes = axes
+        return return_axes, c, d
+    else:
+        raise NotImplementedError
 
     fig2 = plt.gcf()
 
