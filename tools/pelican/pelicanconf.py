@@ -58,6 +58,13 @@ DISPLAY_PAGES_ON_MENU = False
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
 
+# Plugins (follow guidance https://janakiev.com/blog/pelican-jupyter/)
+MARKUP = ('md', 'rst', 'ipynb')
+
+from pelican_jupyter import markup as nb_markup
+PLUGINS = [nb_markup]
+
+IGNORE_FILES = [".ipynb_checkpoints"]  
 # HF: Relative URLS: this seems to work; needs more testing
 
 LOAD_CONTENT_CACHE = False
