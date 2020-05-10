@@ -35,7 +35,7 @@ make html
 
 -> create static html
 
-make regenarate
+make regenerate (or make serve)
 
 -> creates static html on demand, and serves pages at localhost:8000
 
@@ -45,4 +45,13 @@ make regenarate
 ## install
 
 git clone --recursive https://github.com/getpelican/pelican-themes ~/pelican-themes
+
+
+# Which files to place where?
+
+- normal articles in `pelican/content`
+- static pages in `pelican/content/pages`
+- Jupyter Notebooks that should become an article in `pelican/content/ipynb`
+  - files in there are automatically copied to ../wwwroot/ipynb as part of `make
+    publish` (code in `publishconf.ipy``)
 
