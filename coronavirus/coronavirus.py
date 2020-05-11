@@ -674,7 +674,7 @@ def compute_R(daily_change, tau=4):
     return R2
 
 
-def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.5, 100]):
+def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.2, 100]):
     """Given a time series, find the min and max values in the time series within the last n days.
 
     If those values are within the interval `at_least`, then use the values in at_least as the limits.
@@ -688,8 +688,8 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.5, 100])
 
     series = series.replace(math.inf, math.nan)
 
-    min_ = series[-n:].min() - 0.025
-    max_ = series[-n:].max() + 0.025
+    min_ = series[-n:].min() - 0.06
+    max_ = series[-n:].max() + 0.06
 
     if min_ < at_least[0]:
         min_final = min_
