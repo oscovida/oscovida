@@ -10,6 +10,7 @@ import joblib
 import numpy as np
 import pandas as pd
 
+
 # choose font - can be deactivated
 from matplotlib import rcParams
 rcParams['font.family'] = 'sans-serif'
@@ -403,9 +404,14 @@ def compute_daily_change(series):
     smooth_label = f"(rolling mean)"
     rolling_series = diff.rolling(9, center=True,
                                   win_type='gaussian',
-                                  min_periods=1).mean(std=3)
+                                  min_periods=7).mean(std=3)
     smooth = rolling_series, smooth_label
 
+    # strict 7 day week
+    #rolling_series = diff.rolling(7, center=True,
+    #                              min_periods=7).mean()
+    #smooth = rolling_series, smooth_label
+    
     # extra smoothing for better visual effects
     rolling_series2 = rolling_series.rolling(4, center=True,
                                              win_type='gaussian',
@@ -435,7 +441,7 @@ def plot_daily_change(ax, series, color):
     ax.bar(change.index, change.values, color=color,
            label=label, alpha=bar_alpha, linewidth=LW)
 
-    ax.plot(smooth2.index, smooth2.values, color=color,
+    ax.plot(smooth.index, smooth.values, color=color,
             label=label + " " + smooth2_label, linewidth=LW)
 
     ax.legend()
@@ -598,7 +604,7 @@ def compute_growth_factor(series):
     f.replace(np.inf, np.nan, inplace=True)  # seems not to affect plot
 
     # Compute smoother version for line in plots
-    f_smoothed = f.rolling(7, center=True, win_type='gaussian', min_periods=3).mean(std=2)
+    f_smoothed = f.rolling(7, center=True, win_type='gaussian', min_periods=7).mean(std=2)
     smooth_label = f"Gaussian window (stddev=2 days)"
     # simplified label
     smooth_label = "(rolling mean)"
@@ -706,6 +712,8 @@ def plot_reproduction_number(ax, series, color='C1', color_R='C4'):
     smooth_diff = series.diff().rolling(7,
                                         center=True,
                                         win_type='gaussian').mean(std=4)
+
+    smooth_diff = series.diff().rolling(7, center=True).mean()
 
     R = compute_R(smooth_diff)
     ax.plot(R.index, R, "-", color=color_R,
