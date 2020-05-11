@@ -28,8 +28,16 @@ General
 -   \[ \] make python package available via pip - what name? coronavirus? oscovida?
 -   \[ \] tidy up urls: german URLS are sanitised (using sanitise() but world countries are not)
     - watch link to automatic figure creation in generate-individual-plots.ipynb
-
-Webpage generation
+-   \[ \] refactor duplicated plotting in generate-countries.ipynb
+    - have a class to do this with virtual methods that need to be completed for
+      each category (i.e. countries of the world, US states, Germany Landkreise,
+      ...)?
+-   -[ \] change interface to plotting functions: get rid of attribute
+    `.country` and `.label` in the data series - this was a nice hack in the
+    beginning but is awkward now if we think about being able to modify Series
+    and DataFrames interactively (the attributes are not copied when slicing a
+    Series) Webpage generation 
+    
 ------------------
 
 -   \[ \] add binderlink to index page (something like \"binder\" behind
