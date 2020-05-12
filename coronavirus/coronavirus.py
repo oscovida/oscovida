@@ -261,7 +261,7 @@ def compose_dataframe_summary(cases, deaths):
 
 
 @joblib_memory.cache
-def fetch_data_last_execution():
+def fetch_data_germany_last_execution():
     return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
 @joblib_memory.cache
