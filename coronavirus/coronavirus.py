@@ -673,7 +673,7 @@ def compute_R(daily_change, tau=4):
     return R2
 
 
-def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.5, 100]):
+def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.2, 100]):
     """Given a time series, find the min and max values in the time series within the last n days.
 
     If those values are within the interval `at_least`, then use the values in at_least as the limits.
@@ -687,8 +687,8 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.5, 100])
 
     series = series.replace(math.inf, math.nan)
 
-    min_ = series[-n:].min() - 0.025
-    max_ = series[-n:].max() + 0.025
+    min_ = series[-n:].min() - 0.06
+    max_ = series[-n:].max() + 0.06
 
     if min_ < at_least[0]:
         min_final = min_
@@ -712,9 +712,26 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.5, 100])
     return min_final, max_final
 
 
-def plot_reproduction_number(ax, series, color='C1', color_R='C4'):
-    """- series is expected to be cases (not deaths)
+def plot_reproduction_number(ax, series, label, region, color_g='C1', color_R='C4', yscale_days=28):
     """
+    - series is expected to be time series of cases or deaths
+    - label is 'cases' or 'deaths' or whatever is desired as the description
+    - country is the name of the region/country
+    - color_g is the colour for the growth factor
+    - color_R is the colour for the reproduction number
+    """
+
+
+     # get smooth data for growth factor from plot 1 to base this plot on
+    (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
+
+    label_ = region + " " + label + " daily growth factor " + f_label
+    ax.plot(f.index, f.values, 'o', color=color_g, alpha=0.3, label=label_)
+
+    label_ = region + " " + label + " daily growth factor " + smoothed_label
+    ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color_g, label=label_, linewidth=LW,
+            alpha=0.7)
+
 
     # data for computation or R
     smooth_diff = series.diff().rolling(7,
@@ -723,27 +740,19 @@ def plot_reproduction_number(ax, series, color='C1', color_R='C4'):
 
     R = compute_R(smooth_diff)
     ax.plot(R.index, R, "-", color=color_R,
-            label=series.country + r" estimated R (assume $\tau$=4 days)",
-            linewidth=3)
+            label=region + f" estimated R (using {label})",
+            linewidth=4.5, alpha=1)
 
     # choose y limits so that all data points of R in the last 28 days are visible
-    min_, max_ = min_max_in_past_n_days(R, 28);
+    min_, max_ = min_max_in_past_n_days(R, yscale_days);
     ax.set_ylim([min_, max_]);
 
     # Plot ylim interval for debugging
     # ax.plot([R.index.min(), R.index.max()], [min_, min_], 'b-')
     # ax.plot([R.index.min(), R.index.max()], [max_, max_], 'b-')
 
-     # get smooth data for growth factor from plot 1 to base this plot on
-    (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
 
-    label = series.country + " " + series.label + " daily growth factor " + f_label
-    ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
-
-    label = series.country + " " + series.label + " daily growth factor " + smoothed_label
-    ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color, label=label, linewidth=LW)
-
-    ax.set_ylabel("R & growth factor")
+    ax.set_ylabel(f"R & growth factor\n(based on {label})")
     # plot line at 0
     ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3') # label="critical value"
     ax.legend()
@@ -1196,7 +1205,7 @@ def make_compare_plot_spain(region,
 def overview(country, region=None, subregion=None, savefig=False):
     c, d = get_country_data(country, region=region, subregion=subregion)
 
-    fig, axes = plt.subplots(5, 1, figsize=(10, 12), sharex=False)
+    fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     ax = axes[0]
     plot_time_step(ax=ax, series=c, style="-C1")
     plot_time_step(ax=ax, series=d, style="-C0")
@@ -1212,16 +1221,18 @@ def overview(country, region=None, subregion=None, savefig=False):
     ax = axes[3]
     # plot_growth_factor(ax, series=d, color="C0")
     # plot_growth_factor(ax, series=c, color="C1")
-    plot_reproduction_number(ax, series=c)
-
+    plot_reproduction_number(ax, series=c, color_g="C1", color_R="C5", region=country, label='cases')
     ax = axes[4]
+    plot_reproduction_number(ax, series=d, color_g="C0", color_R="C4", region=country, label='deaths')
+
+    ax = axes[5]
     plot_doubling_time(ax, series=d, color="C0")
     plot_doubling_time(ax, series=c, color="C1")
 
     # enforce same x-axis on all plots
-    for i in range(1, 5):
+    for i in range(1, 6):
         axes[i].set_xlim(axes[0].get_xlim())
-    for i in range(0, 5):
+    for i in range(0, 6):
         axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
         axes[i].yaxis.set_ticks_position('both')
 
