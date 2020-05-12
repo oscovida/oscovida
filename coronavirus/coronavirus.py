@@ -47,7 +47,6 @@ def display_binder_link(notebook_name):
         IPython.display.Markdown(f'[Execute this notebook with Binder]({url})'))
 
 
-
 def clear_cache():
     """Need to run this before new data for the day is created"""
     joblib_memory.clear()
