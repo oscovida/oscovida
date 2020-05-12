@@ -1083,9 +1083,9 @@ def overview(country, region=None, subregion=None, savefig=False):
     plot_doubling_time(ax, series=c, color="C1")
 
     # enforce same x-axis on all plots
-    for i in range(1, 5):
+    for i in range(1, 6):
         axes[i].set_xlim(axes[0].get_xlim())
-    for i in range(0, 5):
+    for i in range(0, 6):
         axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
         axes[i].yaxis.set_ticks_position('both')
 
