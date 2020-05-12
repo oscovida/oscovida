@@ -1091,10 +1091,10 @@ def fetch_data_spain():
     """Data source is https://covid19.isciii.es. The text on the webpage implies that 
     the data comes from the Minitry of Health. """
 
-    datasource = "https://covid19.isciii.es/resources/serie_historica_acumulados.csv"
+    datasource = "https://cnecovid.isciii.es/covid19/resources/agregados.csv"
     t0 = time.time()
     print(f"Please be patient - downloading data from {datasource} ...")
-    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=8)
+    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=9)
     rename_columns(spain)
     delta_t = time.time() - t0
     print(f"Completed downloading {len(spain)} rows in {delta_t:.1f} seconds.")
