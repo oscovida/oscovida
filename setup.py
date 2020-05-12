@@ -42,6 +42,7 @@ setup(name="coronavirus-2020",
           'scipy',
           'voila',
           'pelican',
+          'pelican-jupyter',
           'seaborn',
           'tabulate'
       ],

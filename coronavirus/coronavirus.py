@@ -9,6 +9,7 @@ import time
 import joblib
 import numpy as np
 import pandas as pd
+import IPython.display
 
 # choose font - can be deactivated
 from matplotlib import rcParams
@@ -31,6 +32,20 @@ base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/css
 # set up joblib memory to avoid re-fetching files
 joblib_location = "./cachedir"
 joblib_memory = joblib.Memory(joblib_location, verbose=0)
+
+
+def compute_binder_link(notebook_name):
+    """Given a string """
+    root_url = "https://mybinder.org/v2/gh/oscovida/oscovida.github.io/master?filepath=ipynb/"
+    return root_url + notebook_name
+
+
+def display_binder_link(notebook_name):
+    url = compute_binder_link(notebook_name)
+    # print(f"url is {url}")
+    IPython.display.display(
+        IPython.display.Markdown(f'[Execute this notebook with Binder]({url})'))
+
 
 
 def clear_cache():
