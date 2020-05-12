@@ -89,5 +89,9 @@ def test_MetadataRegion_get_all_as_dataframe():
     ref = pd.DataFrame({'html' : {'UK' : 'html-path', "Germany" : 'html-pfad'},
                         'ipynb' : {'UK' : 'ipynb-path', "Germany" : 'ipynb-pfad'}})
     actual = MetadataRegion.get_all_as_dataframe()
-    assert ref.equals(actual)
-    
+
+    # We want to run this line:
+    # assert ref.equals(actual)
+    # but need to sort the table to be sure rows are in the
+    # same order:
+    assert ref.sort_index().equals(actual.sort_index())

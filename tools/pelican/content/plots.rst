@@ -59,8 +59,8 @@ Plot 3: daily changes in deaths
    with some time delay, and reduced by a fraction (the `case fatality
    rate <https://en.wikipedia.org/wiki/Case_fatality_rate>`__).
 
-Plot 4: R & growth factor
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Plot 4: R & growth factor based on cases
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
 .. raw:: html
@@ -75,7 +75,7 @@ Reproduction number R
   <https://en.wikipedia.org/wiki/Basic_reproduction_number>`__ expresses how
   many people are infected from one person with COVID19.
 - If we assume an average infectious period, we can estimate R from the reported
-  new cases. This estimate of R is shown as the yellow line. The estimate or R
+  new cases. This estimate of R is shown as the green line. The estimate of R
   will be affected by inaccuracies in the reported numbers.
 - Following the Robert Koch Institute, we assume an average infectious period of
   4 days. This means, for example, for a reproduction number R=2, that on
@@ -83,7 +83,7 @@ Reproduction number R
 - R needs to be below 1.0 for the total number of infections to
   shrink. A value of R above 1 will lead to exponential growth.
 - See `this page <reproduction-number.html>`__ for more details.
-    
+
 
 Daily growth factor
 +++++++++++++++++++
@@ -127,12 +127,43 @@ Assessing success for containment measures
   factor are good indicators to assess changes in spread even with small case
   numbers.
 
-Plot 5: Doubling times
-~~~~~~~~~~~~~~~~~~~~~~
+
+Plot 5: R & growth factor based on deaths
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
     <img src="{attach}fig-south-korea5.svg" alt="South Korea data">
+
+Conventionally, the R number is computed on infections (here shown in plot 4 and
+referred to as "R based on cases"). Assuming a fixed mortality rate, we can also
+use the reported deaths to estimate R (as R depends not on the total numbers but
+their change over time). This is done in plot 5, and the estimated R is shown in
+yellow. See discussion of plot 4 above for details.
+
+
+This computation of R based on deaths can be of interest, for example, for the
+case of the `United Kingdom <html/United%20Kingdom.html>`__, where the daily new
+infections remained approximately constant from about 10 April to about 10 May,
+but at the same time the daily number of deaths shows a slow but persistent
+reduction from day to day. A possible explanation for the situation would be
+that the nearly constant number of daily infections results from a saturation of
+the testing capacity, and that actually the spread is reducing (which is
+reflected in the deaths, which may be more accurately captured and reported). In
+that case, the R based on deaths may provide a more accurate estimate.
+
+If deaths and infections are similarly captured and reported, both entities
+should point to the same value, although the R based on deaths could be trailing
+the estimate of R based on infections by several weeks; reflecting the duration
+of the illness.
+
+
+Plot 6: Doubling times
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. raw:: html
+
+    <img src="{attach}fig-south-korea6.svg" alt="South Korea data">
 
 -  This plot computes the doubling time of the cases (blue) and deaths
    (red), assuming that the growth of cases and deaths as shown in plot
@@ -177,12 +208,12 @@ Plot 5: Doubling times
 
 - Occasionally, the solid lines are omitted if there are not enough data points.
 
-Plot 6: Comparison of daily new cases with other countries
+Plot 7: Comparison of daily new cases with other countries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
-    <img src="{attach}fig-south-korea6.svg" alt="South Korea data">
+    <img src="{attach}fig-south-korea7.svg" alt="South Korea data">
 
 -  The x-axis shows the number of days since a particular number of new
    cases per day (such as 10) have occurred in that country, and the
@@ -205,12 +236,12 @@ Plot 6: Comparison of daily new cases with other countries
 - [The curve for China starts at a higher value than 10, as the first recorded
   value was 548. We could manually correct this.]
 
-Plot 7: Comparison of daily new deaths with other countries
+Plot 8: Comparison of daily new deaths with other countries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
-    <img src="{attach}fig-south-korea7.svg" alt="South Korea data">
+    <img src="{attach}fig-south-korea8.svg" alt="South Korea data">
 
--  As Plot 6, but for deaths not cases. For South Korea, there are not
-   enough deaths per day to show a meaningful line here.
+-  As Plot 7, but for deaths not cases.
+
