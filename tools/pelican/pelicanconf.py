@@ -46,7 +46,7 @@ SOCIAL = (('Open Science COVID Analysis', 'https://twitter.com/OSCOVIDAproject')
 
 DEFAULT_PAGINATION = False
 
-STATIC_PATHS = ['content/pages', 'content/news']
+STATIC_PATHS = ['content/pages', 'content/news', 'content/ipynb']
 # ARTICLE_PATHS = ['content']
 
 # THEME = "/Users/fangohr/pelican-themes/bootstrap2"
@@ -58,6 +58,13 @@ DISPLAY_PAGES_ON_MENU = False
 # Uncomment following line if you want document-relative URLs when developing
 RELATIVE_URLS = True
 
+# Plugins (follow guidance https://janakiev.com/blog/pelican-jupyter/)
+MARKUP = ('md', 'rst', 'ipynb')
+
+from pelican_jupyter import markup as nb_markup
+PLUGINS = [nb_markup]
+
+IGNORE_FILES = [".ipynb_checkpoints"]  
 # HF: Relative URLS: this seems to work; needs more testing
 
 LOAD_CONTENT_CACHE = False

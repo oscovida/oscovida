@@ -77,9 +77,9 @@ to be interpreted.
 ## Further reading
 
 1. The [Jupyter Notebook to create the plots and table above is
-available](https://github.com/oscovida/oscovida.github.io/blob/master/ipynb/2020-04-30-bbc-germany-increasing.ipynb)
+available](https://github.com/oscovida/oscovida.github.io/blob/master/ipynb/2020-04-30-bbc-germany-increasing.ipynb) or [here](2020-04-30-bbc-germany-increasing-notebook.html)
 and can be [re-executed in your
-browser](https://mybinder.org/v2/gh/oscovida/oscovida.github.io/master?filepath=ipynb/2020-04-30-bbc-germany-increasing.ipynb).
+browser](https://mybinder.org/v2/gh/oscovida/oscovida.github.io/master?filepath=ipynb/2020-04-30-bbc-germany-increasing.ipynb) 
 
 2. Updated plots and tables of the type shown above [are available for many countries and regions](https://oscovida.github.io)
  and for Germany at [https://oscovida.github.io/html/Germany.html](https://oscovida.github.io/html/Germany.html).
