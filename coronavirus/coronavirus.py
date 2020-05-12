@@ -1094,6 +1094,11 @@ def rename_columns(spanish_data):
     return spanish_data
 
 
+@joblib_memory.cache
+def fetch_data_spain_last_execution():
+    return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+
 #@joblib_memory.cache
 def fetch_data_spain():
     """Data source is https://covid19.isciii.es. The text on the webpage implies that 
@@ -1113,8 +1118,7 @@ def fetch_data_spain():
     last_day = g2.index[-1]
     sel = g2.index == last_day
     cleaned = g2.drop(g2[sel].index, inplace=False)
-    fetch_data_last_execution()
-
+    fetch_data_spain_last_execution()
     return cleaned
 
 
