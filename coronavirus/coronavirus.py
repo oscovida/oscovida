@@ -308,12 +308,6 @@ def fetch_data_germany(include_last_day=False):
     # To make our plots not inaccurate, we'll remove the last data point from the RKI data:
     g2 = germany.set_index(pd.to_datetime(germany['Meldedatum']))
     g2.index.name = 'date'
-<<<<<<< HEAD
-    last_day = g2.index.max()
-    sel = g2.index == last_day
-    cleaned = g2.drop(g2[sel].index, inplace=False)
-    fetch_data_last_execution()
-=======
 
     # get rid of last day in data if desired
     if include_last_day == False:
@@ -324,7 +318,6 @@ def fetch_data_germany(include_last_day=False):
         cleaned = g2
 
     fetch_data_germany_last_execution()
->>>>>>> 4905cb94e07ecf4d0b575cc6354a40bc459960f6
     return cleaned
 
 
