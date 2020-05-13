@@ -13,9 +13,9 @@ to better understand the development of the pandemic and measures taken.
 Or use `our code and extend the analysis <open-science.html>`__ for your
 own purposes, or to share here.
 
-We provide a `standard a set of analysis plots <plots.html>`__ for different regions:
+We provide a standard a set of analysis plots (`explained here <plots.html>`__) for different regions:
 
--  `List of all regions <all-regions.html>`__ (different data sources)
+-  `List of all regions, countries and US states <all-regions.html>`__ 
 
 -  `Overview for each country in the world <countries.html>`__ (Johns Hopkins data)
    
@@ -23,7 +23,7 @@ We provide a `standard a set of analysis plots <plots.html>`__ for different reg
 
 -  `Counties (Landkreise) in Germany <germany.html>`__ (Robert Koch Institute data)
 
-Occasionally, we try to `put COVID19 numbers reported in the news into context <tag-numbers-in-news.html>`__.
+Occasionally, we try to `put COVID19 numbers reported in the news into context <tag-analysis.html>`__.
 
 --------------
 
