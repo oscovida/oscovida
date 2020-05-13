@@ -831,11 +831,13 @@ def get_compare_data(countrynames, rolling=7, regions=False):
     - data in the column is the diff of accumulated numbers
     - any zero values are removed for italy (data error)
     - apply some smoothing
+    The 'regions' flag is for countries such as Spain, where data for specific regions are
+    available.
     """
     df_c = pd.DataFrame()
     df_d = pd.DataFrame()
 
-    if regions:
+    if countrynames=='Spain' and region is not None:
         for region in countrynames:
             c, d = spain_get_region(region)
 
@@ -1118,7 +1120,7 @@ def fetch_data_spain():
     return cleaned
 
 
-def map_regions(spanish_data):
+def spain_map_regions(spanish_data):
     """Map the Administrative Region codes from data with proper names. """
     codes = sorted(set(spanish_data['Admin. region code']))
 
@@ -1129,16 +1131,16 @@ def map_regions(spanish_data):
     return spanish_data
 
 
-def get_ES_region_list():
+def get_spain_region_list():
     """Return list of strings with Spain's region names"""
     spain = fetch_data_spain()
-    regions = map_regions(spain)
+    regions = spain_map_regions(spain)
     return sorted(set(regions["Region"]))
 
 
 def spain_get_region(region=None):
     spain = fetch_data_spain()
-    spain = map_regions(spain)
+    spain = spain_map_regions(spain)
     """Returns two time series: (cases, deaths)"""
     assert region, "Need to provide a value for the administrative region"
 
