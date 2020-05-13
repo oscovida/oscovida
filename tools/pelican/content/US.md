@@ -1,66 +1,67 @@
-title: US
-tags: Data, Plots, US
+title: Tracking plots:  United States
+tags: Data, Plots, Tracking plots:  United States
 save-as: us
-date: 2020/04/30 08:06
+slug: us
+date: 2020/05/13 09:46
 
 
 | Location                                                              | Total cases   | Total deaths   |
 |:----------------------------------------------------------------------|:--------------|:---------------|
-| [US: Iowa](html/US-Iowa.html)                                         | 6,843         | 148            |
-| [US: Virginia](html/US-Virginia.html)                                 | 14,962        | 522            |
-| [US: Ohio](html/US-Ohio.html)                                         | 17,303        | 937            |
-| [US: Louisiana](html/US-Louisiana.html)                               | 27,660        | 1,845          |
-| [US: Kentucky](html/US-Kentucky.html)                                 | 4,537         | 234            |
-| [US: Connecticut](html/US-Connecticut.html)                           | 26,767        | 2,169          |
-| [US: South Dakota](html/US-South-Dakota.html)                         | 2,373         | 13             |
-| [US: New York](html/US-New-York.html)                                 | 299,691       | 23,477         |
-| [US: Oklahoma](html/US-Oklahoma.html)                                 | 3,473         | 214            |
-| [US: Mississippi](html/US-Mississippi.html)                           | 6,569         | 250            |
-| [US: Vermont](html/US-Vermont.html)                                   | 862           | 47             |
-| [US: Pennsylvania](html/US-Pennsylvania.html)                         | 46,327        | 2,373          |
-| [US: Texas](html/US-Texas.html)                                       | 27,257        | 754            |
-| [US: Washington](html/US-Washington.html)                             | 14,070        | 801            |
-| [US: Maine](html/US-Maine.html)                                       | 1,056         | 52             |
-| [US: Puerto Rico](html/US-Puerto-Rico.html)                           | 1,433         | 86             |
-| [US: North Dakota](html/US-North-Dakota.html)                         | 1,033         | 19             |
-| [US: Alaska](html/US-Alaska.html)                                     | 355           | 9              |
+| [US: Iowa](html/US-Iowa.html)                                         | 12,912        | 289            |
+| [US: Virginia](html/US-Virginia.html)                                 | 25,800        | 892            |
+| [US: Ohio](html/US-Ohio.html)                                         | 25,250        | 1,436          |
+| [US: Louisiana](html/US-Louisiana.html)                               | 32,050        | 2,347          |
+| [US: Kentucky](html/US-Kentucky.html)                                 | 6,853         | 321            |
+| [US: Connecticut](html/US-Connecticut.html)                           | 34,333        | 3,041          |
+| [US: South Dakota](html/US-South-Dakota.html)                         | 3,663         | 39             |
+| [US: New York](html/US-New-York.html)                                 | 338,485       | 27,284         |
+| [US: Oklahoma](html/US-Oklahoma.html)                                 | 4,732         | 278            |
+| [US: Mississippi](html/US-Mississippi.html)                           | 9,908         | 457            |
+| [US: Vermont](html/US-Vermont.html)                                   | 927           | 53             |
+| [US: Pennsylvania](html/US-Pennsylvania.html)                         | 61,310        | 3,914          |
+| [US: Texas](html/US-Texas.html)                                       | 41,432        | 1,146          |
+| [US: Washington](html/US-Washington.html)                             | 17,330        | 962            |
+| [US: Maine](html/US-Maine.html)                                       | 1,477         | 65             |
+| [US: Puerto Rico](html/US-Puerto-Rico.html)                           | 2,299         | 114            |
+| [US: North Dakota](html/US-North-Dakota.html)                         | 1,571         | 38             |
+| [US: Alaska](html/US-Alaska.html)                                     | 383           | 10             |
 | [US: Grand Princess](html/US-Grand-Princess.html)                     | 103           | 3              |
-| [US: Minnesota](html/US-Minnesota.html)                               | 4,644         | 319            |
-| [US: District of Columbia](html/US-District-of-Columbia.html)         | 4,106         | 205            |
-| [US: Nevada](html/US-Nevada.html)                                     | 4,934         | 230            |
-| [US: Wyoming](html/US-Wyoming.html)                                   | 545           | 7              |
-| [US: Florida](html/US-Florida.html)                                   | 33,193        | 1,218          |
-| [US: Arkansas](html/US-Arkansas.html)                                 | 3,193         | 57             |
-| [US: Colorado](html/US-Colorado.html)                                 | 14,758        | 766            |
-| [US: Tennessee](html/US-Tennessee.html)                               | 10,366        | 195            |
-| [US: Missouri](html/US-Missouri.html)                                 | 7,660         | 338            |
-| [US: Indiana](html/US-Indiana.html)                                   | 17,182        | 964            |
+| [US: Minnesota](html/US-Minnesota.html)                               | 12,494        | 614            |
+| [US: District of Columbia](html/US-District-of-Columbia.html)         | 6,485         | 336            |
+| [US: Nevada](html/US-Nevada.html)                                     | 6,313         | 321            |
+| [US: Wyoming](html/US-Wyoming.html)                                   | 675           | 7              |
+| [US: Florida](html/US-Florida.html)                                   | 41,923        | 1,779          |
+| [US: Arkansas](html/US-Arkansas.html)                                 | 4,164         | 95             |
+| [US: Colorado](html/US-Colorado.html)                                 | 20,157        | 1,010          |
+| [US: Tennessee](html/US-Tennessee.html)                               | 16,111        | 266            |
+| [US: Missouri](html/US-Missouri.html)                                 | 10,269        | 529            |
+| [US: Indiana](html/US-Indiana.html)                                   | 25,127        | 1,578          |
 | [US: Diamond Princess](html/US-Diamond-Princess.html)                 | 49            | 0              |
-| [US: Alabama](html/US-Alabama.html)                                   | 6,912         | 256            |
-| [US: Michigan](html/US-Michigan.html)                                 | 40,399        | 3,670          |
-| [US: California](html/US-California.html)                             | 48,747        | 1,946          |
-| [US: North Carolina](html/US-North-Carolina.html)                     | 10,180        | 382            |
-| [US: Montana](html/US-Montana.html)                                   | 451           | 16             |
-| [US: Maryland](html/US-Maryland.html)                                 | 20,849        | 1,078          |
-| [US: Wisconsin](html/US-Wisconsin.html)                               | 6,520         | 308            |
+| [US: Alabama](html/US-Alabama.html)                                   | 10,464        | 435            |
+| [US: Michigan](html/US-Michigan.html)                                 | 48,021        | 4,674          |
+| [US: California](html/US-California.html)                             | 70,978        | 2,879          |
+| [US: North Carolina](html/US-North-Carolina.html)                     | 15,622        | 600            |
+| [US: Montana](html/US-Montana.html)                                   | 461           | 16             |
+| [US: Maryland](html/US-Maryland.html)                                 | 34,061        | 1,756          |
+| [US: Wisconsin](html/US-Wisconsin.html)                               | 10,611        | 418            |
 | [US: American Samoa](html/US-American-Samoa.html)                     | 0             | 0              |
-| [US: Delaware](html/US-Delaware.html)                                 | 4,655         | 144            |
-| [US: New Jersey](html/US-New-Jersey.html)                             | 116,365       | 6,771          |
-| [US: Rhode Island](html/US-Rhode-Island.html)                         | 8,247         | 251            |
-| [US: Arizona](html/US-Arizona.html)                                   | 7,209         | 308            |
-| [US: Hawaii](html/US-Hawaii.html)                                     | 613           | 16             |
-| [US: South Carolina](html/US-South-Carolina.html)                     | 5,882         | 231            |
-| [US: Utah](html/US-Utah.html)                                         | 4,497         | 45             |
-| [US: West Virginia](html/US-West-Virginia.html)                       | 1,110         | 38             |
-| [US: Illinois](html/US-Illinois.html)                                 | 50,358        | 2,215          |
-| [US: Georgia](html/US-Georgia.html)                                   | 25,775        | 1,101          |
-| [US: Massachusetts](html/US-Massachusetts.html)                       | 60,265        | 3,405          |
-| [US: Idaho](html/US-Idaho.html)                                       | 1,952         | 60             |
-| [US: Northern Mariana Islands](html/US-Northern-Mariana-Islands.html) | 14            | 2              |
-| [US: Nebraska](html/US-Nebraska.html)                                 | 3,851         | 56             |
-| [US: Kansas](html/US-Kansas.html)                                     | 3,839         | 134            |
-| [US: New Hampshire](html/US-New-Hampshire.html)                       | 2,058         | 60             |
-| [US: Virgin Islands](html/US-Virgin-Islands.html)                     | 57            | 4              |
-| [US: Guam](html/US-Guam.html)                                         | 141           | 5              |
-| [US: Oregon](html/US-Oregon.html)                                     | 2,446         | 101            |
-| [US: New Mexico](html/US-New-Mexico.html)                             | 3,213         | 112            |
+| [US: Delaware](html/US-Delaware.html)                                 | 6,741         | 237            |
+| [US: New Jersey](html/US-New-Jersey.html)                             | 140,917       | 9,531          |
+| [US: Rhode Island](html/US-Rhode-Island.html)                         | 11,614        | 444            |
+| [US: Arizona](html/US-Arizona.html)                                   | 11,736        | 562            |
+| [US: Hawaii](html/US-Hawaii.html)                                     | 635           | 17             |
+| [US: South Carolina](html/US-South-Carolina.html)                     | 7,927         | 355            |
+| [US: Utah](html/US-Utah.html)                                         | 6,432         | 73             |
+| [US: West Virginia](html/US-West-Virginia.html)                       | 1,378         | 58             |
+| [US: Illinois](html/US-Illinois.html)                                 | 83,021        | 3,601          |
+| [US: Georgia](html/US-Georgia.html)                                   | 34,924        | 1,498          |
+| [US: Massachusetts](html/US-Massachusetts.html)                       | 79,332        | 5,141          |
+| [US: Idaho](html/US-Idaho.html)                                       | 2,293         | 69             |
+| [US: Northern Mariana Islands](html/US-Northern-Mariana-Islands.html) | 19            | 2              |
+| [US: Nebraska](html/US-Nebraska.html)                                 | 8,532         | 100            |
+| [US: Kansas](html/US-Kansas.html)                                     | 7,240         | 184            |
+| [US: New Hampshire](html/US-New-Hampshire.html)                       | 3,239         | 142            |
+| [US: Virgin Islands](html/US-Virgin-Islands.html)                     | 69            | 6              |
+| [US: Guam](html/US-Guam.html)                                         | 152           | 5              |
+| [US: Oregon](html/US-Oregon.html)                                     | 3,358         | 130            |
+| [US: New Mexico](html/US-New-Mexico.html)                             | 5,212         | 219            |
