@@ -146,8 +146,8 @@ def test_compose_dataframe_summary():
     print(table)
 
 
-def test_get_ES_region_list():
-    x = c.get_ES_region_list()
+def test_get_spain_region_list():
+    x = c.get_spain_region_list()
     assert x[0] == "Andalucía"
     assert "Galicia" in x
     assert len(x) == 19
