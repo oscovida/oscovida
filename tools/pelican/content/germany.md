@@ -1,4 +1,4 @@
-title: Tracking plots:  Germany
+title: Tracking plots - Germany
 tags: Data, Plots, Tracking plots:  Germany
 save-as: germany
 slug: germany
