@@ -88,6 +88,8 @@ def inject_google_analytics_into_html_notebooks(GOOGLE_ANALYTICS):
     print(f"{counter_injected} files injected, " +
           f"and {counter_untouched} untouched")
 
+# create html folder if it does not exist
+os.system("mkdir -p ../wwwroot/html")
 
 inject_google_analytics_into_html_notebooks(GOOGLE_ANALYTICS)
 

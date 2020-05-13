@@ -12,6 +12,10 @@ TIMEZONE = 'Europe/Paris'
 
 DEFAULT_LANG = 'en'
 
+
+USE_FOLDER_AS_CATEGORY = False
+DEFAULT_CATEGORY = "All"
+
 # Feed generation is usually not desired when developing
 FEED_ALL_ATOM = None
 CATEGORY_FEED_ATOM = None
@@ -24,7 +28,7 @@ MENUITEMS = [("Home", "index.html"),
              ("Countries", "countries.html"),
              ("Germany", "germany.html"),
              ("US", "us.html"),
-             ("Articles", "category-misc.html"),
+             ("Articles", "category-all.html"),
              ("Analysis", "tag-analysis"),
              ("About", "tag-about.html")]
 
