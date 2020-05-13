@@ -24,8 +24,8 @@ MENUITEMS = [("Home", "index.html"),
              ("Countries", "countries.html"),
              ("Germany", "germany.html"),
              ("US", "us.html"),
-             ("Data", "tag-data.html"),
-             ("Numbers-in-News", "tag-numbers-in-news.html"),
+             ("Articles", "category-misc.html"),
+             ("Analysis", "tag-analysis"),
              ("About", "tag-about.html")]
 
 OUTPUT_PATH = "../wwwroot"
