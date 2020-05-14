@@ -880,8 +880,8 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
     ax.yaxis.set_ticks_position('both')
 
 
-def make_compare_plot(main_country, compare_with=["China", "Italy", "US", "Korea, South",
-                                                  "Spain", "United Kingdom", "Iran"],
+def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Poland", "Korea, South",
+                                                  "Belarus", "Switzerland", "US"],
                      v0c=10, v0d=3):
     rolling = 7
     df_c, df_d = get_compare_data([main_country] + compare_with, rolling=rolling)
