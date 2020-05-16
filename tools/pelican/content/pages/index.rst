@@ -62,6 +62,10 @@ Acknowledgements
 
 .. raw:: html
 
+   <img src="{attach}europe-flag.svg" alt="European flag" width="40"> This project has received funding from the European Union's Horizon 2020 research and innovation programme under grant agreement No. 823852.
+
+.. raw:: html
+
    <!--![Plot]({attach}belgium7.png)
 
    -------------------------
