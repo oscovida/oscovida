@@ -713,7 +713,7 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.2, 100])
     return min_final, max_final
 
 
-def plot_reproduction_number(ax, series, label, region, color_g='C1', color_R='C4', yscale_days=28):
+def plot_reproduction_number(ax, series, label, region, color_g='C1', color_R='C4', yscale_days=28, max_yscale=10):
     """
     - series is expected to be time series of cases or deaths
     - label is 'cases' or 'deaths' or whatever is desired as the description
@@ -746,6 +746,12 @@ def plot_reproduction_number(ax, series, label, region, color_g='C1', color_R='C
 
     # choose y limits so that all data points of R in the last 28 days are visible
     min_, max_ = min_max_in_past_n_days(R, yscale_days);
+
+    # set upper bound for R
+    # (Germany data has huge spike in February )
+    if max_ > max_yscale:
+        max_ = max_yscale
+
     ax.set_ylim([min_, max_]);
 
     # Plot ylim interval for debugging
