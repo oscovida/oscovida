@@ -28,32 +28,56 @@ def test_mock_get_country_data_johns_hopkins():
 
 def test_overview():
     axes, cases, deaths = c.overview("China")
-    assert cases.label == 'cases'
-    assert cases.country == 'China'
-    assert deaths.label == 'deaths'
-    assert deaths.country == 'China'
+    assert cases.name == 'China cases'
+    assert deaths.name == 'China deaths'
 
     isinstance(deaths, pd.core.series.Series)
     isinstance(deaths, pd.core.series.Series)
+
+
+def test_US_overview():
+    axes, cases, deaths = c.overview(country="US", region="New Jersey")
+    assert cases.name == 'US-New Jersey cases'
+    assert deaths.name == 'US-New Jersey deaths'
+
+    isinstance(deaths, pd.core.series.Series)
+    isinstance(deaths, pd.core.series.Series)
+
+
+def test_get_US_region_list():
+    x = c.get_US_region_list()
+    assert x[0] == "Alabama"
+    assert "Hawaii" in x
+    assert len(x) > 50  # at least 50 states, plus diamond Princess
+
+
+def test_label_from_region_subregion():
+    assert c.label_from_region_subregion(("Hamburg", None)) == "Hamburg"
+    assert c.label_from_region_subregion("Hamburg") == "Hamburg"
+    assert c.label_from_region_subregion(("Schleswig Holstein", "Pinneberg")) == "Schleswig Holstein-Pinneberg"
+
+
 
 
 def test_get_country_data():
     # Germany
-    cases, deaths = c.get_country_data(country="Germany",
-                                       subregion="SK Hamburg")
-    assert cases.name == "AnzahlFall"
-    assert deaths.name == "AnzahlTodesfall"
-    assert cases.country == 'Germany-SK Hamburg'
-    assert deaths.country == 'Germany-SK Hamburg'
+    cases, deaths, region_label = c.get_country_data(country="Germany",
+                                                     subregion="SK Hamburg")
+    print(f"region_label = {region_label}")
+    print(f"deaths = {type(deaths)}")
+    print(f"empty")
+    assert cases.name == 'Germany-SK Hamburg cases'
+    assert deaths.name == 'Germany-SK Hamburg deaths'
+    assert region_label == 'Germany-SK Hamburg'
 
-    c2, d2 = c.get_country_data(country="United Kingdom")
-    assert c2.country == "United Kingdom"
-    assert c2.label == "cases"
-    assert d2.label == "deaths"
+    c2, d2, region_label = c.get_country_data(country="United Kingdom")
+    assert c2.name == "United Kingdom cases"
+    assert d2.name == "United Kingdom deaths"
+    assert region_label == "United Kingdom"
 
 
 def test_compute_daily_change():
-    cases, deaths = mock_get_country()
+    cases, deaths = mock_get_country_data_johns_hopkins()
     change, smooth, smooth2 = c.compute_daily_change(cases)
     assert isinstance(change[0], pd.Series)  # data
     assert isinstance(smooth[0], pd.Series)  # data
@@ -118,26 +142,42 @@ def test_compute_growth_factor():
 
 
 
-def test_plot_growth_factor():
-    cases, deaths = mock_get_country()
+#def test_plot_growth_factor():
+#    cases, deaths = mock_get_country()
+#    fig, ax = plt.subplots()
+#    ax = c.plot_growth_factor(ax, cases, 'C1')
+#    fig.savefig('test-growth_factor.pdf')
+#
+#
+#def test_plot_growth_factor_fetch_data():
+#    """Similar to test above, but using fresh data"""
+#    for country in ["Korea, South", "China", "Germany"]:
+#        cases, deaths = c.get_country(country)
+#        fig, ax = plt.subplots()
+#        c.plot_growth_factor(ax, cases, 'C1');
+#        c.plot_growth_factor(ax, deaths, 'C0');
+#        fig.savefig(f'test-growth-factor-{country}.pdf')
+
+def test_plot_reproduction_number ():
+    cases, deaths = mock_get_country_data_johns_hopkins()
     fig, ax = plt.subplots()
-    ax = c.plot_growth_factor(ax, cases, 'C1')
-    fig.savefig('test-growth_factor.pdf')
+    ax = c.plot_reproduction_number(ax, cases, 'C1')
+    fig.savefig('test-reproduction_number.pdf')
 
 
-def test_plot_growth_factor_fetch_data():
+def test_plot_reproduction_number_fetch_data():
     """Similar to test above, but using fresh data"""
     for country in ["Korea, South", "China", "Germany"]:
-        cases, deaths = c.get_country(country)
+        cases, deaths = c.get_country_data_johns_hopkins(country)
         fig, ax = plt.subplots()
-        c.plot_growth_factor(ax, cases, 'C1');
-        c.plot_growth_factor(ax, deaths, 'C0');
-        fig.savefig(f'test-growth-factor-{country}.pdf')
+        c.plot_reproduction_number(ax, cases, 'C1', labels=("Germany", "cases"));
+        c.plot_reproduction_number(ax, deaths, 'C0', labels=("Germany", "deaths"));
+        fig.savefig(f'test-reproduction_number-{country}.pdf')
 
 
 
 def test_compose_dataframe_summary():
-    cases, deaths = mock_get_country()
+    cases, deaths = mock_get_country_data_johns_hopkins()
 
     table = c.compose_dataframe_summary(cases, deaths)
     assert table['total cases'][-1] == 643
