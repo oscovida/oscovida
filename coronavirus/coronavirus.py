@@ -109,11 +109,11 @@ def fetch_cases_US():
     return df
 
 
-def get_country(country):
-    """Given a country name, return deaths and cases as a tuple of pandas time
-    series. Works for all (?) countries in the world, or at least those in the
-    Johns Hopkins data set. All rows should contain a datetime index and a
-    value.
+def get_country_data_johns_hopkins(country):
+    """Given a country name, return deaths and cases as a tuple of
+    pandas time series. Works for all (?) countries in the world, or at least
+    those in the Johns Hopkins data set. All rows should contain a datetime
+    index and a value.
     """
 
     deaths = fetch_deaths()
@@ -841,7 +841,7 @@ def get_compare_data(countrynames, rolling=7):
     df_d = pd.DataFrame()
 
     for countryname in countrynames:
-        c, d = get_country(countryname)
+        c, d = get_country_data_johns_hopkins(countryname)
 
         df_c[countryname] = c.diff().rolling(rolling, center=True).mean()  # cases
         df_d[countryname] = d.diff().rolling(rolling, center=True).mean()  # deaths
