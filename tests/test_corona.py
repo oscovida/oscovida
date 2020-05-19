@@ -88,7 +88,7 @@ def test_compute_daily_change():
     assert abs(smooth2_data.sum() - 82914.7) < 1
 
 
- 
+
 def test_plot_daily_change():
     cases, deaths = mock_get_country()
     fig, ax = plt.subplots()
@@ -144,4 +144,10 @@ def test_compose_dataframe_summary():
 
     # check that most recent data item is last
     print(table)
-    
+
+
+def test_get_spain_region_list():
+    x = c.get_spain_region_list()
+    assert x[0] == "Andalucía"
+    assert "Galicia" in x
+    assert len(x) == 19

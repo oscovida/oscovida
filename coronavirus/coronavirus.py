@@ -47,7 +47,6 @@ def display_binder_link(notebook_name):
         IPython.display.Markdown(f'[Execute this notebook with Binder]({url})'))
 
 
-
 def clear_cache():
     """Need to run this before new data for the day is created"""
     joblib_memory.clear()
@@ -788,6 +787,8 @@ def get_country_data(country, region=None, subregion=None):
     elif country.lower() == 'us' and region != None:
         # load US data
         c, d = get_region_US(region)
+    elif country.lower() == 'es' and region != None:
+        c, d = spain_get_region(region)
     else:
         c, d = get_country(country)
     return c, d
@@ -829,22 +830,33 @@ def align_sets_at(v0, df):
 
     return res
 
-def get_compare_data(countrynames, rolling=7):
+def get_compare_data(countrynames, rolling=7, regions=False):
     """Given a list of country names, return two dataframes: one with cases and one with deaths
     where
     - each column is one country
     - data in the column is the diff of accumulated numbers
     - any zero values are removed for italy (data error)
     - apply some smoothing
+    The 'regions' flag is for countries such as Spain, where data for specific regions are
+    available.
     """
     df_c = pd.DataFrame()
     df_d = pd.DataFrame()
 
-    for countryname in countrynames:
-        c, d = get_country(countryname)
+    if countrynames=='Spain' and region is not None:
+        for region in countrynames:
+            c, d = spain_get_region(region)
 
-        df_c[countryname] = c.diff().rolling(rolling, center=True).mean()  # cases
-        df_d[countryname] = d.diff().rolling(rolling, center=True).mean()  # deaths
+            df_c[region] = c.diff().rolling(rolling, center=True).mean()  # cases
+            df_d[region] = d.diff().rolling(rolling, center=True).mean()  # deaths
+
+    else:
+
+        for countryname in countrynames:
+            c, d = get_country(countryname)
+
+            df_c[countryname] = c.diff().rolling(rolling, center=True).mean()  # cases
+            df_d[countryname] = d.diff().rolling(rolling, center=True).mean()  # deaths
 
     return df_c, df_d
 
@@ -1058,6 +1070,147 @@ def make_compare_plot_germany(region_subregion,
     return axes, res_c, res_d
 
 
+###################### Functions needed for Spanish data
+
+spanish_regions = ["Andalucía", "Aragón", "Asturias", "Cantabria", "Ceuta",
+                   "Castilla y León", "Castilla-La Mancha", "Canarias", "Cataluña",
+                   "Extremadura", "Galicia", "Islas Baleares", "Murcia", "Com. Madrid",
+                   "Melilla", "Navarra", "País Vasco", "La Rioja", "Com. Valenciana"]
+
+def rename_columns(spanish_data):
+    """Rename columns for non-spanish speakers. """
+
+    spanish_data.rename(columns={'CCAA': 'Admin. region code',
+                                 'FECHA': 'Date',
+                                 'CASOS': 'Cases',
+                                 'PCR+': 'Positive PCR test',
+                                 'TestAc+': 'Positive Antibody test',
+                                 'Hospitalizados': 'Hospitalized',
+                                 'UCI': 'ICU',
+                                 'Fallecidos': 'Deceases',
+                                 'Recuperados': 'Recovered'}, inplace=True)
+
+    # Fill the NaN values with 0
+    spanish_data.fillna(0, inplace=True)
+
+    # We're assuming that, from 15/04/2020, 'Positive test' and 'Positive Antibody test' 
+    # are the new cases
+    spanish_data['New cases'] = (spanish_data['Cases'] + \
+                                 spanish_data['Positive PCR test'] + \
+                                 spanish_data['Positive Antibody test']).astype("int")
+
+    return spanish_data
+
+
+@joblib_memory.cache
+def fetch_data_spain_last_execution():
+    return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+
+#@joblib_memory.cache
+def fetch_data_spain():
+    """Data source is https://covid19.isciii.es. The text on the webpage implies that 
+    the data comes from the Minitry of Health. """
+
+    datasource = "https://cnecovid.isciii.es/covid19/resources/agregados.csv"
+    t0 = time.time()
+    print(f"Please be patient - downloading data from {datasource} ...")
+    spain = pd.read_csv(datasource, encoding="ISO-8859-1", engine="python", skipfooter=9)
+    rename_columns(spain)
+    delta_t = time.time() - t0
+    print(f"Completed downloading {len(spain)} rows in {delta_t:.1f} seconds.")
+
+    g2 = spain.set_index(pd.to_datetime(spain['Date'], errors="coerce", format="%d/%m/%Y"))
+    g2.drop(columns=['Date'],inplace=True)
+    g2.index.name = 'date'
+    last_day = g2.index[-1]
+    sel = g2.index == last_day
+    cleaned = g2.drop(g2[sel].index, inplace=False)
+    fetch_data_spain_last_execution()
+    return cleaned
+
+
+def spain_map_regions(spanish_data):
+    """Map the Administrative Region codes from data with proper names. """
+    codes = sorted(set(spanish_data['Admin. region code']))
+
+    regions = dict(zip(codes, spanish_regions))
+    spanish_data['Region'] = spanish_data['Admin. region code'].map(regions)
+    spanish_data.drop(columns=['Admin. region code'], inplace=True)
+
+    return spanish_data
+
+
+def get_spain_region_list():
+    """Return list of strings with Spain's region names"""
+    spain = fetch_data_spain()
+    regions = spain_map_regions(spain)
+    return sorted(set(regions["Region"]))
+
+
+def spain_get_region(region=None):
+    spain = fetch_data_spain()
+    spain = spain_map_regions(spain)
+    """Returns two time series: (cases, deaths)"""
+    assert region, "Need to provide a value for the administrative region"
+
+    if region:
+        assert region in spain['Region'].values, \
+            f"{region} not in available Spanish Administrative Regions. These are {sorted(spain['Region'].drop_duplicates())}"
+
+        region = spain[spain['Region'] == region]
+
+        # group over multiple rows for the same region
+        cases = region["New cases"]
+        cases.country = f'Spain-{region}'
+        cases.label = 'cases'
+
+        deaths = region["Deceases"]
+        deaths.country = f'Spain-{region}'
+        deaths.label = 'deaths'
+
+        return cases, deaths
+
+
+def make_compare_plot_spain(region,
+                              compare_with=[], #"China", "Italy", "Germany"],
+                              compare_with_local=spanish_regions,
+                              v0c=10, v0d=1):
+    rolling = 7
+
+    compare_with_local = compare_with_local[::2]
+    compare_with_local.append(region)
+
+    df_c, df_d = get_compare_data(compare_with_local, rolling=rolling, regions=True)
+
+    res_c = align_sets_at(v0c, df_c)
+    res_d = align_sets_at(v0d, df_d)
+
+    fig, axes = plt.subplots(2, 1, figsize=(10, 6))
+    ax=axes[0]
+    plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
+                      "daily new cases\n(rolling 7-day mean)",
+                      v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
+    ax = axes[1]
+
+    res_d_0 = res_d[res_d.index >= 0]   # from "day 0" only
+    # if we have values in between 0.1 and 1, set the lower `y_limit` on the graph to 0.1
+    if res_d_0[(res_d_0 > 0.1) & (res_d_0 < 1)].any().any():    # there must be a more elegant check
+        y_limit = 0.1
+    else:
+        y_limit = v0d
+    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
+                      "daily new deaths\n(rolling 7-day mean)",
+                      v0=y_limit, highlight={res_d.columns[0]:"C0"},
+                      labeloffset=0.5)
+
+    # fig.tight_layout(pad=1)
+
+    title = f"Daily cases (top) and deaths (below) for Spain: {region}"
+    axes[0].set_title(title)
+
+    return axes, res_c, res_d
+
 #######################
 
 
@@ -1118,6 +1271,14 @@ def overview(country, region=None, subregion=None, savefig=False):
         axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
                                                                # compare_with_local=laender)
         return_axes = np.concatenate([axes, axes_compare])
+
+    elif country=="Spain":   # Spain specific plots
+        # We thus compare only against those regions, that are in the data set:
+        spain = fetch_data_spain()
+        axes_compare, res_c, red_d = make_compare_plot_spain((region, subregion),
+                                                             compare_with_local=spanish_regions)
+        return_axes = np.concatenate([axes, axes_compare])
+
     elif country=="US" and region is not None:
         # skip comparison plot for the US states at the moment
         return_axes = axes
