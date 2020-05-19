@@ -17,6 +17,7 @@ rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
+from matplotlib.ticker import ScalarFormatter
 
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
@@ -390,6 +391,7 @@ def plot_time_step(ax, series, style="-", logscale=True):
         ax.set_yscale('log')
     ax.legend()
     ax.set_ylabel("total numbers")
+    ax.yaxis.set_major_formatter(ScalarFormatter())
     return ax
 
 
@@ -878,6 +880,7 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
     ax.set_ylabel(yaxislabel)
     ax.set_xlabel(xaxislabel)
     ax.set_yscale('log')
+    ax.yaxis.set_major_formatter(ScalarFormatter())
     # ax.set_xscale('log')    # also interesting
     ax.set_ylim(bottom=v0)  # remove setting limit?, following
                               # https://github.com/fangohr/coronavirus-2020/issues/3
@@ -1034,20 +1037,26 @@ def make_compare_plot_germany(region_subregion,
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
+    res_c_0 = res_c[res_c.index >= 0]  # from "day 0" only
+        # if we have values in between 1 and 10, set the lower `yc_limit` on the graph to 1
+    if res_c_0[(res_c_0 >= 1) & (res_c_0 < 10)].any().any():
+        yc_limit = 1
+    else:
+        yc_limit = v0c
     plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
                       "daily new cases\n(rolling 7-day mean)",
-                      v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
+                      v0=yc_limit, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
     ax = axes[1]
 
     res_d_0 = res_d[res_d.index >= 0]   # from "day 0" only
     # if we have values in between 0.1 and 1, set the lower `y_limit` on the graph to 0.1
     if res_d_0[(res_d_0 > 0.1) & (res_d_0 < 1)].any().any():    # there must be a more elegant check
-        y_limit = 0.1
+        yd_limit = 0.1
     else:
-        y_limit = v0d
+        yd_limit = v0d
     plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
                       "daily new deaths\n(rolling 7-day mean)",
-                      v0=y_limit, highlight={res_d.columns[0]:"C0"},
+                      v0=yd_limit, highlight={res_d.columns[0]:"C0"},
                       labeloffset=0.5)
 
     # fig.tight_layout(pad=1)
