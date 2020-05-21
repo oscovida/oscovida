@@ -708,7 +708,7 @@ def compute_R(daily_change, tau=4):
     return R2
 
 
-def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.2, 100]):
+def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.1, 100], print_alert=False):
     """Given a time series, find the min and max values in the time series within the last n days.
 
     If those values are within the interval `at_least`, then use the values in at_least as the limits.
@@ -722,8 +722,8 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.2, 100])
 
     series = series.replace(math.inf, math.nan)
 
-    min_ = series[-n:].min() - 0.06
-    max_ = series[-n:].max() + 0.06
+    min_ = series[-n:].min() - 0.1    # the -0.1 is to make extra space because the line we draw is thick
+    max_ = series[-n:].max() + 0.1
 
     if min_ < at_least[0]:
         min_final = min_
@@ -735,12 +735,13 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.2, 100])
     else:
         max_final = at_least[1]
 
-    if max_final > alert[1]:
-        # print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n", series[-n:])
-        print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n")
-    if min_final < alert[0]:
-        # print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n", series[-n:])
-        print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n")
+    if print_alert:
+        if max_final > alert[1]:
+            # print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n", series[-n:])
+            print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n")
+        if min_final < alert[0]:
+            # print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n", series[-n:])
+            print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n")
 
 
     # print(f"DDD: min_={min_}, max_={max_}")
