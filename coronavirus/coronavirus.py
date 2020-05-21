@@ -17,6 +17,8 @@ rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
+from matplotlib.ticker import ScalarFormatter, FuncFormatter
+from bisect import bisect
 
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
@@ -400,6 +402,7 @@ def plot_time_step(ax, series, style="-", labels=None, logscale=True):
         ax.set_yscale('log')
     ax.legend()
     ax.set_ylabel("total numbers")
+    ax.yaxis.set_major_formatter(ScalarFormatter())
     return ax
 
 
@@ -936,13 +939,35 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
     ax.set_ylabel(yaxislabel)
     ax.set_xlabel(xaxislabel)
     ax.set_yscale('log')
+    # use integer numbers for values > 1, and decimal presentation below
+    # from https://stackoverflow.com/questions/21920233/matplotlib-log-scale-tick-label-number-formatting/33213196
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:g}'.format(y)))
     # ax.set_xscale('log')    # also interesting
-    ax.set_ylim(bottom=v0)  # remove setting limit?, following
-                              # https://github.com/fangohr/coronavirus-2020/issues/3
+    ax.set_ylim(bottom=set_y_axis_limit(df, v0))
     ax.set_xlim(left=-1)  #ax.set_xlim(-1, df.index.max())
     ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
     ax.yaxis.set_ticks_position('both')
 
+
+def set_y_axis_limit(data, current_lim):
+    """The function analyses the data set given and lowers
+    the y-limit if there are data points below `current_lim`
+
+    :param data: data to plot
+    :param current_lim: initial y-axis lower limit
+    :return: new y-axis lower limit
+    """
+    data_0 = data[data.index >= 0]  # from "day 0" only
+    limits = [0.1, 1, 10, 100]
+    # if we have values within the `limits`, we set the lower `y_limit` on the graph to the value on the left of bisect
+    # example: if the minimum value is 3, then y_limit = 1
+    index = bisect(limits, data_0.min().min())
+    if 0 < index < len(limits):
+        return limits[index - 1]
+    elif index == 0:
+        return limits[0]
+    else:
+        return current_lim
 
 def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Poland", "Korea, South",
                                                   "Belarus", "Switzerland", "US"],
@@ -1047,12 +1072,12 @@ def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
 
 
 def make_compare_plot_germany(region_subregion,
-                              compare_with=[], #"China", "Italy", "Germany"],
-                              compare_with_local =['Bayern',
-                                                   'Berlin', 'Bremen',
-                                                   'Hamburg', 'Hessen',
-                                                   'Nordrhein-Westfalen',
-                                                   'Sachsen-Anhalt'],
+                              compare_with=[],  # "China", "Italy", "Germany"],
+                              compare_with_local=['Bayern',
+                                                  'Berlin', 'Bremen',
+                                                  'Hamburg', 'Hessen',
+                                                  'Nordrhein-Westfalen',
+                                                  'Sachsen-Anhalt'],
     # The 'compare_with_local' subset is chosen to look sensibly on 2 May 2020.
     #                          compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
     #                                              'Brandenburg', 'Bremen', 'Hamburg',
@@ -1091,15 +1116,9 @@ def make_compare_plot_germany(region_subregion,
                       v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
     ax = axes[1]
 
-    res_d_0 = res_d[res_d.index >= 0]   # from "day 0" only
-    # if we have values in between 0.1 and 1, set the lower `y_limit` on the graph to 0.1
-    if res_d_0[(res_d_0 > 0.1) & (res_d_0 < 1)].any().any():    # there must be a more elegant check
-        y_limit = 0.1
-    else:
-        y_limit = v0d
     plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
                       "daily new deaths\n(rolling 7-day mean)",
-                      v0=y_limit, highlight={res_d.columns[0]:"C0"},
+                      v0=v0d, highlight={res_d.columns[0]:"C0"},
                       labeloffset=0.5)
 
     # fig.tight_layout(pad=1)
