@@ -17,7 +17,7 @@ rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
-from matplotlib.ticker import ScalarFormatter
+from matplotlib.ticker import ScalarFormatter, FuncFormatter
 from bisect import bisect
 
 import matplotlib.pyplot as plt
@@ -881,7 +881,9 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
     ax.set_ylabel(yaxislabel)
     ax.set_xlabel(xaxislabel)
     ax.set_yscale('log')
-    ax.yaxis.set_major_formatter(ScalarFormatter())
+    # use integer numbers for values > 1, and decimal presentation below
+    # from https://stackoverflow.com/questions/21920233/matplotlib-log-scale-tick-label-number-formatting/33213196
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:g}'.format(y)))
     # ax.set_xscale('log')    # also interesting
     ax.set_ylim(bottom=set_y_axis_limit(df, v0))
     ax.set_xlim(left=-1)  #ax.set_xlim(-1, df.index.max())
