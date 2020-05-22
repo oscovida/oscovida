@@ -1203,3 +1203,13 @@ def overview(country, region=None, subregion=None, savefig=False):
         fig2.savefig(filename)
 
     return return_axes, c, d
+
+
+def get_cases_last_week(cases):
+    """Given cumulative cases time series, return the number of cases from the last week.
+    """
+    # make sure we have one value for every day
+    c2 = cases.resample('D').pad()
+    # last week is difference between last value, and the one 7 days before
+    cases_last_week = c2[-1] - c2[-8]
+    return cases_last_week
