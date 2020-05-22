@@ -1,7 +1,9 @@
+import numpy as np
 import pandas as pd
 from pandas import DatetimeIndex
 import matplotlib.pyplot as plt
 import coronavirus as c
+
 
 
 def mock_get_country_data_johns_hopkins(country="China"):
@@ -185,3 +187,18 @@ def test_compose_dataframe_summary():
     # check that most recent data item is last
     print(table)
     
+
+
+def test_get_cases_last_week():
+    index = pd.date_range(start='1/1/2018', end='1/08/2018', freq='D')
+    z = pd.Series(np.zeros(shape=index.shape), index=index)
+    assert c.get_cases_last_week(z) == 0
+
+    index = pd.date_range(start='1/1/2018', end='1/08/2018', freq='D')
+    z = pd.Series(np.ones(shape=index.shape), index=index)
+    assert c.get_cases_last_week(z) == 0
+    assert c.get_cases_last_week(z.cumsum()) == 7
+
+    cases, deaths = mock_get_country_data_johns_hopkins(country="China")
+    assert c.get_cases_last_week(cases) == 430
+
