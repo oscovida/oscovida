@@ -1165,6 +1165,13 @@ def overview(country, region=None, subregion=None, savefig=False):
     if country == "China":
         ax.set_ylim(0, 5000)
 
+    # data cleaning 
+    if country == "China":
+        ax.set_ylim(0, 5000)
+    elif country == "Spain":   # https://github.com/fangohr/coronavirus-2020/issues/44
+        ax.set_ylim(bottom=0)
+
+
     ax = axes[2]
     plot_daily_change(ax=ax, series=d, color="C0", labels=(region_label, "deaths"))
 
