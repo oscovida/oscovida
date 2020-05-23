@@ -1162,9 +1162,6 @@ def overview(country, region=None, subregion=None, savefig=False):
 
     ax = axes[1]
     plot_daily_change(ax=ax, series=c, color="C1", labels=(region_label, "cases"))
-    if country == "China":
-        ax.set_ylim(0, 5000)
-
     # data cleaning 
     if country == "China":
         ax.set_ylim(0, 5000)
@@ -1174,6 +1171,7 @@ def overview(country, region=None, subregion=None, savefig=False):
 
     ax = axes[2]
     plot_daily_change(ax=ax, series=d, color="C0", labels=(region_label, "deaths"))
+
 
     ax = axes[3]
     # plot_growth_factor(ax, series=d, color="C0")
