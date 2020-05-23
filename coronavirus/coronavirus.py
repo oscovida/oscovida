@@ -816,8 +816,8 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
 
 
 
-def get_country_data(country, region=None, subregion=None):
-    """Given the name of a country, get the Johns Hopkins data for cases and  deaths,
+def get_country_data(country, region=None, subregion=None, verbose=False):
+    """Given the name of a country, get the Johns Hopkins data for cases and deaths,
     and return them as a tuple of pandas.Series objects and a string describing the region:
     (cases, deaths, region_label)
 
@@ -826,10 +826,17 @@ def get_country_data(country, region=None, subregion=None):
     the region is provided, the data from all subregions in that region is
     accumulated.
 
-    If the country is "US", get US data (states are available as regions)
+    If the country is "US", get US data (states are available as regions) from Johns Hopkins
+    repository.
 
     Returns "cases, deaths, country_region" where country region is a string
     describing the country and region.
+
+    The series are resampled at a daily interval. Missing data points are replaced
+    by the last provided value (seems reasonable for a data set representing
+    cumulative numbers as a function of time: where no new data point is provided,
+    assume the change was zero, thus the last data point can be re-used).
+
 
     """
 
@@ -847,6 +854,19 @@ def get_country_data(country, region=None, subregion=None):
     else:
         c, d = get_country_data_johns_hopkins(country)
         country_region = country
+
+    len_cases1 = len(c)
+    len_deaths1 = len(d)
+    # resample data so we have one value per day
+    c = c.resample("D").pad()
+    d = d.resample("D").pad()
+
+    len_cases2 = len(c)
+    len_deaths2 = len(d)
+
+    if verbose:
+        print(f"get_country_data: cases [{len_cases1}] -> [{len_cases2}]")
+        print(f"get_country_data: deaths[{len_deaths1}] -> [{len_deaths2}]")
     return c, d, country_region
 
 #######################
