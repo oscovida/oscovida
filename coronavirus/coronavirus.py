@@ -850,7 +850,7 @@ def get_country_data(country, region=None, subregion=None, verbose=False):
     elif country.lower() == 'us' and region != None:
         # load US data
         c, d = get_region_US(region)
-        country_region = "United States: {region}"
+        country_region = f"United States: {region}"
     else:
         c, d = get_country_data_johns_hopkins(country)
         country_region = country
