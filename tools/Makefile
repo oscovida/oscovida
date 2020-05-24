@@ -38,12 +38,16 @@ status/pelican-publish:
 
 status/git-commit-push-wwwroot:
 	cd wwwroot && git commit -m "updated $(shell date)" -a
-  cd wwwroot && git push -v
+	cd wwwroot && git push -v
 	touch status/git-commit-wwwroot
 
 
 status/git-commit-push-binder:
+	# cd binder && git add *
 	cd binder && git commit -m "updated $(shell date)" -a
-  cd binder && git push -v
-	touch status/git-commit-binder
+	cd binder && git push -v
+	touch status/git-commit-push-binder
 
+
+trigger-binder-build:
+	open https://mybinder.org/v2/gh/oscovida/oscovida.github.io/master?filepath=ipynb/US.ipynb
