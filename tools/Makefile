@@ -26,21 +26,24 @@ status/generate-countries:
 	touch status/generate-countries
 
 
-
 status/copy-ipynb-files:
-	@echo "Still needs to be written"
+	mkdir -p binder/ipynb
+	rsync -auv wwwroot/ipynb/* binder/ipynb
+	touch status/copy-ipynb-files	
 
 status/pelican-publish:
 	cd pelican && make publish
 	touch status/pelican-publish
 
 
-status/git-commit:
+status/git-commit-push-wwwroot:
 	cd wwwroot && git commit -m "updated $(shell date)" -a
-	touch status/git-commit
+  cd wwwroot && git push -v
+	touch status/git-commit-wwwroot
 
-status/git-push:
-	cd wwwroot && git push
-	touch status/git-push
 
+status/git-commit-push-binder:
+	cd binder && git commit -m "updated $(shell date)" -a
+  cd binder && git push -v
+	touch status/git-commit-binder
 
