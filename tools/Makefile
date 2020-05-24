@@ -1,20 +1,20 @@
 # Makefile to help with updating of webpages
 
-all: one two four 
+all: one two three four 
 
 clean: 
 	mkdir -p status
 	rm -fv status/*
 	python generate-webpage-clean-setup.py
-	bash python generate-webpage-clean-setup.sh
+	bash generate-webpage-clean-setup.sh
 
 
 one: status/generate-individual-plots
 two: status/generate-countries
 three: status/copy-ipynb-files
 four: status/pelican-publish
-five: status/git-commit
-six: status/git-push
+five: status/git-commit-push-wwwroot
+six: status/git-commit-push-binder
 
 
 status/generate-individual-plots:
