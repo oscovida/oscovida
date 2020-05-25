@@ -1,6 +1,7 @@
 # Makefile to help with updating of webpages
 
-all: one two three four 
+all1: one two three four
+all2: five six seven
 
 clean: 
 	mkdir -p status
@@ -54,5 +55,5 @@ trigger-binder-build:
 	# wait after git push
 	sleep 30
 	# $(shell open https://mybinder.org/v2/gh/oscovida/oscovida.github.io/master?filepath=ipynb/US.ipynb)
-  $(shell open https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb/US.ipynb)
-  touch status/trigger-binder-build
+	$(shell open https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb/US.ipynb)
+	touch status/trigger-binder-build
