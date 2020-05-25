@@ -99,7 +99,31 @@ re-execute notebooks.
 
 Plan: create an extra repository just for these `*ipynb` files, so that creating
 a container for Binder doesn't need to clone the big repository that contains
-all the html files.
+all the html files. This is realised with the next section:
+
+coronavirus-2020/tools/binder
+------------------------------
+
+-   repository <https://github.com/oscovida/binder> 
+
+-   this started (24 May 2020) as a copy of the coronavirus-2020/tools/wwwroot/ipynb
+    directory, but in a separate repository to make the binder start up time shorter
+    (because this repo is faster to clone than the massive wwwroot one.)
+    
+-   for now, we rsync everything from coronavirus-2020/tools/wwwroot/ipynb to
+    coronavirus-2020/tools/binder/ipynb
+    
+    In the long run, we could consider to write ipynb files directly into the
+    binder directory.
+
+-   The files committed to the webpages repository must contain the most recent
+    `coronavirus` in the `ipynb` subdirectory and `requirements.txt` and
+    `apt.txt` as those are needed by binder to execute the notebooks.
+
+-   By also commiting the `cachedir`, people don\'t need to re-fetch the data on
+    the binder service (fetching of the German data set varies between 1s and 60
+    seconds). The downside is that the data will grow stale over time.
+    (At the moment, 25May 2020, we don't copy the cachedir into the binder directory.)
 
 
 coronavirus-2020/tools/pelican
@@ -116,6 +140,9 @@ Base directory of Pelican (static html generator) package.
     that we don't want for development, and javascript to enable disqus. (Not
     sure if we want the latter, but we might as well set it up while there is no
     traffic on the page, and then deactivate if we don't want it.)
+    
+    `make publish` also copies `ipynb` files into the
+    coronavirus/tools/wwwroot/ipynb directory.
 
 - the `generate-countries.ipynb` notebook creates files `germany.md` and
   `world.md` (and more) in pelican/contents
@@ -128,6 +155,8 @@ Base directory of Pelican (static html generator) package.
   
 - `tools/pelican/contents/ipynb`:
   - contains notebooks that are rendered as normal articles by pelican
+  
+  
 
 coronavirus-2020/archive
 ------------------------
