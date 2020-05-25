@@ -19,7 +19,7 @@ All the computational steps and code are available
 
 * All of the plots and tables can be recomputed using the Binder service (link
   in each webpage with plots and data, or use [go here and select the relevant
-  notebook yourself](https://mybinder.org/v2/gh/oscovida/oscovida.github.io/master?filepath=ipynb).
+  notebook yourself](https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb).
   
   This will provide a fully functional computing environment, that can be used
   from your browser. (But you need to download your notebook at the end of the
