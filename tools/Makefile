@@ -20,7 +20,7 @@ seven: trigger-binder-build
 
 
 status/generate-individual-plots:
-	jupyter-nbconvert generate-individiual-plots.ipynb --execute && touch make-generate-individua
+	jupyter-nbconvert generate-individiual-plots.ipynb --execute 
 	touch status/generate-individual-plots
 
 status/generate-countries:
