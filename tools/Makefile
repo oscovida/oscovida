@@ -41,7 +41,7 @@ status/pelican-publish:
 status/git-commit-push-wwwroot:
 	cd wwwroot && git commit -m "updated $(shell date)" -a
 	cd wwwroot && git push -v
-	touch status/git-commit-wwwroot
+	touch status/git-commit-push-wwwroot
 
 
 status/git-commit-push-binder:
