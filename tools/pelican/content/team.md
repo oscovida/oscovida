@@ -7,8 +7,8 @@ Following early work by [Hans Fangohr](http://fangohr.github.io), members of the
 European research project [Photon and Neutron Open Science Cloud
 (PANOSC)](http://panosc.eu) and the Data Analysis Group of [European
 XFEL](https://xfel.eu) contribute to the project here, including [David Doblas
-Jiménez](https://git.elnota.space/daviddoji/), Jacek Generowicz, [Thomas
-Michelat](https://github.com/tmichela), and others.
+Jiménez](https://git.elnota.space/daviddoji/), Jacek Generowicz, Yury Kirienko,
+[Thomas Michelat](https://github.com/tmichela), and others.
 
 
 
