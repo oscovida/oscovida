@@ -1,5 +1,8 @@
 # Makefile to help with updating of webpages
 
+
+all: one two three four five six seven
+
 all1: one two three four
 all2: five six seven
 
@@ -28,32 +31,37 @@ status/generate-countries:
 	touch status/generate-countries
 
 
-status/copy-ipynb-files:
+status/copy-ipynb-files: status/generate-countries
 	mkdir -p binder/ipynb
 	rsync -auv wwwroot/ipynb/* binder/ipynb
 	touch status/copy-ipynb-files	
 
-status/pelican-publish:
+status/pelican-publish: status/generate-individual-plots status/generate-countries status/copy-ipynb-files
 	cd pelican && make publish
 	touch status/pelican-publish
 
 
 status/git-commit-push-wwwroot:
+  @echo "We should check here we have no new files?"
+  # see for example https://stackoverflow.com/questions/5139290/how-to-check-if-theres-nothing-to-be-committed-in-the-current-branch
+  # new files could show up if a new country starts reporting numbers, or
+  # if a new pelican article is written
 	cd wwwroot && git commit -m "updated $(shell date)" -a
 	cd wwwroot && git push -v
 	touch status/git-commit-push-wwwroot
 
 
 status/git-commit-push-binder:
-	# cd binder && git add *
+	@echo "We should check here we have no new files"
+	@# cd binder && git add *
 	cd binder && git commit -m "updated $(shell date)" -a
 	cd binder && git push -v
 	touch status/git-commit-push-binder
 
 
 trigger-binder-build:
-	# wait after git push
+	# wait after git push (seems to be ignored)
 	sleep 30
-	# $(shell open https://mybinder.org/v2/gh/oscovida/oscovida.github.io/master?filepath=ipynb/US.ipynb)
+  # seems to work anyway
 	$(shell open https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb/US.ipynb)
 	touch status/trigger-binder-build
