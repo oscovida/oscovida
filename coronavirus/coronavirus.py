@@ -38,7 +38,7 @@ joblib_memory = joblib.Memory(joblib_location, verbose=0)
 
 def compute_binder_link(notebook_name):
     """Given a string """
-    root_url = "https://mybinder.org/v2/gh/oscovida/oscovida.github.io/master?filepath=ipynb/"
+    root_url = "https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb/"
     return root_url + notebook_name
 
 
@@ -850,7 +850,7 @@ def get_country_data(country, region=None, subregion=None, verbose=False):
     elif country.lower() == 'us' and region != None:
         # load US data
         c, d = get_region_US(region)
-        country_region = "United States: {region}"
+        country_region = f"United States: {region}"
     else:
         c, d = get_country_data_johns_hopkins(country)
         country_region = country
@@ -1147,7 +1147,6 @@ def make_compare_plot_germany(region_subregion,
     axes[0].set_title(title)
 
     return axes, res_c, res_d
-
 
 #######################
 

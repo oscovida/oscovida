@@ -44,7 +44,7 @@ monitor such indicators for some time (months or years?) to come.
 * Using [Jupyter Notebooks](https://jupyter.org/) and the [MyBinder
   project](https://mybinder.org) project, anyone with a web browser can execute
   the source (to create the same or new plots) from within a web browser, by
-  clicking [this link](https://mybinder.org/v2/gh/oscovida/oscovida.github.io/master?filepath=ipynb).
+  clicking [this link](https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb).
 
 * See also [related post on open science](open-science.html).
 
