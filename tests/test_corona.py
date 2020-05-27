@@ -1,10 +1,12 @@
+import numpy as np
 import pandas as pd
 from pandas import DatetimeIndex
 import matplotlib.pyplot as plt
 import coronavirus as c
 
 
-def mock_get_country(country="China"):
+
+def mock_get_country_data_johns_hopkins(country="China"):
     cases_values = [548, 643, 920, 1406, 2075, 2877, 5509, 6087, 8141, 9802, 11891, 16630, 19716, 23707, 27440, 30587, 34110, 36814, 39829, 42354, 44386, 44759, 59895, 66358, 68413, 70513, 72434, 74211, 74619, 75077, 75550, 77001, 77022, 77241, 77754, 78166, 78600, 78928, 79356, 79932, 80136, 80261, 80386, 80537, 80690, 80770, 80823, 80860, 80887, 80921, 80932, 80945, 80977, 81003, 81033, 81058, 81102, 81156, 81250, 81305, 81435, 81498, 81591, 81661, 81782, 81897, 81999, 82122, 82198, 82279, 82361, 82432, 82511, 82543, 82602, 82665, 82718, 82809, 82883, 82941]
     cases_index = "DatetimeIndex(['2020-01-22', '2020-01-23', '2020-01-24', '2020-01-25',  '2020-01-26', '2020-01-27', '2020-01-28', '2020-01-29',  '2020-01-30', '2020-01-31', '2020-02-01', '2020-02-02',  '2020-02-03', '2020-02-04', '2020-02-05', '2020-02-06',  '2020-02-07', '2020-02-08', '2020-02-09', '2020-02-10',  '2020-02-11', '2020-02-12', '2020-02-13', '2020-02-14',  '2020-02-15', '2020-02-16', '2020-02-17', '2020-02-18',  '2020-02-19', '2020-02-20', '2020-02-21', '2020-02-22',  '2020-02-23', '2020-02-24', '2020-02-25', '2020-02-26',  '2020-02-27', '2020-02-28', '2020-02-29', '2020-03-01',  '2020-03-02', '2020-03-03', '2020-03-04', '2020-03-05',  '2020-03-06', '2020-03-07', '2020-03-08', '2020-03-09',  '2020-03-10', '2020-03-11', '2020-03-12', '2020-03-13',  '2020-03-14', '2020-03-15', '2020-03-16', '2020-03-17',  '2020-03-18', '2020-03-19', '2020-03-20', '2020-03-21',  '2020-03-22', '2020-03-23', '2020-03-24', '2020-03-25',  '2020-03-26', '2020-03-27', '2020-03-28', '2020-03-29',  '2020-03-30', '2020-03-31', '2020-04-01', '2020-04-02',  '2020-04-03', '2020-04-04', '2020-04-05', '2020-04-06',  '2020-04-07', '2020-04-08', '2020-04-09', '2020-04-10'], dtype='datetime64[ns]', freq=None)"
 
@@ -18,8 +20,8 @@ def mock_get_country(country="China"):
     return cases, deaths
 
 
-def test_mock_get_country():
-    cases, deaths = mock_get_country()
+def test_mock_get_country_data_johns_hopkins():
+    cases, deaths = mock_get_country_data_johns_hopkins()
     assert cases.shape == (80,)
     assert deaths.shape == (80,)
     assert deaths.label == 'deaths'
@@ -28,32 +30,56 @@ def test_mock_get_country():
 
 def test_overview():
     axes, cases, deaths = c.overview("China")
-    assert cases.label == 'cases'
-    assert cases.country == 'China'
-    assert deaths.label == 'deaths'
-    assert deaths.country == 'China'
+    assert cases.name == 'China cases'
+    assert deaths.name == 'China deaths'
 
     isinstance(deaths, pd.core.series.Series)
     isinstance(deaths, pd.core.series.Series)
+
+
+def test_US_overview():
+    axes, cases, deaths = c.overview(country="US", region="New Jersey")
+    assert cases.name == 'US-New Jersey cases'
+    assert deaths.name == 'US-New Jersey deaths'
+
+    isinstance(deaths, pd.core.series.Series)
+    isinstance(deaths, pd.core.series.Series)
+
+
+def test_get_US_region_list():
+    x = c.get_US_region_list()
+    assert x[0] == "Alabama"
+    assert "Hawaii" in x
+    assert len(x) > 50  # at least 50 states, plus diamond Princess
+
+
+def test_label_from_region_subregion():
+    assert c.label_from_region_subregion(("Hamburg", None)) == "Hamburg"
+    assert c.label_from_region_subregion("Hamburg") == "Hamburg"
+    assert c.label_from_region_subregion(("Schleswig Holstein", "Pinneberg")) == "Schleswig Holstein-Pinneberg"
+
+
 
 
 def test_get_country_data():
     # Germany
-    cases, deaths = c.get_country_data(country="Germany",
-                                       subregion="SK Hamburg")
-    assert cases.name == "AnzahlFall"
-    assert deaths.name == "AnzahlTodesfall"
-    assert cases.country == 'Germany-SK Hamburg'
-    assert deaths.country == 'Germany-SK Hamburg'
+    cases, deaths, region_label = c.get_country_data(country="Germany",
+                                                     subregion="SK Hamburg")
+    print(f"region_label = {region_label}")
+    print(f"deaths = {type(deaths)}")
+    print(f"empty")
+    assert cases.name == 'Germany-SK Hamburg cases'
+    assert deaths.name == 'Germany-SK Hamburg deaths'
+    assert region_label == 'Germany-SK Hamburg'
 
-    c2, d2 = c.get_country_data(country="United Kingdom")
-    assert c2.country == "United Kingdom"
-    assert c2.label == "cases"
-    assert d2.label == "deaths"
+    c2, d2, region_label = c.get_country_data(country="United Kingdom")
+    assert c2.name == "United Kingdom cases"
+    assert d2.name == "United Kingdom deaths"
+    assert region_label == "United Kingdom"
 
 
 def test_compute_daily_change():
-    cases, deaths = mock_get_country()
+    cases, deaths = mock_get_country_data_johns_hopkins()
     change, smooth, smooth2 = c.compute_daily_change(cases)
     assert isinstance(change[0], pd.Series)  # data
     assert isinstance(smooth[0], pd.Series)  # data
@@ -90,14 +116,14 @@ def test_compute_daily_change():
 
  
 def test_plot_daily_change():
-    cases, deaths = mock_get_country()
+    cases, deaths = mock_get_country_data_johns_hopkins()
     fig, ax = plt.subplots()
     ax = c.plot_daily_change(ax, cases, 'C1')
     fig.savefig('test-plot_daily_change.pdf')
 
 
 def test_compute_growth_factor():
-    cases, deaths = mock_get_country()
+    cases, deaths = mock_get_country_data_johns_hopkins()
     f, smooth = c.compute_growth_factor(cases)
     assert isinstance(f[0], pd.Series)
     assert isinstance(smooth[0], pd.Series)
@@ -118,26 +144,42 @@ def test_compute_growth_factor():
 
 
 
-def test_plot_growth_factor():
-    cases, deaths = mock_get_country()
+#def test_plot_growth_factor():
+#    cases, deaths = mock_get_country()
+#    fig, ax = plt.subplots()
+#    ax = c.plot_growth_factor(ax, cases, 'C1')
+#    fig.savefig('test-growth_factor.pdf')
+#
+#
+#def test_plot_growth_factor_fetch_data():
+#    """Similar to test above, but using fresh data"""
+#    for country in ["Korea, South", "China", "Germany"]:
+#        cases, deaths = c.get_country(country)
+#        fig, ax = plt.subplots()
+#        c.plot_growth_factor(ax, cases, 'C1');
+#        c.plot_growth_factor(ax, deaths, 'C0');
+#        fig.savefig(f'test-growth-factor-{country}.pdf')
+
+def test_plot_reproduction_number ():
+    cases, deaths = mock_get_country_data_johns_hopkins()
     fig, ax = plt.subplots()
-    ax = c.plot_growth_factor(ax, cases, 'C1')
-    fig.savefig('test-growth_factor.pdf')
+    ax = c.plot_reproduction_number(ax, cases, 'C1')
+    fig.savefig('test-reproduction_number.pdf')
 
 
-def test_plot_growth_factor_fetch_data():
+def test_plot_reproduction_number_fetch_data():
     """Similar to test above, but using fresh data"""
     for country in ["Korea, South", "China", "Germany"]:
-        cases, deaths = c.get_country(country)
+        cases, deaths = c.get_country_data_johns_hopkins(country)
         fig, ax = plt.subplots()
-        c.plot_growth_factor(ax, cases, 'C1');
-        c.plot_growth_factor(ax, deaths, 'C0');
-        fig.savefig(f'test-growth-factor-{country}.pdf')
+        c.plot_reproduction_number(ax, cases, 'C1', labels=("Germany", "cases"));
+        c.plot_reproduction_number(ax, deaths, 'C0', labels=("Germany", "deaths"));
+        fig.savefig(f'test-reproduction_number-{country}.pdf')
 
 
 
 def test_compose_dataframe_summary():
-    cases, deaths = mock_get_country()
+    cases, deaths = mock_get_country_data_johns_hopkins()
 
     table = c.compose_dataframe_summary(cases, deaths)
     assert table['total cases'][-1] == 643
@@ -145,3 +187,18 @@ def test_compose_dataframe_summary():
     # check that most recent data item is last
     print(table)
     
+
+
+def test_get_cases_last_week():
+    index = pd.date_range(start='1/1/2018', end='1/08/2018', freq='D')
+    z = pd.Series(np.zeros(shape=index.shape), index=index)
+    assert c.get_cases_last_week(z) == 0
+
+    index = pd.date_range(start='1/1/2018', end='1/08/2018', freq='D')
+    z = pd.Series(np.ones(shape=index.shape), index=index)
+    assert c.get_cases_last_week(z) == 0
+    assert c.get_cases_last_week(z.cumsum()) == 7
+
+    cases, deaths = mock_get_country_data_johns_hopkins(country="China")
+    assert c.get_cases_last_week(cases) == 430
+

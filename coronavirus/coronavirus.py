@@ -17,6 +17,8 @@ rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
+from matplotlib.ticker import ScalarFormatter, FuncFormatter
+from bisect import bisect
 
 import matplotlib.pyplot as plt
 plt.style.use('ggplot')
@@ -66,17 +68,21 @@ def report_download(url, df):
 
 @joblib_memory.cache
 def fetch_deaths_last_execution():
-    """Use to remember at what time and date the last set of deaths was downloaded"""
+    """Use to remember at what time and date the last set of deaths was downloaded.
+    A bit of a hack as we didn't know how to get this out of joblib.
+    """
     return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
 
 @joblib_memory.cache
 def fetch_cases_last_execution():
+    """See fetch_deaths_last_execution"""
     return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
 
 @joblib_memory.cache
 def fetch_deaths():
+    """Download deaths from Johns Hopkins data repository"""
     url = os.path.join(base_url, "time_series_covid19_" + "deaths" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
@@ -85,6 +91,7 @@ def fetch_deaths():
 
 @joblib_memory.cache
 def fetch_deaths_US():
+    """Download deaths for US states from Johns Hopkins data repository"""
     url = os.path.join(base_url, "time_series_covid19_" + "deaths" + "_US.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
@@ -94,6 +101,7 @@ def fetch_deaths_US():
 
 @joblib_memory.cache
 def fetch_cases():
+    """Download cases from Johns Hopkins data repository"""
     url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_global.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
@@ -102,6 +110,7 @@ def fetch_cases():
 
 @joblib_memory.cache
 def fetch_cases_US():
+    """Download cases for US status from Johns Hopkins data repository"""
     url = os.path.join(base_url, "time_series_covid19_" + "confirmed" + "_US.csv")
     df = pd.read_csv(url, index_col=1)
     report_download(url, df)
@@ -109,11 +118,11 @@ def fetch_cases_US():
     return df
 
 
-def get_country(country):
-    """Given a country name, return deaths and cases as a tuple of pandas time
-    series. Works for all (?) countries in the world, or at least those in the
-    Johns Hopkins data set. All rows should contain a datetime index and a
-    value.
+def get_country_data_johns_hopkins(country):
+    """Given a country name, return deaths and cases as a tuple of
+    pandas time series. Works for all (?) countries in the world, or at least
+    those in the Johns Hopkins data set. All rows should contain a datetime
+    index and a value.
     """
 
     deaths = fetch_deaths()
@@ -159,11 +168,8 @@ def get_country(country):
     assert d.isnull().sum() == 0, f"{d.isnull().sum()} NaNs in {d}"
 
     # label data
-    c.country = country
-    c.label = "cases"
-
-    d.country = country
-    d.label = "deaths"
+    c.name = country + " cases"
+    d.name = country + " deaths"
 
     return c, d
 
@@ -174,19 +180,13 @@ def get_US_region_list():
     return list(deaths.groupby("Province_State").sum().index)
 
 
-def test_get_US_region_list():
-    x = get_US_region_list()
-    assert x[0] == "Alabama"
-    assert "Hawaii" in x
-    assert len(x) > 50  # at least 50 states, plus diamond Princess
-
 
 def get_region_US(state, county=None, debug=False):
-    """Given a US state name and country, return deaths and cases as a tuple of pandas time
+    """Given a US state name and county, return deaths and cases as a tuple of pandas time
     series. (Johns Hopkins data set)
 
     If country is None, then sum over all counties in that state (i.e. return
-    the numbers for the statee)
+    the numbers for the state.)
 
     """
 
@@ -230,11 +230,8 @@ def get_region_US(state, county=None, debug=False):
 
     # label data
     country = f"US-{state}"
-    c.country = country
-    c.label = "cases"
-
-    d.country = country
-    d.label = "deaths"
+    c.name = country + " cases"
+    d.name = country + " deaths"
 
     return c, d
 
@@ -244,7 +241,7 @@ def compose_dataframe_summary(cases, deaths):
     """Used in per-country template to show data table.
     Could be extended.
 
-    Expects series of cases and deaths (time-alignd)
+    Expects series of cases and deaths (time-aligned), combines those in DataFrame and returns it
     """
     df = pd.DataFrame()
     df["total cases"] = cases
@@ -253,7 +250,7 @@ def compose_dataframe_summary(cases, deaths):
     df["daily new deaths"] = deaths.diff()
 
     # drop first row with nan -> otherwise ints are shows as float in table
-    df = df.dropna()
+    df = df.dropna().astype(int)
 
     # change index: latest numbers shown first
     df = df[::-1]
@@ -265,13 +262,18 @@ def compose_dataframe_summary(cases, deaths):
 def fetch_data_germany_last_execution():
     return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
+
 @joblib_memory.cache
-def fetch_data_germany(include_last_day=False):
-    """Data source is https://npgeo-corona-npgeo-de.hub.arcgis.com . The text on the
+def fetch_data_germany(include_last_day=True):
+    """Fetch data for Germany from Robert Koch institute.
+
+    Data source is https://npgeo-corona-npgeo-de.hub.arcgis.com . The text on the
     webpage implies that the data comes from the Robert Koch Institute.
 
     By default, we omit the last day with data from the retrieved data sets
-    (see reasoning below in source).
+    (see reasoning below in source), as the data is commonly update one day
+    later with more accurate (and typically higher) numbers.
+
     """
 
     datasource = "https://opendata.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0.csv"
@@ -322,11 +324,11 @@ def fetch_data_germany(include_last_day=False):
 
 
 def germany_get_region(state=None, landkreis=None):
-    """ Returns cases and deaths time series for Germany:
+    """ Returns cases and deaths time series for Germany, and a label for the state/kreis.
 
     If state is given, return sum of cases (as function of time) in that state (state=Bundesland)
 
-    If landkreis is given, return data from just that Landkreis.
+    If Landkreis is given, return data from just that Landkreis.
 
     Landkreis seems unique, so there is no need to provide state and Landkreis.
 
@@ -353,15 +355,14 @@ def germany_get_region(state=None, landkreis=None):
         # group over multiple rows for the same date
         # (this will also group over the different landkreise in the state)
         cases = land["AnzahlFall"].groupby('date').agg('sum').cumsum()
-        cases.country = f'Germany-{state}'
-        cases.label = 'cases'
-
+        region_label = f'Germany-{state}'
+        cases.name = region_label + " cases"
+        
         # group over all multiple entries per day
         deaths = land["AnzahlTodesfall"].groupby('date').agg('sum').cumsum()
-        deaths.country = f'Germany-{state}'
-        deaths.label = 'deaths'
+        deaths.name = region_label + " deaths"
 
-        return cases, deaths
+        return cases, deaths, region_label
 
     if landkreis:
         assert landkreis in germany['Landkreis'].values, \
@@ -373,23 +374,35 @@ def germany_get_region(state=None, landkreis=None):
         lk = lk.sort_index()
 
         cases = lk["AnzahlFall"].groupby('date').agg('sum').cumsum()
-        cases.country = f'Germany-{landkreis}'
-        cases.label = 'cases'
+        region_label = f'Germany-{landkreis}'
+        cases.name = region_label + ' cases'
 
         deaths = lk["AnzahlTodesfall"].groupby('date').agg('sum').cumsum()
-        deaths.country = f'Germany-{landkreis}'
-        deaths.label = 'deaths'
+        deaths.name = region_label + ' deaths'
 
-        return cases, deaths
+        return cases, deaths, region_label
 
 
-def plot_time_step(ax, series, style="-", logscale=True):
-    ax.step(series.index, series.values, style, label=series.country + " " + series.label,
+def plot_time_step(ax, series, style="-", labels=None, logscale=True):
+    """Plot the series as cumulative cases/deaths, plotted as step function.
+    Parameters:
+    - ax : axis object from matplotlib
+    - series: the actual data as pandas Series
+    - style : matplotlib style/Colour
+    - labels: tuple of (region_name, kind) where
+              both elements are strings, and 'kind' is either 'cases' or 'deaths'.
+    - logscale: plot y-axis in logscale (default=True)
+
+    Returns ax object.
+    """
+
+    ax.step(series.index, series.values, style, label=series.name,
            linewidth=LW)
     if logscale:
         ax.set_yscale('log')
     ax.legend()
     ax.set_ylabel("total numbers")
+    ax.yaxis.set_major_formatter(ScalarFormatter())
     return ax
 
 
@@ -435,23 +448,35 @@ def compute_daily_change(series):
     return change, smooth, smooth2
 
 
-def plot_daily_change(ax, series, color):
-    """ Given a series of data and matplotlib axis ax, plot the
+def plot_daily_change(ax, series, color, labels=None):
+    """Given a series of data and matplotlib axis ax, plot the
     - difference in the series data from day to day as bars and plot a smooth
     - line to show the overall development
+
+    - series is pandas.Series with data as index, and cumulative cases (or
+    deaths)
+    - color is color to be used for plotting
+
+    See plot_time_step for documentation on other parameters.
     """
 
     bar_alpha = 0.2
-    label = series.country + " new " + series.label
+    if labels is None:
+        label = ""
+        region = ""
+    else:
+        region, label = labels
+
+    ax_label = region + " new " + label
 
     (change, change_label) , (smooth, smooth_label), \
         (smooth2, smooth2_label) = compute_daily_change(series)
 
     ax.bar(change.index, change.values, color=color,
-           label=label, alpha=bar_alpha, linewidth=LW)
+           label=ax_label, alpha=bar_alpha, linewidth=LW)
 
     ax.plot(smooth2.index, smooth2.values, color=color,
-            label=label + " " + smooth2_label, linewidth=LW)
+            label=ax_label + " " + smooth2_label, linewidth=LW)
 
     ax.legend()
     ax.set_ylabel('daily change')
@@ -465,7 +490,7 @@ def plot_daily_change(ax, series, color):
     # new infections. This sets the scale to be too large.
     # There was also a value of ~-2000 on 22 April. We limit the y-scale to correct
     # manually for this:
-    if series.country == "France" and series.label == "cases":
+    if region == "France" and label == "cases":
         # get current limits
         ymin, ymax = ax.get_ylim()
         ax.set_ylim([max(-500, ymin), min(10000, ymax)])
@@ -474,7 +499,7 @@ def plot_daily_change(ax, series, color):
 
 
 
-def compute_doubling_time(series, minchange=0.5, debug=False):
+def compute_doubling_time(series, minchange=0.5, labels=None, debug=False):
 
     """
     Compute and return doubling time of (assumed exponential) growth, based on two
@@ -495,6 +520,13 @@ def compute_doubling_time(series, minchange=0.5, debug=False):
     ((None, message), (None, None)) where 'message' provides
     data for debugging the analysis.
     """
+
+    if labels is None:
+        label = ""
+        region = ""
+    else:
+        region, label = labels
+
 
     # only keep values where there is a change of a minumum number
     # get rid of data points where change is small values
@@ -546,7 +578,7 @@ def compute_doubling_time(series, minchange=0.5, debug=False):
     if dtime.isna().all():
         return (None, "Cannot compute smooth doubling time"), (None, None)
 
-    dtime_label = series.country + " doubling time " + series.label
+    dtime_label = region + " doubling time " + label
     dtime_smooth_label = dtime_label + ' 7-day rolling mean (stddev=3)'
     # simplified label
     dtime_smooth_label = dtime_label + ' (rolling mean)'
@@ -554,16 +586,21 @@ def compute_doubling_time(series, minchange=0.5, debug=False):
     return (dtime, dtime_label), (dtime_smooth, dtime_smooth_label)
 
 
-def plot_doubling_time(ax, series, color, minchange=0.5, debug=False):
+def plot_doubling_time(ax, series, color, minchange=0.5, labels=None, debug=False):
     """Plot doubling time of series, assuming series is accumulated cases/deaths as
     function of days.
 
     Returns axis.
 
+    See plot_time_step for documentation on other parameters.
     """
 
+    if labels is None:
+        labels = "", ""
+    region, label = labels
+
     (dtime, dtime_label), (dtime_smooth, dtime_smooth_label) = \
-        compute_doubling_time(series, minchange=minchange, debug=debug)
+        compute_doubling_time(series, minchange=minchange, debug=debug, labels=labels)
 
     if dtime is None:
         if debug:
@@ -624,29 +661,29 @@ def compute_growth_factor(series):
 
 
 
-def plot_growth_factor(ax, series, color):
-    """relative change of number of new cases/deaths from day to day
-    See https://youtu.be/Kas0tIxDvrg?t=330, 5:30 onwards
-
-    Computed based smooth daily change data.
-    """
-
-    # get smooth data from plot 1 to base this plot on
-    (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
-
-
-    label = series.country + " " + series.label + " growth factor " + f_label
-    ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
-
-    label = series.country + " " + series.label + " growth factor " + smoothed_label
-    ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color, label=label, linewidth=LW)
-
-    # ax.legend(loc='lower left')
-    ax.legend()
-    ax.set_ylabel("growth factor")
-    ax.set_ylim(0.5, 1.5)  # should generally be below 1
-    ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3') # label="critical value"
-    return ax
+#def plot_growth_factor(ax, series, color):
+#    """relative change of number of new cases/deaths from day to day
+#    See https://youtu.be/Kas0tIxDvrg?t=330, 5:30 onwards
+#
+#    Computed based smooth daily change data.
+#    """
+#
+#    # get smooth data from plot 1 to base this plot on
+#    (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
+#
+#
+#    label = series.country + " " + series.label + " growth factor " + f_label
+#    ax.plot(f.index, f.values, 'o', color=color, alpha=0.3, label=label)
+#
+#    label = series.country + " " + series.label + " growth factor " + smoothed_label
+#    ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color, label=label, linewidth=LW)
+#
+#    # ax.legend(loc='lower left')
+#    ax.legend()
+#    ax.set_ylabel("growth factor")
+#    ax.set_ylim(0.5, 1.5)  # should generally be below 1
+#    ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3') # label="critical value"
+#    return ax
 
 
 # Computation or R
@@ -674,7 +711,7 @@ def compute_R(daily_change, tau=4):
     return R2
 
 
-def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.2, 100]):
+def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.1, 100], print_alert=False):
     """Given a time series, find the min and max values in the time series within the last n days.
 
     If those values are within the interval `at_least`, then use the values in at_least as the limits.
@@ -688,8 +725,8 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.2, 100])
 
     series = series.replace(math.inf, math.nan)
 
-    min_ = series[-n:].min() - 0.06
-    max_ = series[-n:].max() + 0.06
+    min_ = series[-n:].min() - 0.1    # the -0.1 is to make extra space because the line we draw is thick
+    max_ = series[-n:].max() + 0.1
 
     if min_ < at_least[0]:
         min_final = min_
@@ -701,27 +738,36 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.2, 100])
     else:
         max_final = at_least[1]
 
-    if max_final > alert[1]:
-        # print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n", series[-n:])
-        print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n")
-    if min_final < alert[0]:
-        # print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n", series[-n:])
-        print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n")
+    if print_alert:
+        if max_final > alert[1]:
+            # print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n", series[-n:])
+            print(f"Large value for R_max = {max_final} > {alert[1]} in last {n} days: \n")
+        if min_final < alert[0]:
+            # print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n", series[-n:])
+            print(f"Small value for R_min = {min_final} < {alert[0]} in last {n} days: \n")
 
 
     # print(f"DDD: min_={min_}, max_={max_}")
     return min_final, max_final
 
 
-def plot_reproduction_number(ax, series, label, region, color_g='C1', color_R='C4', yscale_days=28):
+def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
+                             yscale_days=28, max_yscale=10,
+                             labels=None):
     """
     - series is expected to be time series of cases or deaths
     - label is 'cases' or 'deaths' or whatever is desired as the description
     - country is the name of the region/country
     - color_g is the colour for the growth factor
     - color_R is the colour for the reproduction number
+
+    See plot_time_step for documentation on other parameters.
     """
 
+    if labels is None:
+        region, label = "", ""
+    else:
+        region, label = labels
 
      # get smooth data for growth factor from plot 1 to base this plot on
     (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
@@ -746,6 +792,12 @@ def plot_reproduction_number(ax, series, label, region, color_g='C1', color_R='C
 
     # choose y limits so that all data points of R in the last 28 days are visible
     min_, max_ = min_max_in_past_n_days(R, yscale_days);
+
+    # set upper bound for R
+    # (Germany data has huge spike in February )
+    if max_ > max_yscale:
+        max_ = max_yscale
+
     ax.set_ylim([min_, max_]);
 
     # Plot ylim interval for debugging
@@ -764,27 +816,58 @@ def plot_reproduction_number(ax, series, label, region, color_g='C1', color_R='C
 
 
 
-def get_country_data(country, region=None, subregion=None):
-    """Given the name of a country, get the Johns Hopkins data for cases and  deaths,
-    and return them as a tuple of pandas.Series objects: (cases, deaths)
+def get_country_data(country, region=None, subregion=None, verbose=False):
+    """Given the name of a country, get the Johns Hopkins data for cases and deaths,
+    and return them as a tuple of pandas.Series objects and a string describing the region:
+    (cases, deaths, region_label)
 
-    If the country is "Germany", use the region (=Land) and subregion (=Kreis) to select
-    the appropriate subset from the Robert Koch Institute. If only the region is provided,
-    the data from all subregions in that region is accumulated.
+    If the country is "Germany", use the region (=Land) and subregion (=Kreis)
+    to select the appropriate subset from the Robert Koch Institute. If only
+    the region is provided, the data from all subregions in that region is
+    accumulated.
+
+    If the country is "US", get US data (states are available as regions) from Johns Hopkins
+    repository.
+
+    Returns "cases, deaths, country_region" where country region is a string
+    describing the country and region.
+
+    The series are resampled at a daily interval. Missing data points are replaced
+    by the last provided value (seems reasonable for a data set representing
+    cumulative numbers as a function of time: where no new data point is provided,
+    assume the change was zero, thus the last data point can be re-used).
+
+
     """
 
     if country.lower() == 'germany':
         if region == None and subregion == None:
-            c, d = get_country(country)  # use johns hopkins data
+            c, d = get_country_data_johns_hopkins(country)  # use johns hopkins data
+            country_region = country
         else:
             # use German data
-            c, d = germany_get_region(state=region, landkreis=subregion)
+            c, d, country_region = germany_get_region(state=region, landkreis=subregion)
     elif country.lower() == 'us' and region != None:
         # load US data
         c, d = get_region_US(region)
+        country_region = "United States: {region}"
     else:
-        c, d = get_country(country)
-    return c, d
+        c, d = get_country_data_johns_hopkins(country)
+        country_region = country
+
+    len_cases1 = len(c)
+    len_deaths1 = len(d)
+    # resample data so we have one value per day
+    c = c.resample("D").pad()
+    d = d.resample("D").pad()
+
+    len_cases2 = len(c)
+    len_deaths2 = len(d)
+
+    if verbose:
+        print(f"get_country_data: cases [{len_cases1}] -> [{len_cases2}]")
+        print(f"get_country_data: deaths[{len_deaths1}] -> [{len_deaths2}]")
+    return c, d, country_region
 
 #######################
 
@@ -835,7 +918,7 @@ def get_compare_data(countrynames, rolling=7):
     df_d = pd.DataFrame()
 
     for countryname in countrynames:
-        c, d = get_country(countryname)
+        c, d = get_country_data_johns_hopkins(countryname)
 
         df_c[countryname] = c.diff().rolling(rolling, center=True).mean()  # cases
         df_d[countryname] = d.diff().rolling(rolling, center=True).mean()  # deaths
@@ -846,7 +929,11 @@ def get_compare_data(countrynames, rolling=7):
 
 def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, labeloffset=2, v0=0,
                       highlight={}, other_lines_alpha=0.4):
-    """highlight is dictionary: {country_name : color}"""
+    """highlight is dictionary: {country_name : color}
+
+    - df: DataFrame with time series to align
+    """
+
     for i, col in enumerate(df.columns):
         # print(f"plot_logdiff: Processing {i} {col}")
         if col in highlight:
@@ -872,13 +959,35 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
     ax.set_ylabel(yaxislabel)
     ax.set_xlabel(xaxislabel)
     ax.set_yscale('log')
+    # use integer numbers for values > 1, and decimal presentation below
+    # from https://stackoverflow.com/questions/21920233/matplotlib-log-scale-tick-label-number-formatting/33213196
+    ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:g}'.format(y)))
     # ax.set_xscale('log')    # also interesting
-    ax.set_ylim(bottom=v0)  # remove setting limit?, following
-                              # https://github.com/fangohr/coronavirus-2020/issues/3
+    ax.set_ylim(bottom=set_y_axis_limit(df, v0))
     ax.set_xlim(left=-1)  #ax.set_xlim(-1, df.index.max())
     ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
     ax.yaxis.set_ticks_position('both')
 
+
+def set_y_axis_limit(data, current_lim):
+    """The function analyses the data set given and lowers
+    the y-limit if there are data points below `current_lim`
+
+    :param data: data to plot
+    :param current_lim: initial y-axis lower limit
+    :return: new y-axis lower limit
+    """
+    data_0 = data[data.index >= 0]  # from "day 0" only
+    limits = [0.1, 1, 10, 100]
+    # if we have values within the `limits`, we set the lower `y_limit` on the graph to the value on the left of bisect
+    # example: if the minimum value is 3, then y_limit = 1
+    index = bisect(limits, data_0.min().min())
+    if 0 < index < len(limits):
+        return limits[index - 1]
+    elif index == 0:
+        return limits[0]
+    else:
+        return current_lim
 
 def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Poland", "Korea, South",
                                                   "Belarus", "Switzerland", "US"],
@@ -929,11 +1038,6 @@ def label_from_region_subregion(region_subregion):
     return label
 
 
-def test_label_from_region_subregion():
-    assert label_from_region_subregion(("Hamburg", None)) == "Hamburg"
-    assert label_from_region_subregion("Hamburg") == "Hamburg"
-    assert label_from_region_subregion(("Schleswig Holstein", "Pinneberg")) == "Schleswig Holstein-Pinneberg"
-
 
 
 
@@ -960,7 +1064,6 @@ def unpack_region_subregion(region_subregion):
         region, subregion = region_subregion, None
     return region, subregion
 
-test_label_from_region_subregion()
 
 def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
     """Given a region_subregion for Germany, and a list of region_subregion to compare with,
@@ -979,7 +1082,7 @@ def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
     for reg_subreg in [region_subregion] + compare_with_local:
 
         region, subregion = unpack_region_subregion(reg_subreg)
-        c, d = germany_get_region(state=region, landkreis=subregion)
+        c, d, country_subregion = germany_get_region(state=region, landkreis=subregion)
 
         label = label_from_region_subregion((region, subregion))
         df_c[label] = c.diff().rolling(rolling, center=True).mean()  # cases
@@ -989,12 +1092,12 @@ def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
 
 
 def make_compare_plot_germany(region_subregion,
-                              compare_with=[], #"China", "Italy", "Germany"],
-                              compare_with_local =['Bayern',
-                                                   'Berlin', 'Bremen',
-                                                   'Hamburg', 'Hessen',
-                                                   'Nordrhein-Westfalen',
-                                                   'Sachsen-Anhalt'],
+                              compare_with=[],  # "China", "Italy", "Germany"],
+                              compare_with_local=['Bayern',
+                                                  'Berlin', 'Bremen',
+                                                  'Hamburg', 'Hessen',
+                                                  'Nordrhein-Westfalen',
+                                                  'Sachsen-Anhalt'],
     # The 'compare_with_local' subset is chosen to look sensibly on 2 May 2020.
     #                          compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
     #                                              'Brandenburg', 'Bremen', 'Hamburg',
@@ -1033,15 +1136,9 @@ def make_compare_plot_germany(region_subregion,
                       v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
     ax = axes[1]
 
-    res_d_0 = res_d[res_d.index >= 0]   # from "day 0" only
-    # if we have values in between 0.1 and 1, set the lower `y_limit` on the graph to 0.1
-    if res_d_0[(res_d_0 > 0.1) & (res_d_0 < 1)].any().any():    # there must be a more elegant check
-        y_limit = 0.1
-    else:
-        y_limit = v0d
     plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
                       "daily new deaths\n(rolling 7-day mean)",
-                      v0=y_limit, highlight={res_d.columns[0]:"C0"},
+                      v0=v0d, highlight={res_d.columns[0]:"C0"},
                       labeloffset=0.5)
 
     # fig.tight_layout(pad=1)
@@ -1056,31 +1153,36 @@ def make_compare_plot_germany(region_subregion,
 
 
 def overview(country, region=None, subregion=None, savefig=False):
-    c, d = get_country_data(country, region=region, subregion=subregion)
+    c, d, region_label = get_country_data(country, region=region, subregion=subregion)
 
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     ax = axes[0]
-    plot_time_step(ax=ax, series=c, style="-C1")
-    plot_time_step(ax=ax, series=d, style="-C0")
+    plot_time_step(ax=ax, series=c, style="-C1", labels=(region_label, "cases"))
+    plot_time_step(ax=ax, series=d, style="-C0", labels=(region_label, "deaths"))
 
     ax = axes[1]
-    plot_daily_change(ax=ax, series=c, color="C1")
+    plot_daily_change(ax=ax, series=c, color="C1", labels=(region_label, "cases"))
+    # data cleaning 
     if country == "China":
         ax.set_ylim(0, 5000)
+    elif country == "Spain":   # https://github.com/fangohr/coronavirus-2020/issues/44
+        ax.set_ylim(bottom=0)
+
 
     ax = axes[2]
-    plot_daily_change(ax=ax, series=d, color="C0")
+    plot_daily_change(ax=ax, series=d, color="C0", labels=(region_label, "deaths"))
+
 
     ax = axes[3]
     # plot_growth_factor(ax, series=d, color="C0")
     # plot_growth_factor(ax, series=c, color="C1")
-    plot_reproduction_number(ax, series=c, color_g="C1", color_R="C5", region=country, label='cases')
+    plot_reproduction_number(ax, series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
     ax = axes[4]
-    plot_reproduction_number(ax, series=d, color_g="C0", color_R="C4", region=country, label='deaths')
+    plot_reproduction_number(ax, series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
 
     ax = axes[5]
-    plot_doubling_time(ax, series=d, color="C0")
-    plot_doubling_time(ax, series=c, color="C1")
+    plot_doubling_time(ax, series=d, color="C0", labels=(region_label, "deaths"))
+    plot_doubling_time(ax, series=c, color="C1", labels=(region_label, "cases"))
 
     # enforce same x-axis on all plots
     for i in range(1, 6):
@@ -1090,13 +1192,13 @@ def overview(country, region=None, subregion=None, savefig=False):
         axes[i].yaxis.set_ticks_position('both')
 
 
-    title = f"Overview {c.country}, last data point from {c.index[-1].date().isoformat()}"
+    title = f"Overview {country}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
 
     # tight_layout gives warnings, for example for Heinsberg
     # fig.tight_layout(pad=1)
 
-    filename = os.path.join("figures", c.country.replace(" ", "-").replace(",", "-") + '.svg')
+    filename = os.path.join("figures", region_label.replace(" ", "-").replace(",", "-") + '.svg')
     if savefig:
         fig.savefig(filename)
 
@@ -1122,7 +1224,17 @@ def overview(country, region=None, subregion=None, savefig=False):
     fig2 = plt.gcf()
 
     if savefig:
-        filename = os.path.join("figures", c.country.replace(" ", "-").replace(",", "-") + '2.svg')
+        filename = os.path.join("figures", region_label.replace(" ", "-").replace(",", "-") + '2.svg')
         fig2.savefig(filename)
 
     return return_axes, c, d
+
+
+def get_cases_last_week(cases):
+    """Given cumulative cases time series, return the number of cases from the last week.
+    """
+    # make sure we have one value for every day
+    c2 = cases.resample('D').pad()
+    # last week is difference between last value, and the one 7 days before
+    cases_last_week = c2[-1] - c2[-8]
+    return cases_last_week
