@@ -12,3 +12,5 @@ tools/generate-individiual-plots.html
 .coverage
 coverage.xml
 coronavirus-metadata
+tools/binder
+tools/status
