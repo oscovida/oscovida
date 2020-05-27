@@ -264,7 +264,7 @@ def fetch_data_germany_last_execution():
 
 
 @joblib_memory.cache
-def fetch_data_germany(include_last_day=False):
+def fetch_data_germany(include_last_day=True):
     """Fetch data for Germany from Robert Koch institute.
 
     Data source is https://npgeo-corona-npgeo-de.hub.arcgis.com . The text on the
