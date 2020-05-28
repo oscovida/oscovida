@@ -17,8 +17,8 @@ one: status/generate-individual-plots
 two: status/generate-countries
 three: status/copy-ipynb-files
 four: status/pelican-publish
-five: status/git-commit-push-wwwroot
-six: status/git-commit-push-binder
+five: status/git-commit-push-binder
+six: status/git-commit-push-wwwroot
 seven: trigger-binder-build
 
 
