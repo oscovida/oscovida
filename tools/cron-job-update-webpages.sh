@@ -13,5 +13,5 @@ make clean
 # targets completes without an error code.)
 for i in `seq 1 10`; do
     echo "`date` attempt $i running make all"
-    make all1;
+    make all;
 done
