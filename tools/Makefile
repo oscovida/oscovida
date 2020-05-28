@@ -59,9 +59,7 @@ status/git-commit-push-binder:
 	touch status/git-commit-push-binder
 
 
-trigger-binder-build:
-	# wait after git push (seems to be ignored)
-	sleep 30
+status/trigger-binder-build:
   # seems to work anyway
 	$(shell open https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb/US.ipynb)
 	touch status/trigger-binder-build
