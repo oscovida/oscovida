@@ -323,7 +323,33 @@ def fetch_data_germany(include_last_day=True):
     return cleaned
 
 
-def germany_get_region(state=None, landkreis=None):
+def pad_cumulative_series_to_yesterday(series):
+    """Given a time series with date as index and cumulative cases/deaths as values:
+
+    - if the last date in the index is older than yesterday, then
+    - add that date
+    - resample the series with a daily interval, using padding with last known value
+    - and return.
+
+    Required for Robert Koch Data, where only a new data point is provided if
+    the numbers change, but the plotting algorithms need to know that there is
+    no change. Without this padding, the data set looks old as the last plotted
+    data point is the last one for which data is provided.
+    """
+    now = datetime.datetime.now()
+    today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday = today - pd.Timedelta("1D")
+    last = series.index.max()
+    if last < yesterday:
+        # repeat last data point with index for yesterday
+        series[yesterday] = series[last]
+        series2 = series.resample("1D").pad()
+        return series2
+    else:
+        return series
+
+
+def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
     """ Returns cases and deaths time series for Germany, and a label for the state/kreis.
 
     If state is given, return sum of cases (as function of time) in that state (state=Bundesland)
@@ -362,6 +388,10 @@ def germany_get_region(state=None, landkreis=None):
         deaths = land["AnzahlTodesfall"].groupby('date').agg('sum').cumsum()
         deaths.name = region_label + " deaths"
 
+        if pad2yesterday:
+            deaths = pad_cumulative_series_to_yesterday(deaths)
+            cases = pad_cumulative_series_to_yesterday(cases)
+
         return cases, deaths, region_label
 
     if landkreis:
@@ -380,7 +410,13 @@ def germany_get_region(state=None, landkreis=None):
         deaths = lk["AnzahlTodesfall"].groupby('date').agg('sum').cumsum()
         deaths.name = region_label + ' deaths'
 
+        if pad2yesterday:
+            deaths = pad_cumulative_series_to_yesterday(deaths)
+            cases = pad_cumulative_series_to_yesterday(cases)
+
         return cases, deaths, region_label
+
+    raise NotImplemented("Should never get to this point.")
 
 
 def plot_time_step(ax, series, style="-", labels=None, logscale=True):
@@ -816,7 +852,7 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
 
 
 
-def get_country_data(country, region=None, subregion=None, verbose=False):
+def get_country_data(country, region=None, subregion=None, verbose=False, pad_RKI_data_to_yesterday=True):
     """Given the name of a country, get the Johns Hopkins data for cases and deaths,
     and return them as a tuple of pandas.Series objects and a string describing the region:
     (cases, deaths, region_label)
@@ -837,6 +873,16 @@ def get_country_data(country, region=None, subregion=None, verbose=False):
     cumulative numbers as a function of time: where no new data point is provided,
     assume the change was zero, thus the last data point can be re-used).
 
+    Data from Johns Hopkins is reported daily, even if there is no change in numbers.
+
+    Data from Robert Koch Institute (RKI) is only provided if the cumulative
+    numbers change. We thus resample the data set if the last provided data
+    point is not from yesterday, up to yesterday (which is the most recent day
+    for which data could be available).
+
+    Note that some data sets are updated retrospectively (in particular data
+    from RKI), so the numbers for the a particular date may increase after one
+    or two days (or even later in extreme cases).
 
     """
 
@@ -846,7 +892,8 @@ def get_country_data(country, region=None, subregion=None, verbose=False):
             country_region = country
         else:
             # use German data
-            c, d, country_region = germany_get_region(state=region, landkreis=subregion)
+            c, d, country_region = germany_get_region(state=region, landkreis=subregion,
+                                                      pad2yesterday=pad_RKI_data_to_yesterday)
     elif country.lower() == 'us' and region != None:
         # load US data
         c, d = get_region_US(region)
