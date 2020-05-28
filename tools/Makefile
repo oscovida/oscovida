@@ -42,7 +42,7 @@ status/pelican-publish: status/generate-individual-plots status/generate-countri
 
 
 status/git-commit-push-wwwroot:
-  @echo "We should check here we have no new files?"
+	@echo "We should check here we have no new files?"
   # see for example https://stackoverflow.com/questions/5139290/how-to-check-if-theres-nothing-to-be-committed-in-the-current-branch
   # new files could show up if a new country starts reporting numbers, or
   # if a new pelican article is written
