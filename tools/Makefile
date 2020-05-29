@@ -19,7 +19,7 @@ three: status/copy-ipynb-files
 four: status/pelican-publish
 five: status/git-commit-push-binder
 six: status/git-commit-push-wwwroot
-seven: trigger-binder-build
+seven: status/trigger-binder-build
 
 
 status/generate-individual-plots:
@@ -60,6 +60,5 @@ status/git-commit-push-binder:
 
 
 status/trigger-binder-build:
-  # seems to work anyway
 	$(shell open https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb/US.ipynb)
 	touch status/trigger-binder-build
