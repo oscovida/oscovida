@@ -5,6 +5,7 @@ https://github.com/fangohr/coronavirus-2020"""
 import datetime
 import math
 import os
+import pytz
 import time
 import joblib
 import numpy as np
@@ -337,6 +338,13 @@ def pad_cumulative_series_to_yesterday(series):
     data point is the last one for which data is provided.
     """
     now = datetime.datetime.now()
+    rki_tz = pytz.timezone('Europe/Berlin')
+    now_tz = datetime.datetime.now(rki_tz)
+
+    # remove time zone information from datetime, so we can compare against
+    # datatime dates from get_country_data which has no timezone information
+    # attached.
+    now = now.replace(tzinfo=None)
     today = now.replace(hour=0, minute=0, second=0, microsecond=0)
     yesterday = today - pd.Timedelta("1D")
     last = series.index.max()
