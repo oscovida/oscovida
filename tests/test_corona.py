@@ -1,3 +1,4 @@
+import datetime
 import numpy as np
 import pandas as pd
 from pandas import DatetimeIndex
@@ -202,3 +203,40 @@ def test_get_cases_last_week():
     cases, deaths = mock_get_country_data_johns_hopkins(country="China")
     assert c.get_cases_last_week(cases) == 430
 
+
+
+def test_pad_cumulative_series_to_yesterday():
+    # create fake data
+    now = datetime.datetime.now()
+    today = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    yesterday = today - pd.Timedelta("1D")
+    point1 = today - pd.Timedelta("10D")
+    point2 = today - pd.Timedelta("3D")
+    index = pd.date_range(start=point1, end=point2)
+
+    x = pd.Series(data=range(len(index)), index=index)
+    # 2020-05-18    0
+	# 2020-05-19    1
+	# 2020-05-20    2
+	# 2020-05-21    3
+	# 2020-05-22    4
+	# 2020-05-23    5
+	# 2020-05-24    6
+	# 2020-05-25    7
+	# Freq: D, dtype: int64
+    assert x[x.index.max()] == 7
+
+    x2 = c.pad_cumulative_series_to_yesterday(x)
+    assert x2.index.max() == yesterday
+    assert x2[-1] == 7
+    assert x2[-2] == 7
+    assert x2[-3] == 7
+    assert x2[-4] == 6
+
+
+    index2 = pd.date_range(start=point1, end=yesterday)
+
+    y = pd.Series(data=range(len(index2)), index=index2)
+    y2 = c.pad_cumulative_series_to_yesterday(y)
+    assert y.shape == (10,)
+    assert y2.shape == y.shape
