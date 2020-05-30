@@ -1,6 +1,5 @@
 title: OSCOVIDA in the news
 date: 27-05-2020
-status: draft
 
 
 
