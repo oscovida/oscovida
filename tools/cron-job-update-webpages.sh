@@ -14,4 +14,7 @@ make clean
 for i in `seq 1 10`; do
     echo "`date` attempt $i running make all"
     make all;
+    # if we have a fail, give the system some time
+    # to sort itself out. 
+    sleep 10
 done
