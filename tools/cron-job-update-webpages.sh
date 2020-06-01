@@ -1,4 +1,6 @@
-#!/usr/bin/env bash
+#!/usr/bin/env fish
+
+conda activate oscovida-production
 
 # This script is meant to be usable as a cron job. 
 
@@ -11,10 +13,10 @@ make clean
 # work being done already, and only commit and push the webpages once the
 # updating has completed. (Or at least until each step in the chain of makefile
 # targets completes without an error code.)
-for i in `seq 1 10`; do
+for i in `seq 1 10`;
     echo "`date` attempt $i running make all"
-    make all;
+    make all1;
     # if we have a fail, give the system some time
     # to sort itself out. 
     sleep 10
-done
+end
