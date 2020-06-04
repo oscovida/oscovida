@@ -1013,7 +1013,24 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
             tmp = df[col].dropna()
             if len(tmp) > 0:   # possible we have no data points
                 x, y = tmp.index[-1], tmp.values[-1]
-                y = np.NaN if y == 0 else y
+
+                # If we use the 'annotate' function on a data point with value 0 or a negative value,
+                # we run into a bizarre bug that the created figure has very large dimensions in the
+                # vertical direction when rendered to svg. The next line prevents this.
+                #
+                # Our fix/hack means that the label of the country will not be visible. That's not so bad
+                # at the moment as the situation of zero new deaths causes the problem, and the infections
+                # are higher and non-zero, thus we can see the country label in the infections plot.
+                #
+                # If this stops, we could consider choosing a data point from
+                # earlier in the series to put the label there.
+                #
+                # The comparison for "y < 0" should not be necessary as the new deaths per day can at
+                # most be zero. However, for Australia, there is a -1 reported for first of June,
+                # which can lead to negative values when computing a rolling mean.
+                y = np.NaN if y <= 0 else y
+
+                # Add country/region name as text next to last data point of the line:
                 ax.annotate(col, xy=(x + labeloffset, y), textcoords='data')
                 ax.plot([x], [y], "o" + color, alpha=alpha)
     # ax.legend()
