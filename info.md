@@ -6,9 +6,14 @@ Data for Germany from Robert Koch Institute
 
 -   From <https://npgeo-corona-npgeo-de.hub.arcgis.com/> -\> Menu top
     left -\> \"Data\", scroll down to \"RKI Corona Landkreise\" data
-    set, -\> select interesting data set -\> for example
+    set, -\> select interesting data set -\> 
     -   RKI Corona Bundesländer
-    -   RKI COVID19 -\> RKI Corona Landkreise
+    -   RKI COVID19 -\>  "Download der Daten als CSV" 
+    - leading to this page: https://www.arcgis.com/home/item.html?id=f10774f1c63e40168479a1feb6c7ca74
+    - there seem to be multiple options to get to the data. One of them is the "URL" in the rigth column,
+    - which points to https://www.arcgis.com/sharing/rest/content/items/f10774f1c63e40168479a1feb6c7ca74/data
+
+- outdated as of 6 June 2020:
     -   Download button (below image, on the right) -\> Full Data set
         -\> Spreadsheet This provides a link to a csv file, but with a
         URL that includes a hash. As of 9 April, this is
