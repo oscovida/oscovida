@@ -2,6 +2,18 @@
 
 conda activate oscovida-production
 
+python -c "import coronavirus as cv; print(cv.__file__)"
+
+# capture exit code
+if test $status -eq 0
+    #echo "no error when importing"
+else
+    echo "SCHTOPP - wrong conda environment??"
+    exit 1
+end
+
+echo "About to clean cache and metadata cache [in 5 sec]"
+sleep 5
 # This script is meant to be usable as a cron job. 
 
 # first delete cached data etc
@@ -13,8 +25,8 @@ make clean
 # work being done already, and only commit and push the webpages once the
 # updating has completed. (Or at least until each step in the chain of makefile
 # targets completes without an error code.)
-for i in `seq 1 20`;
-    echo "`date` attempt $i running make all"
+for i in (seq 1 10);
+    echo (date) " attempt $i running make all"
     make all;
     # if we have a fail, give the system some time
     # to sort itself out. 
