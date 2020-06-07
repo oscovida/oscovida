@@ -2,7 +2,7 @@ title: OSCOVIDA in the news
 date: 27-05-2020
 
 
-
+- [3 June 2020 Digitum, University Murcia, Spain (in spanish)](http://digitum-um.blogspot.com/2020/06/descubra-oscovida-open-science-covid.html)
 - [ 27 May 2020 CORDIS website](https://cordis.europa.eu/article/id/418274-discover-oscovida-the-panosc-open-science-covid-analysis-platform-tracking-data-about-covid19)
 - [ 27 May 2020 PaNOSC website ](https://www.panosc.eu/news/panosc-open-science-covid-analysis-platform-now-online/)
 - [ 27 May 2020 YouTube](https://www.youtube.com/watch?v=1_oDc_vptBQ)
