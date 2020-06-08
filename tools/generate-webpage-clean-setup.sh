@@ -8,7 +8,7 @@ cp ../binder/apt.txt wwwroot
 cp ../binder/requirements.txt binder
 cp ../binder/apt.txt binder
 
-# copy coronavirus package so the notebooks can import it when executing on binder
+# copy oscovida package so the notebooks can import it when executing on binder
 rm -rf wwwroot/ipynb/coronavirus 
 cp -av ../coronavirus wwwroot/ipynb
 rm -rf binder/ipynb/coronavirus 
