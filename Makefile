@@ -10,7 +10,7 @@ dev-install-upgrade-depedencies:
 	python3 -m pip install --upgrade --upgrade-strategy eager -e .[test]
 
 test:
-	python3 -m pytest -v --cov=ocsovida
+	python3 -m pytest -v --cov=oscovida
 
 test-pelican:
 	cd tools && jupyter-nbconvert --execute generate-individiual-plots.ipynb
