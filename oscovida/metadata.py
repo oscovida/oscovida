@@ -5,8 +5,7 @@ import os
 import pandas as pd
 
 
-# FIXME: where should this come from?
-MetadataStorageLocation = os.path.join("coronavirus-metadata", "regions")
+MetadataStorageLocation = os.path.join("oscovida-metadata", "regions")
 
 
 class MetadataRegion:
