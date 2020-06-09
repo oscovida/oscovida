@@ -8,7 +8,7 @@ import numpy as np
 import pandas as pd
 
 
-from coronavirus import MetadataRegion
+from oscovida import MetadataRegion
 
 
 def test_MetadataRegion_basics():
