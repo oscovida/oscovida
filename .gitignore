@@ -2,15 +2,14 @@
 __pycache__
 tools/wwwroot
 cachedir
-tools/coronavirus.py
 .DS_Store
 .venv/
 .vscode/
-coronavirus_2020.egg-info
 default.profraw
 tools/generate-individiual-plots.html
+tools/generate-countries.html
 .coverage
 coverage.xml
-coronavirus-metadata
+oscovida-metadata
 tools/binder
 tools/status

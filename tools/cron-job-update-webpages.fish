@@ -2,7 +2,7 @@
 
 conda activate oscovida-production
 
-python -c "import coronavirus as cv; print(cv.__file__)"
+python -c "import oscovida as osc; print(osc.__file__)"
 
 # capture exit code
 if test $status -eq 0
