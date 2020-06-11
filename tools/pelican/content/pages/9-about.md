@@ -9,9 +9,9 @@ Dashboard: [![Voila](https://mybinder.org/badge_logo.svg)](https://mybinder.org/
 
 ## Available materials
 
-* [Plots and basic data tables for all countries for which the Johns Hopkins University provides data](https://fangohr.github.io/coronavirus/index-world.html)
+* [Plots and basic data tables for all countries for which the Johns Hopkins University provides data](https://oscovida.github.io/countries.html)
 
-* [Plots and basic data tables for all "Kreise" in Germany (based on data from Robert Koch Institute)](https://fangohr.github.io/coronavirus/index-germany.html)
+* [Plots and basic data tables for all "Kreise" in Germany (based on data from Robert Koch Institute)](https://oscovida.github.io/germany.html)
 
 * Selected Plots for strongly affected countries (discussion below), see
 [index.ipynb](https://github.com/fangohr/coronavirus-2020/blob/master/index.ipynb)
