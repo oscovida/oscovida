@@ -18,7 +18,9 @@ from nbconvert.writers import FilesWriter
 
 class BaseReport:
     def __init__(self, country, title, overview_function, overview_args,
-                 data_load_function, data_load_args, output_file, wwwroot):
+                 data_load_function, data_load_args, output_file, wwwroot,
+                 verbose=False):
+        self.verbose = verbose
         self.country = country
         self.title = title
 
@@ -77,6 +79,9 @@ class BaseReport:
             in meta.items()
         ]
 
+    def init_metadata(self):
+        raise NotImplementedError()
+
     def generate_notebook(self, template_file="./template-report.py"):
         with open(template_file, 'r') as f:
             template_str = f.read()
@@ -86,11 +91,11 @@ class BaseReport:
         notebook = ipynb_py_convert.py2nb(template_str)
 
         with open(self.output_ipynb_path, 'tw') as f:
-            print(self.output_ipynb_path)
+            print(self.output_ipynb_path) if self.verbose else None
             json.dump(notebook, f, indent=2)
 
-            print(f"Written file to {self.output_file_name}")
-            self.metadata['ipynb-name'] = self.output_ipynb_path
+            print(f"Written file to {self.output_file_name}") if self.verbose else None
+            self.metadata['ipynb-name'] = os.path.basename(self.output_ipynb_path)
 
     def generate_html(self, kernel_name='python3'):
         nb_executor = ExecutePreprocessor(kernel_name=kernel_name)
@@ -107,17 +112,18 @@ class BaseReport:
             html_writer.write(body, resources,
                 self.output_html_path.replace(".html", ""))
 
-            print(f"Written file to {self.output_html_path}")
-            self.metadata['html-file'] = self.output_html_path
+            print(f"Written file to {self.output_html_path}") if self.verbose else None
+            self.metadata['html-file'] = os.path.basename(self.output_html_path)
             self.metadata.mark_as_updated()
 
     def generate(self, kernel_name='python3', template_file="./template-report.py"):
+        self.init_metadata()
         self.generate_notebook(template_file=template_file)
         self.generate_html(kernel_name=kernel_name)
 
 
 class CountryReport(BaseReport):
-    def __init__(self, country, wwwroot='wwwroot'):
+    def __init__(self, country, wwwroot='wwwroot', verbose=False):
         title = country
         overview_function = "overview"
         overview_args = f"\"{country}\""
@@ -129,7 +135,7 @@ class CountryReport(BaseReport):
 
         super().__init__(
             country, title, overview_function, overview_args,
-            data_load_function, data_load_args, output_file, wwwroot
+            data_load_function, data_load_args, output_file, wwwroot, verbose=verbose
         )
 
     @staticmethod
@@ -154,7 +160,7 @@ class CountryReport(BaseReport):
 
 
 class GermanyReport(BaseReport):
-    def __init__(self, region, wwwroot='wwwroot'):
+    def __init__(self, region, wwwroot='wwwroot', verbose=False):
         country = "Germany"
         self.region = region[0] #  Bundesland
         self.subregion = region[1] #  Kreis
@@ -170,7 +176,7 @@ class GermanyReport(BaseReport):
 
         super().__init__(
             country, title, overview_function, overview_args,
-            data_load_function, data_load_args, output_file, wwwroot
+            data_load_function, data_load_args, output_file, wwwroot, verbose=verbose
         )
 
     def init_metadata(self):
@@ -202,7 +208,7 @@ class GermanyReport(BaseReport):
 
 
 class USAReport(BaseReport):
-    def __init__(self, region, wwwroot='wwwroot'):
+    def __init__(self, region, wwwroot='wwwroot', verbose=False):
         country = "USA"
         title = f"United States: {region}"
         overview_function = "overview"
@@ -215,7 +221,7 @@ class USAReport(BaseReport):
 
         super().__init__(
             country, title, overview_function, overview_args,
-            data_load_function, data_load_args, output_file, wwwroot
+            data_load_function, data_load_args, output_file, wwwroot, verbose=verbose
         )
 
     def init_metadata(self):
