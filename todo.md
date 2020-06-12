@@ -4,7 +4,7 @@ Software engineering: things to do
 General
 -------
 
--   \[ \] PEP8 coronavirus.py (and other files)
+-   \[ \] PEP8 oscovida.py (and other files)
 -   \[X\] write test that attempts to generate plots for all countries
     in Johns Hopkins data -> `tools/test-plots-for-all-regions.ipynb`
 -   \[X\] write test that attempts to generate plots for all countries
@@ -70,7 +70,7 @@ Binder
 -------
 -   \[ \] split Binder repository for ipynb files from html repository:
     - html repo is pretty big, poor binder needs to clone this every time it is used
--   \[ \] remove inconsolata font from coronavirus.py, or install in binder (so
+-   \[ \] remove inconsolata font from oscovida.py, or install in binder (so
     that no font warning is reported when executing the notebook on binder)
 
 Bugs
