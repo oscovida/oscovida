@@ -9,7 +9,9 @@ env:
     - MPLBACKEND=agg
 
 install:
-  - make dev-install
+  - make dev-install-upgrade-depedencies
+  #- make dev-install
+
 
 script:
   - make test
