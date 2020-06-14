@@ -1,19 +1,14 @@
-
 import datetime
 import json
 import os
-import shutil
-import sys
-from multiprocessing import Pool, cpu_count
 
-import ipynb_py_convert
 import nbformat
-import numpy as np
-import coronavirus
-from coronavirus import MetadataRegion
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.writers import FilesWriter
+
+import coronavirus
+import ipynb_py_convert
 
 
 class BaseReport:
@@ -38,7 +33,7 @@ class BaseReport:
 
         self.create_date = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-        self.metadata = MetadataRegion(self.title)
+        self.metadata = coronavirus.MetadataRegion(self.title)
 
     @staticmethod
     def sanitise(name):
@@ -212,7 +207,7 @@ class USAReport(BaseReport):
         country = "USA"
         title = f"United States: {region}"
         overview_function = "overview"
-        overview_args = f"country=\"US\", region=\"{region}\")"
+        overview_args = f"country=\"US\", region=\"{region}\""
         data_load_function = "get_country_data"
         data_load_args = f"\"US\", \"{region}\""
         output_file = f"US-{region}"
