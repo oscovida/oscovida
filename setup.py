@@ -48,7 +48,7 @@ setup(name="oscovida",
       ],
       extras_require={
           'test': [
-              'pytest>=4.6',
+              'pytest',
               'pytest-cov',
               'coverage',
               'nbval',

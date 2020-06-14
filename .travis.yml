@@ -9,8 +9,9 @@ env:
     - MPLBACKEND=agg
 
 install:
-  #- make dev-install-upgrade-depedencies
+  - pip install -U pytest
   - make dev-install
+  
 
 
 script:
