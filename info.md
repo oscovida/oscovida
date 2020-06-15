@@ -184,11 +184,16 @@ Setting up a local installation for development
 
 2. Get the repository that keeps the static webpages (using github pages)
    `cd tools && git clone git@github.com:oscovida/oscovida.github.io.git wwwroot`
+   
+3. Get the binder repository:
+   `cd tools && git clone git@github.com:oscovida/binder.git binder`
 
-Procedure to update data and webpages
+Procedure to update data and webpages (manual)
 ==============================================
 
-3. update notebooks by running (in X/tools):
+[see below for automatic version]
+
+4. update notebooks by running (in X/tools):
 
    - jupyter-notebook generate-countries.html:
      - updates all ~600 html files by executing ~600 ipynb files, which are created from the templates
@@ -197,14 +202,22 @@ Procedure to update data and webpages
      - updates image on home page (with one country out of the top 10)
      - updates plots on https://oscovida.github.io/plots.html with current data
    
-4. in X/tools/pelican, run ``make html` to update html pages (to develop), `make
+5. in X/tools/pelican, run ``make html` to update html pages (to develop), `make
    publish` for the final version
    
    - if you want to see results, use `make serve` and open `http://localhost:8000`
 
-5. in `wwwroot`, run `git add *; git commit *`, then `git push` 
+6. in `wwwroot`, run `git add *; git commit *`, then `git push` 
 
-6. updates should appear at https://oscovida.github.io a few minutes later
+7. updates should appear at https://oscovida.github.io a few minutes later
+
+8. in `binder`, run `git add *; git commit *`, then `git push` 
+
+
+Procedure to update data and webpages (automatic)
+=================================================
+
+Run script `tools/cron-job-update-webpages.fish`
 
 
 
