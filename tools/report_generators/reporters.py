@@ -12,9 +12,13 @@ import ipynb_py_convert
 
 
 class BaseReport:
-    def __init__(self, country, title, overview_function, overview_args,
-                 data_load_function, data_load_args, output_file, wwwroot,
-                 verbose=False):
+    def __init__(self, *,
+        country, title,
+        overview_function, overview_args,
+        data_load_function, data_load_args,
+        output_file,
+        wwwroot, verbose=False
+    ):
         self.verbose = verbose
         self.country = country
         self.title = title
@@ -29,11 +33,13 @@ class BaseReport:
         self.output_ipynb_path = os.path.join(
             wwwroot, "ipynb", self.output_file_name)
         self.output_html_path = os.path.join(
-            wwwroot, "html", self.output_file_name.replace(".ipynb", ".html"))
+            wwwroot, "html", self.sanitise(output_file) + ".ipynb")
 
         self.create_date = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
         self.metadata = coronavirus.MetadataRegion(self.title)
+
+        self.init_metadata()
 
     @staticmethod
     def sanitise(name):
@@ -112,25 +118,24 @@ class BaseReport:
             self.metadata.mark_as_updated()
 
     def generate(self, kernel_name='python3', template_file="./template-report.py"):
-        self.init_metadata()
         self.generate_notebook(template_file=template_file)
         self.generate_html(kernel_name=kernel_name)
 
 
 class CountryReport(BaseReport):
     def __init__(self, country, wwwroot='wwwroot', verbose=False):
-        title = country
-        overview_function = "overview"
-        overview_args = f"\"{country}\""
-        data_load_function = "get_country_data"
-        data_load_args = f"\"{country}\""
-        output_file = f"{country}"
-
         self.check_country_is_known(country)
 
         super().__init__(
-            country, title, overview_function, overview_args,
-            data_load_function, data_load_args, output_file, wwwroot, verbose=verbose
+            country=country,
+            title=country,
+            overview_function="overview",
+            overview_args=f"\"{country}\"",
+            data_load_function="get_country_data",
+            data_load_args=f"\"{country}\"",
+            output_file=f"{country}",
+            wwwroot=wwwroot,
+            verbose=verbose
         )
 
     @staticmethod
@@ -156,22 +161,22 @@ class CountryReport(BaseReport):
 
 class GermanyReport(BaseReport):
     def __init__(self, region, wwwroot='wwwroot', verbose=False):
-        country = "Germany"
         self.region = region[0] #  Bundesland
         self.subregion = region[1] #  Kreis
-        title = f"{country}: {self.subregion} ({self.region})"
-        overview_function = "overview"
-        overview_args = f"country=\"{country}\", subregion=\"{self.subregion}\""
-        data_load_function = "germany_get_region"
-        data_load_args = f"landkreis=\"{self.subregion}\""
-        output_file = f"Germany-{self.region}-{self.subregion}"
 
         self.germany_check_region_is_known(self.region)
         self.germany_check_subregion__is_known(self.subregion)
 
         super().__init__(
-            country, title, overview_function, overview_args,
-            data_load_function, data_load_args, output_file, wwwroot, verbose=verbose
+            country="Germany",
+            title=f"Germany: {self.subregion} ({self.region})",
+            overview_function="overview",
+            overview_args=f"country=\"Germany\", subregion=\"{self.subregion}\"",
+            data_load_function="germany_get_region",
+            data_load_args=f"landkreis=\"{self.subregion}\"",
+            output_file=f"Germany-{self.region}-{self.subregion}",
+            wwwroot=wwwroot,
+            verbose=verbose
         )
 
     def init_metadata(self):
@@ -204,19 +209,18 @@ class GermanyReport(BaseReport):
 
 class USAReport(BaseReport):
     def __init__(self, region, wwwroot='wwwroot', verbose=False):
-        country = "USA"
-        title = f"United States: {region}"
-        overview_function = "overview"
-        overview_args = f"country=\"US\", region=\"{region}\""
-        data_load_function = "get_country_data"
-        data_load_args = f"\"US\", \"{region}\""
-        output_file = f"US-{region}"
-
         self.region = region
 
         super().__init__(
-            country, title, overview_function, overview_args,
-            data_load_function, data_load_args, output_file, wwwroot, verbose=verbose
+            country="USA",
+            title=f"United States: {region}",
+            overview_function="overview",
+            overview_args=f"country=\"US\", region=\"{region}\"",
+            data_load_function="get_country_data",
+            data_load_args=f"\"US\", \"{region}\"",
+            output_file=f"US-{region}",
+            wwwroot=wwwroot,
+            verbose=verbose
         )
 
     def init_metadata(self):
