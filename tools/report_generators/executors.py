@@ -1,9 +1,14 @@
-from tqdm.notebook import trange, tqdm
-from concurrent.futures import ThreadPoolExecutor
+from tqdm.notebook import trange
 import logging
 import threading
-import sys
 import time
+
+
+# logging.basicConfig(
+#     format="%(asctime)s %(threadName)s: %(message)s",
+#     level=logging.DEBUG,
+#     datefmt="%H:%M:%S"
+# )
 
 
 class ReportExecutor:
@@ -19,12 +24,6 @@ class ReportExecutor:
         self.force = force
         self.verbose = verbose
 
-        # logging.basicConfig(
-        #     format="%(asctime)s %(threadName)s: %(message)s",
-        #     level=logging.DEBUG,
-        #     datefmt="%H:%M:%S"
-        # )
-
     def _create_html_report_single(self, region) -> None:
         for attempt in range(self.attempts):
             if self.__stop__.is_set():
@@ -38,15 +37,17 @@ class ReportExecutor:
                     break
 
                 report.generate()
-                break #  Without this break if force is on it will keep generating reports
+                break #  Without this break if force is on it will keep attempting
             except Exception as e:
                 if e == KeyboardInterrupt:
                     raise e
 
-                logging.warning(f"error {type(e)}, retrying")
                 if attempt + 1 == self.attempts:
-                    logging.warning(f"error\n{e}")
+                    logging.warning(f"Processing {region} error\n{e}")
                     raise e
+
+                logging.warning(f"Processing {region} error {type(e)}, "
+                                f"retrying {attempt+1}")
 
     def _create_html_reports_serial(self, regions):
         pbar = trange(len(regions))
