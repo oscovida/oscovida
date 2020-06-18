@@ -89,19 +89,3 @@ def create_markdown_index_page(
         f.write("\n")
         f.write(md_content)
         f.write("\n")
-
-def create_index_page(sections, rootname, wwwroot):
-    """Sections is dictionary: key is title, value is markdown text"""
-    md_file = rootname + ".md"
-
-    with open(os.path.join(wwwroot, md_file), "tw") as f:
-        for section in sections:
-            f.write(f"# {section}\n\n")
-            f.write(sections[section])
-    print(f"Written overview to {md_file}.")
-    html_file = rootname + ".html"
-    subprocess.check_call(
-        f"pandoc -t html -o {os.path.join(wwwroot, html_file)} " +
-        f"{os.path.join(wwwroot, md_file)}", shell=True
-    )
-    return html_file
