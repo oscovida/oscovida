@@ -1,8 +1,8 @@
-from tqdm.notebook import trange
 import logging
 import threading
 import time
 
+from tqdm.notebook import trange
 
 # logging.basicConfig(
 #     format="%(asctime)s %(threadName)s: %(message)s",
