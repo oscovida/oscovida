@@ -2,6 +2,7 @@ import logging
 import threading
 import time
 
+from coronavirus import MetadataRegion
 from tqdm.notebook import trange
 
 # logging.basicConfig(
@@ -23,6 +24,11 @@ class ReportExecutor:
         self.workers = workers
         self.force = force
         self.verbose = verbose
+
+    @property
+    def regions(self):
+        regions_all = MetadataRegion.get_all_as_dataframe()
+        return regions_all[regions_all['category'] == self.Reporter.category]
 
     def _create_html_report_single(self, region) -> None:
         for attempt in range(self.attempts):
