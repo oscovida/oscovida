@@ -62,9 +62,9 @@ def create_markdown_index_page(executor:ReportExecutor, *,
     md_content = create_markdown_index_list(executor)
 
     title_map = {
-        "Countries": title_prefix + " Countries of the world",
-        "Germany": title_prefix + " Germany",
-        "US": title_prefix + " United States",
+        "countries": title_prefix + " Countries of the world",
+        "germany": title_prefix + " Germany",
+        "us": title_prefix + " United States",
     }
 
     executor_category = executor.Reporter.category
