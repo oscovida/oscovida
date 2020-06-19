@@ -123,6 +123,8 @@ class BaseReport:
 
 
 class CountryReport(BaseReport):
+    category = "countries"
+
     def __init__(self, country, wwwroot='wwwroot', verbose=False):
         self.check_country_is_known(country)
 
@@ -149,7 +151,7 @@ class CountryReport(BaseReport):
 
         self._init_metadata(meta={
             'source': "CSSE Johns Hopkins",
-            'category': "world",
+            'category': self.category,
             'max-deaths': int(deaths[-1]),
             'max-cases': int(cases[-1]),
             'region': str(None),
@@ -160,6 +162,8 @@ class CountryReport(BaseReport):
 
 
 class GermanyReport(BaseReport):
+    category = "Germany"
+
     def __init__(self, region, wwwroot='wwwroot', verbose=False):
         self.region = region[0] #  Bundesland
         self.subregion = region[1] #  Kreis
@@ -185,7 +189,7 @@ class GermanyReport(BaseReport):
 
         self._init_metadata(meta={
             'source': "Robert Koch Institute",
-            'category': "Germany",
+            'category': self.category,
             'max-deaths': int(deaths[-1]),
             'max-cases': int(cases[-1]),
             'region': self.region,
@@ -208,6 +212,8 @@ class GermanyReport(BaseReport):
 
 
 class USAReport(BaseReport):
+    category = "US"
+
     def __init__(self, region, wwwroot='wwwroot', verbose=False):
         self.region = region
 
@@ -229,7 +235,7 @@ class USAReport(BaseReport):
 
         self._init_metadata(meta={
             'source': "Johns Hopkins University CSSE",
-            'category': "US",
+            'category': self.category,
             'max-deaths': int(deaths[-1]),
             'max-cases': int(cases[-1]),
             'region': self.region,
