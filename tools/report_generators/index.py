@@ -62,7 +62,7 @@ def create_markdown_index_page(executor:ReportExecutor, *,
     md_content = create_markdown_index_list(executor)
 
     title_map = {
-        "countries": title_prefix + " Countries of the world",
+        "Countries": title_prefix + " Countries of the world",
         "Germany": title_prefix + " Germany",
         "US": title_prefix + " United States",
     }
@@ -79,7 +79,9 @@ def create_markdown_index_page(executor:ReportExecutor, *,
     if pelican_file_path is None:
         pelican_file_path = f"pelican/content/{executor_category}.md"
 
-    with open(os.path.join(pelican_file_path), "tw") as f:
+    index_path = os.path.join(pelican_file_path)
+
+    with open(index_path, "tw") as f:
         f.write(f"title: {title}\n")
         # f.write(f"category: Data\n")  - have stopped using categories (22 April 2020)
         f.write(f"tags: Data, Plots, {title}\n")
@@ -91,3 +93,5 @@ def create_markdown_index_page(executor:ReportExecutor, *,
         f.write("\n")
         f.write(md_content)
         f.write("\n")
+
+    return os.path.join(pelican_file_path)
