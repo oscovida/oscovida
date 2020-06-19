@@ -1,11 +1,9 @@
 import datetime
 import os
-import subprocess
-
-from coronavirus import MetadataRegion
+from .executors import ReportExecutor
 
 
-def create_markdown_index_list(category):
+def create_markdown_index_list(executor: ReportExecutor):
     """Assemble a markdown table like this:
 
     | Country/Region                       | Total cases   | Total deaths   |
@@ -18,20 +16,7 @@ def create_markdown_index_list(category):
     and return as string.
     """
 
-    known_categories = ["world", "Germany", "US"]
-
-    # gather data
-    regions_all = MetadataRegion.get_all_as_dataframe()
-    if category in known_categories:
-        # select those we are interested in
-        regions = regions_all[regions_all['category'] == category]
-    elif category in ["all-regions"]:
-        regions = regions_all
-    else:
-
-        raise NotImplementedError(
-            f"category {category} is unknown."+
-            f" Known values are {known_categories + ['all-regions']}")
+    regions = executor.regions
 
     # change index to contain URLs and one-line summary in markdown syntax
     def compose_md_url(x):
@@ -62,9 +47,9 @@ def create_markdown_index_list(category):
 
     return regions5.to_markdown()
 
-def create_markdown_index_page(
-    md_content, title, pelican_file_path,
-    save_as, wwwroot, slug=None
+def create_markdown_index_page(executor:ReportExecutor, *,
+    save_as=None, slug=None, pelican_file_path=None,
+    title_prefix="Tracking plots: "
 ):
     """Create pelican markdown file, like this:
 
@@ -74,8 +59,25 @@ def create_markdown_index_page(
     date: 2020-04-11 08:00
     """
 
+    md_content = create_markdown_index_list(executor)
+
+    title_map = {
+        "countries": title_prefix + " Countries of the world",
+        "Germany": title_prefix + " Germany",
+        "US": title_prefix + " United States",
+    }
+
+    executor_category = executor.Reporter.category
+
+    title = title_map[executor_category]
+
+    if save_as is None:
+        save_as = executor_category
     if slug is None:
         slug = save_as
+
+    if pelican_file_path is None:
+        pelican_file_path = f"pelican/content/{executor_category}.md"
 
     with open(os.path.join(pelican_file_path), "tw") as f:
         f.write(f"title: {title}\n")
