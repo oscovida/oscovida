@@ -2,7 +2,7 @@ import logging
 import threading
 import time
 
-from coronavirus import MetadataRegion
+from oscovida import MetadataRegion
 from tqdm.notebook import trange
 
 # logging.basicConfig(

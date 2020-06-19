@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd
 from pandas import DatetimeIndex
 import matplotlib.pyplot as plt
-import coronavirus as c
+import oscovida as c
 
 
 

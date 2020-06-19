@@ -21,8 +21,8 @@ def find_version(*parts):
     raise RuntimeError("Unable to find version string.")
 
 
-setup(name="coronavirus-2020",
-      version=find_version("coronavirus", "__init__.py"),
+setup(name="oscovida",
+      version=find_version("oscovida", "__init__.py"),
       author="European XFEL GmbH",
       author_email="da-support@xfel.eu",
       maintainer="Hans Fangohr",

@@ -10,7 +10,7 @@ library and the Jupyter Notebook.
 
 ## Source code
 All the computational steps and code are available
-[here](https://github.com/fangohr/coronavirus-2020/tree/master/coronavirus).
+[here](https://github.com/fangohr/coronavirus-2020/tree/master/oscovida).
 
 ## Ways to use and execute the source code
 
