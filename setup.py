@@ -44,7 +44,10 @@ setup(name="coronavirus-2020",
           'pelican',
           'pelican-jupyter',
           'seaborn',
-          'tabulate'
+          'tabulate',
+          'ipywidgets',
+          'tqdm',
+          'ipynb_py_convert',
       ],
       extras_require={
           'test': [
