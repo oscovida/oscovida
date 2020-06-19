@@ -33,7 +33,7 @@ class BaseReport:
         self.output_ipynb_path = os.path.join(
             wwwroot, "ipynb", self.output_file_name)
         self.output_html_path = os.path.join(
-            wwwroot, "html", self.sanitise(output_file) + ".ipynb")
+            wwwroot, "html", self.sanitise(output_file) + ".html")
 
         self.create_date = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
@@ -162,7 +162,7 @@ class CountryReport(BaseReport):
 
 
 class GermanyReport(BaseReport):
-    category = "Germany"
+    category = "germany"
 
     def __init__(self, region, wwwroot='wwwroot', verbose=False):
         self.region = region[0] #  Bundesland
@@ -212,7 +212,7 @@ class GermanyReport(BaseReport):
 
 
 class USAReport(BaseReport):
-    category = "US"
+    category = "us"
 
     def __init__(self, region, wwwroot='wwwroot', verbose=False):
         self.region = region
