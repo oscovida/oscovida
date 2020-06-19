@@ -3,7 +3,7 @@ import matplotlib
 matplotlib.use("Agg")
 
 
-from coronavirus import overview, fetch_data_germany, fetch_deaths, fetch_cases
+from oscovida import overview, fetch_data_germany, fetch_deaths, fetch_cases
 
 
 def get_germany_subregion_list():

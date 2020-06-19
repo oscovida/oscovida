@@ -1,4 +1,4 @@
-from .coronavirus import *
+from .oscovida import *
 from .metadata import MetadataRegion
 
 

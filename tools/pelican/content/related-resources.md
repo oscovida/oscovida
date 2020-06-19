@@ -1,9 +1,11 @@
 title: Related resources
 tags: About
 save-as: related-resources
-date: 2020/05/03 10:00
+date: 2020/06/08 10:00
 
 # Somewhat random collection of related links
+
+- [Covid19 data portal, covid19dataportal.org](https://www.covid19dataportal.org)
 
 - [Overview of COVID 19 medical research (french)](https://lejournal.cnrs.fr/articles/visualiser-la-recherche-sur-le-coronavirus-en-un-coup-doeil)
 

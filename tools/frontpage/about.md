@@ -28,7 +28,7 @@ Dashboard: [![Voila](https://mybinder.org/badge_logo.svg)](https://mybinder.org/
   for countries, 
 - and from the [German Robert Koch Insitute (RKI)](https://npgeo-corona-npgeo-de.hub.arcgis.com/)
   for data within Germany.
-- All computational steps and code are available [here](https://github.com/fangohr/coronavirus-2020/blob/master/coronavirus.py) -- contributions and corrections welcome.
+- All computational steps and code are available [here](https://github.com/fangohr/coronavirus-2020/blob/master/oscovida.py) -- contributions and corrections welcome.
 
 ## Motivation
 

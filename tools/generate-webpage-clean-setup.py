@@ -1,8 +1,8 @@
-import coronavirus as cv
+import oscovida as osc
 
 # force download of new data
-cv.clear_cache()
+osc.clear_cache()
 
 # clear all metadata entries (cache used to compose markdown after html notebooks have been created)
-cv.MetadataRegion.clear_all()
+osc.MetadataRegion.clear_all()
 

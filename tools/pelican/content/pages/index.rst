@@ -4,14 +4,16 @@ Home
 :URL: index.html
 :save_as: index.html
 
+OCOVIDA provides an `open science <open-science.html>`__ portal to see and
+investigate the COVID19 infections and deaths as a function of time for the
+`US states <us.html>`__, the `districts in Germany <germany.html>`__,
+and most `other countries <countries.html>`__ in the world.
 
+Use OSCOVIDA to monitor the pandemic, second waves, local outbreaks and motivate
+social distancing and support for other containment measures.
 
-Welcome to the Open Science COVID19 Analysis page! Read about our
-`motivation <motivation.html>`__, `data sources <data-sources.html>`__,
-`team <team.html>`__. Use our analysis plots of COVID19 cases and deaths
-to better understand the development of the pandemic and measures taken.
-Or use `our code and extend the analysis <open-science.html>`__ for your
-own purposes, or to share here.
+Read more about our `motivation <motivation.html>`__, `data sources
+<data-sources.html>`__, `team <team.html>`__, or watch a `video interview <https://youtu.be/1_oDc_vptBQ>`__.
 
 We provide a standard a set of analysis plots (`explained here <plots.html>`__) for different regions:
 
@@ -24,6 +26,9 @@ We provide a standard a set of analysis plots (`explained here <plots.html>`__) 
 -  `Counties (Landkreise) in Germany <germany.html>`__ (Robert Koch Institute data)
 
 Occasionally, we try to `put COVID19 numbers reported in the news into context <tag-analysis.html>`__.
+
+You can `fire up your own analysis environment in the cloud, select the relevant analysis notebook yourself, re-execute or extend the analysis <https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb>`__.
+  
 
 --------------
 

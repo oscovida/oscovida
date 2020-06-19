@@ -5,12 +5,13 @@ install:
 
 dev-install:
 	python3 -m pip install -U -e .[test]
+	python3 -m pip install notebook
 
 dev-install-upgrade-depedencies:
 	python3 -m pip install --upgrade --upgrade-strategy eager -e .[test]
 
 test:
-	python3 -m pytest -v --cov=coronavirus
+	python3 -m pytest -v --cov=oscovida
 
 test-pelican:
 	cd tools && jupyter-nbconvert --execute generate-individiual-plots.ipynb

@@ -7,7 +7,7 @@ from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.writers import FilesWriter
 
-import coronavirus
+import oscovida
 import ipynb_py_convert
 
 
@@ -37,7 +37,7 @@ class BaseReport:
 
         self.create_date = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
-        self.metadata = coronavirus.MetadataRegion(self.title)
+        self.metadata = oscovida.MetadataRegion(self.title)
 
         self.init_metadata()
 
@@ -142,11 +142,11 @@ class CountryReport(BaseReport):
 
     @staticmethod
     def check_country_is_known(country):
-        d = coronavirus.fetch_deaths()
+        d = oscovida.fetch_deaths()
         assert country in d.index, f"{country} is unknown. Known countries are {sorted(d.index)}"
 
     def init_metadata(self):
-        cases, deaths, region_label = coronavirus.get_country_data(self.country)
+        cases, deaths, region_label = oscovida.get_country_data(self.country)
         one_line_summary = f"{self.country}"
 
         self._init_metadata(meta={
@@ -157,7 +157,7 @@ class CountryReport(BaseReport):
             'region': str(None),
             'subregion': str(None),
             'one-line-summary': one_line_summary,  # used as title in table
-            'cases-last-week': int(coronavirus.get_cases_last_week(cases)),
+            'cases-last-week': int(oscovida.get_cases_last_week(cases)),
         })
 
 
@@ -184,7 +184,7 @@ class GermanyReport(BaseReport):
         )
 
     def init_metadata(self):
-        cases, deaths, region_label = coronavirus.get_country_data("Germany", subregion=self.subregion)
+        cases, deaths, region_label = oscovida.get_country_data("Germany", subregion=self.subregion)
         one_line_summary = f"Germany: {self.region} : {self.subregion}"
 
         self._init_metadata(meta={
@@ -195,18 +195,18 @@ class GermanyReport(BaseReport):
             'region': self.region,
             'subregion': self.subregion,
             'one-line-summary': one_line_summary,  # used as title in table
-            'cases-last-week': int(coronavirus.get_cases_last_week(cases)),
+            'cases-last-week': int(oscovida.get_cases_last_week(cases)),
         })
 
     @staticmethod
     def germany_check_region_is_known(region):
-        d = coronavirus.fetch_data_germany()
+        d = oscovida.fetch_data_germany()
         assert region in list(d['Bundesland'].drop_duplicates()), \
             f"{region} is unknown."
 
     @staticmethod
     def germany_check_subregion__is_known(subregion):
-        d = coronavirus.fetch_data_germany()
+        d = oscovida.fetch_data_germany()
         assert subregion in list(d['Landkreis'].drop_duplicates()), \
             f"{subregion} is unknown."
 
@@ -230,7 +230,7 @@ class USAReport(BaseReport):
         )
 
     def init_metadata(self):
-        cases, deaths = coronavirus.get_region_US(self.region)
+        cases, deaths = oscovida.get_region_US(self.region)
         one_line_summary = f"US: {self.region}"
 
         self._init_metadata(meta={
@@ -241,5 +241,5 @@ class USAReport(BaseReport):
             'region': self.region,
             'subregion': str(None),
             'one-line-summary': one_line_summary,  # used as title in table
-            'cases-last-week': int(coronavirus.get_cases_last_week(cases)),
+            'cases-last-week': int(oscovida.get_cases_last_week(cases)),
         })
