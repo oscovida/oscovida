@@ -44,7 +44,10 @@ setup(name="oscovida",
           'pelican',
           'pelican-jupyter',
           'seaborn',
-          'tabulate'
+          'tabulate',
+          'tqdm',
+          'ipywidgets',
+          'ipynb_py_convert',
       ],
       extras_require={
           'test': [
