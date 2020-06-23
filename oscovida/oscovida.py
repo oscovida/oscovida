@@ -12,6 +12,8 @@ import numpy as np
 import pandas as pd
 import IPython.display
 
+from oscovida.hungary_data import get_region_hungary
+
 # choose font - can be deactivated
 from matplotlib import rcParams
 rcParams['font.family'] = 'sans-serif'
@@ -913,18 +915,32 @@ def get_country_data(country, region=None, subregion=None, verbose=False, pad_RK
         # load US data
         c, d = get_region_US(region)
         country_region = f"United States: {region}"
+
+    elif country.lower() == 'hungary':
+        # region -> térség
+        # subregion -> kistérség
+        # county -> megye
+
+        if region is not None:
+            c, d, country_region = get_region_hungary(county=region)
+
+        else:
+            c, d = get_country_data_johns_hopkins(country)
+            country_region = country
+
     else:
         c, d = get_country_data_johns_hopkins(country)
         country_region = country
 
     len_cases1 = len(c)
-    len_deaths1 = len(d)
+    # hungarian county data doesn't contain number of deaths
+    len_deaths1 = 0 if d is None else len(d)
     # resample data so we have one value per day
     c = c.resample("D").pad()
-    d = d.resample("D").pad()
+    d = None if d is None else d.resample("D").pad()
 
     len_cases2 = len(c)
-    len_deaths2 = len(d)
+    len_deaths2 = 0 if d is None else len(d)
 
     if verbose:
         print(f"get_country_data: cases [{len_cases1}] -> [{len_cases2}]")
@@ -1234,41 +1250,37 @@ def overview(country, region=None, subregion=None, savefig=False):
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
 
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
-    ax = axes[0]
-    plot_time_step(ax=ax, series=c, style="-C1", labels=(region_label, "cases"))
-    plot_time_step(ax=ax, series=d, style="-C0", labels=(region_label, "deaths"))
 
-    ax = axes[1]
-    plot_daily_change(ax=ax, series=c, color="C1", labels=(region_label, "cases"))
-    # data cleaning 
+    plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
+    plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"))
+    # data cleaning
     if country == "China":
-        ax.set_ylim(0, 5000)
+        axes[1].set_ylim(0, 5000)
     elif country == "Spain":   # https://github.com/fangohr/coronavirus-2020/issues/44
-        ax.set_ylim(bottom=0)
+        axes[1].set_ylim(bottom=0)
+    plot_reproduction_number(axes[3], series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
+    plot_doubling_time(axes[5], series=c, color="C1", labels=(region_label, "cases"))
 
+    if d is not None:
+        plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
+        plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"))
+        plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
+        plot_doubling_time(axes[5], series=d, color="C0", labels=(region_label, "deaths"))
 
-    ax = axes[2]
-    plot_daily_change(ax=ax, series=d, color="C0", labels=(region_label, "deaths"))
+    if d is None:
+        axes[2].set_visible(False)
+        axes[4].set_visible(False)
 
-
-    ax = axes[3]
+    # ax = axes[3]
     # plot_growth_factor(ax, series=d, color="C0")
     # plot_growth_factor(ax, series=c, color="C1")
-    plot_reproduction_number(ax, series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
-    ax = axes[4]
-    plot_reproduction_number(ax, series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
-
-    ax = axes[5]
-    plot_doubling_time(ax, series=d, color="C0", labels=(region_label, "deaths"))
-    plot_doubling_time(ax, series=c, color="C1", labels=(region_label, "cases"))
 
     # enforce same x-axis on all plots
-    for i in range(1, 6):
+    for i in range(1, axes.shape[0]):
         axes[i].set_xlim(axes[0].get_xlim())
-    for i in range(0, 6):
+    for i in range(0, axes.shape[0]):
         axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
         axes[i].yaxis.set_ticks_position('both')
-
 
     title = f"Overview {country}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
@@ -1296,6 +1308,9 @@ def overview(country, region=None, subregion=None, savefig=False):
         # skip comparison plot for the US states at the moment
         return_axes = axes
         return return_axes, c, d
+
+    elif country == 'Hungary':
+        return axes, c, d
     else:
         raise NotImplementedError
 

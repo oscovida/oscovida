@@ -14,3 +14,8 @@ oscovida-metadata
 tools/binder
 tools/status
 oscovida.egg-info
+
+
+#hun_related
+hun_data/
+venv/
