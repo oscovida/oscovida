@@ -249,8 +249,9 @@ def compose_dataframe_summary(cases, deaths):
     df = pd.DataFrame()
     df["total cases"] = cases
     df["daily new cases"] = cases.diff()
-    df["total deaths"] = deaths
-    df["daily new deaths"] = deaths.diff()
+    if deaths is not None:
+        df["total deaths"] = deaths
+        df["daily new deaths"] = deaths.diff()
 
     # drop first row with nan -> otherwise ints are shows as float in table
     df = df.dropna().astype(int)
