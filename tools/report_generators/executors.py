@@ -3,7 +3,7 @@ import threading
 import time
 
 from oscovida import MetadataRegion
-from tqdm.notebook import trange
+from tqdm.auto import tqdm
 
 # logging.basicConfig(
 #     format="%(asctime)s %(threadName)s: %(message)s",
@@ -14,8 +14,7 @@ from tqdm.notebook import trange
 
 class ReportExecutor:
     def __init__(self, *,
-        Reporter, wwwroot, expiry_hours=2, attempts=3, workers=0,
-        force=False, verbose=False
+        force=False, verbose=False, disable_pbar=False
     ) -> None:
         self.Reporter = Reporter
         self.wwwroot = wwwroot
@@ -24,6 +23,7 @@ class ReportExecutor:
         self.workers = workers
         self.force = force
         self.verbose = verbose
+        self.disable_pbar = disable_pbar
 
     @property
     def regions(self):
@@ -56,12 +56,19 @@ class ReportExecutor:
                                 f"retrying {attempt+1}")
 
     def _create_html_reports_serial(self, regions):
-        pbar = trange(len(regions))
+        if self.disable_pbar:
+            pbar = range(len(regions))
+        else:
+            pbar = tqdm(range(len(regions)))
+
         try:
             for i in pbar:
                 region = regions[i]
                 region_str = region[-1] if type(region) == list else region
-                pbar.set_description(f"Processing {region_str}")
+                if self.disable_pbar:
+                    logging.info(f"Processing {region_str}")
+                else:
+                    pbar.set_description(f"Processing {region_str}")
 
                 self._create_html_report_single(region)
         except KeyboardInterrupt:
