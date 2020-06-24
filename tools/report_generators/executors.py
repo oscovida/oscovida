@@ -14,9 +14,11 @@ from tqdm.auto import tqdm
 
 class ReportExecutor:
     def __init__(self, *,
+        Reporter, wwwroot, kernel_name='', expiry_hours=2, attempts=3, workers=0,
         force=False, verbose=False, disable_pbar=False
     ) -> None:
         self.Reporter = Reporter
+        self.kernel_name = kernel_name
         self.wwwroot = wwwroot
         self.expiry_hours = expiry_hours
         self.attempts = attempts
@@ -35,14 +37,17 @@ class ReportExecutor:
             if self.__stop__.is_set():
                 raise KeyboardInterrupt
 
-            logging.debug(f"Processing {region} attempt {attempt}")
+            logging.info(f"Processing {region} attempt {attempt}")
             try:
-                report = self.Reporter(region, wwwroot=self.wwwroot, verbose=self.verbose)
+                report = self.Reporter(
+                    region, wwwroot=self.wwwroot, verbose=self.verbose
+                )
+
                 recently_generated = report.metadata.last_updated_hours_ago() < self.expiry_hours
                 if recently_generated and not self.force:
                     break
 
-                report.generate()
+                report.generate(kernel_name=self.kernel_name)
                 break #  Without this break if force is on it will keep attempting
             except Exception as e:
                 if e == KeyboardInterrupt:
@@ -124,6 +129,7 @@ class ReportExecutor:
             self._create_html_reports_parallel(regions)
             while any([thread.is_alive() for thread in self.threads]):
                 try:
+                    #  running `while True` while doing nothing seems bad
                     time.sleep(0.5)
                 except KeyboardInterrupt:
                     self.__stop__.set()
