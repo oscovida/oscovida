@@ -48,6 +48,7 @@ setup(name="oscovida",
           'tqdm',
           'ipywidgets',
           'ipynb_py_convert',
+          'click',
       ],
       extras_require={
           'test': [
