@@ -9,7 +9,7 @@
 
 # %%
 %config InlineBackend.figure_formats = ['svg']
-from coronavirus import *
+from oscovida import *
 
 # %%
 {OVERVIEW_FUNCTION}({OVERVIEW_ARGS});
