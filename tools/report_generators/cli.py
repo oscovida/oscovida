@@ -124,7 +124,7 @@ def generate(*, region, workers, kernel_name, wwwroot, disable_pbar):
 @click.command()
 @click.option(
     '--regions', '-r',
-    type=click.Choice(['countries', 'germany', 'usa'], case_sensitive=False),
+    type=click.Choice(['countries', 'germany', 'usa', 'all'], case_sensitive=False),
     multiple=True,
     help='Region(s) to generate reports for.'
 )
@@ -163,9 +163,11 @@ def generate(*, region, workers, kernel_name, wwwroot, disable_pbar):
 def cli(*,
     workers, regions,
     kernel_name='', wwwroot="wwwroot", create_wwwroot=False,
-    disable_pbar=False, log_level=logging.WARNING, log_file=None,
+    disable_pbar=False, log_level='WARNING', log_file=None,
 ):
-    click.echo(locals())
+    if log_level in ['INFO', 'DEBUG']:
+        click.echo("Disabling progress bar due to log level verbosity")
+        disable_pbar = True
 
     handlers = []
     if log_file:
@@ -187,12 +189,15 @@ def cli(*,
 
     if workers == 'auto':
         workers = max(1, cpu_count())
-        # try at most 4 to reduce probability of error message like
-        # the one shown at https://github.com/jupyter/jupyter_client/issues/541
         workers = max(workers-2, 1)
 
     if workers:
         print(f'Using {workers} processes')
+
+    if 'all' in regions:
+        if len(regions) > 1:
+            raise Exception("Cannot accept multiple regions if 'all' is passed")
+        regions = ['countries', 'germany', 'usa',]
 
     for region in regions:
         generate(
