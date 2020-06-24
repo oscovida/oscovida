@@ -98,7 +98,7 @@ class BaseReport:
             print(f"Written file to {self.output_file_name}") if self.verbose else None
             self.metadata['ipynb-name'] = os.path.basename(self.output_ipynb_path)
 
-    def generate_html(self, kernel_name='python3'):
+    def generate_html(self, kernel_name=''):
         nb_executor = ExecutePreprocessor(kernel_name=kernel_name)
         nb_executor.allow_errors = True
 
@@ -117,7 +117,7 @@ class BaseReport:
             self.metadata['html-file'] = os.path.basename(self.output_html_path)
             self.metadata.mark_as_updated()
 
-    def generate(self, kernel_name='python3', template_file="./template-report.py"):
+    def generate(self, kernel_name='', template_file="./template-report.py"):
         self.generate_notebook(template_file=template_file)
         self.generate_html(kernel_name=kernel_name)
 
