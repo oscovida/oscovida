@@ -5,6 +5,8 @@ import time
 from oscovida import MetadataRegion
 from tqdm.auto import tqdm
 
+from .index import create_markdown_index_page
+
 # logging.basicConfig(
 #     format="%(asctime)s %(threadName)s: %(message)s",
 #     level=logging.DEBUG,
@@ -136,3 +138,13 @@ class ReportExecutor:
                     logging.warning(f"stopped")
         else:
             self._create_html_reports_serial(regions)
+
+    def create_markdown_index_page(self, save_as=None, slug=None, pelican_file_path=None, title_prefix="Tracking plots: "):
+        create_markdown_index_page(
+            self.regions,
+            self.Reporter.category,
+            save_as,
+            slug,
+            pelican_file_path,
+            title_prefix
+        )

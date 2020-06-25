@@ -51,7 +51,7 @@ def generate_reports_countries(*, workers, kernel_name, wwwroot, disable_pbar):
 
     cre.create_html_reports(countries)
 
-    create_markdown_index_page(cre)
+    cre.create_markdown_index_page()
 
 
 def get_germany_regions_list():
@@ -90,7 +90,7 @@ def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar):
 
     gre.create_html_reports(germany_regions)
 
-    create_markdown_index_page(gre)
+    gre.create_markdown_index_page()
 
 
 def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar):
@@ -105,7 +105,8 @@ def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar):
 
     usre.create_html_reports(states)
 
-    create_markdown_index_page(usre)
+    usre.create_markdown_index_page()
+
 
 
 def generate(*, region, workers, kernel_name, wwwroot, disable_pbar):
