@@ -1257,7 +1257,7 @@ def get_compare_data_hungary(region, compare_with_local: list, rolling=7):
     # df_d = pd.DataFrame()
     for reg in [region] + compare_with_local:
         c, d, country_subregion = get_region_hungary(county=reg)
-        label = reg
+        label = str(reg)
         df_c[label] = c.diff().rolling(rolling, center=True).mean()  # cases
         # df_d[label] = d.diff().rolling(rolling, center=True).mean()  # deaths
     return df_c, None
@@ -1340,7 +1340,7 @@ def choose_random_counties(exclude_region, size) -> list:
     return choosen
 
 
-def make_compare_plot_hungary(region, compare_with_local: list, v0c=10, v0d=1):
+def make_compare_plot_hungary(region: str, compare_with_local: list, v0c=10, v0d=1):
     rolling = 7
 
     df_c1, _ = get_compare_data_hungary(region, compare_with_local, rolling=rolling)

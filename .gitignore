@@ -18,4 +18,5 @@ oscovida.egg-info
 
 #hun_related
 hun_data/
+hun_jupyter/
 venv/
