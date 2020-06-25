@@ -103,7 +103,7 @@ class ReportExecutor:
         self.threads = []
 
         print(f"Using {self.workers} workers with tasks:")
-        for n in range(self.workers):
+        for n in range(len(regions_per_worker)):
             thread_name = f"OscovidaWorker {n}"
             if len(regions_per_worker[n]) > 5:
                 print(f"\t{thread_name}: {len(regions_per_worker[n])} regions...")
