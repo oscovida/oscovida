@@ -17,7 +17,7 @@ from .index import create_markdown_index_page
 class ReportExecutor:
     def __init__(self, *,
         Reporter, wwwroot, kernel_name='', expiry_hours=2, attempts=3, workers=0,
-        force=False, verbose=False, disable_pbar=False
+        force=False, verbose=False, disable_pbar=False, debug=False,
     ) -> None:
         self.Reporter = Reporter
         self.kernel_name = kernel_name
@@ -28,11 +28,24 @@ class ReportExecutor:
         self.force = force
         self.verbose = verbose
         self.disable_pbar = disable_pbar
+        self.debug = debug
 
     @property
     def regions(self):
         regions_all = MetadataRegion.get_all_as_dataframe()
-        return regions_all[regions_all['category'] == self.Reporter.category]
+
+        if self.Reporter.category == 'all-regions':
+            selected_regions = regions_all
+        else:
+            selected_regions = regions_all[regions_all['category'] == self.Reporter.category]
+
+        #  TODO : Not correct as regions actually returns the regions stored in
+        #  the metadata, not the regions to be analysed. This should be
+        #  clarified later on.
+        # if self.debug:
+        #     selected_regions = selected_regions[:10]
+
+        return selected_regions
 
     def _create_html_report_single(self, region) -> None:
         for attempt in range(self.attempts):

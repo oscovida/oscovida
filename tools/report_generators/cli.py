@@ -39,18 +39,22 @@ def get_country_list():
 
     return sorted(countries.drop_duplicates())
 
-def generate_reports_countries(*, workers, kernel_name, wwwroot, disable_pbar):
+def generate_reports_countries(*, workers, kernel_name, wwwroot, disable_pbar, debug):
     d, c = fetch_deaths(), fetch_cases()
 
     countries = d.index
     countries2 = c.index
     assert (countries2 == countries).all()
 
+    #  TODO: The get_x_list methods should be part of Reporter class
     countries = get_country_list()
 
     cre = ReportExecutor(Reporter=CountryReport,
         wwwroot=wwwroot, expiry_hours=2, attempts=3, workers=workers, force=True,
-        disable_pbar=disable_pbar)
+        disable_pbar=disable_pbar, debug=debug)
+
+    if debug:
+        countries = countries[:10]
 
     cre.create_html_reports(countries)
 
@@ -63,9 +67,10 @@ def get_germany_regions_list():
     ordered = land_kreis.sort_values(['Bundesland', 'Landkreis'])
     return ordered.drop_duplicates().values.tolist()
 
-def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar):
-    germany = fetch_data_germany()
+def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar, debug):
+    _ = fetch_data_germany()
 
+    #  TODO: The get_x_list methods should be part of Reporter class
     germany_regions = get_germany_regions_list()
 
     # data cleaning: on 13 April, we had a Landkreis "LK Göttingen (alt)"
@@ -89,22 +94,27 @@ def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar):
 
     gre = ReportExecutor(Reporter=GermanyReport, kernel_name=kernel_name,
         wwwroot=wwwroot, expiry_hours=2, attempts=3, workers=workers, force=True,
-        disable_pbar=disable_pbar)
+        disable_pbar=disable_pbar, debug=debug)
+
+    if debug:
+        germany_regions = germany_regions[:10]
 
     gre.create_html_reports(germany_regions)
 
     gre.create_markdown_index_page()
 
 
-def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar):
-    data_US_cases = fetch_cases_US()
-    data_US_deaths = fetch_deaths_US()
+def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar, debug):
 
+    #  TODO: The get_x_list methods should be part of Reporter class
     states = get_US_region_list()
 
     usre = ReportExecutor(Reporter=USAReport,
         wwwroot=wwwroot, expiry_hours=2, attempts=3, workers=workers, force=True,
-        disable_pbar=disable_pbar)
+        disable_pbar=disable_pbar, debug=debug)
+
+    if debug:
+        states = states[:10]
 
     usre.create_html_reports(states)
 
@@ -112,7 +122,7 @@ def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar):
 
 
 
-def generate(*, region, workers, kernel_name, wwwroot, disable_pbar):
+def generate(*, region, workers, kernel_name, wwwroot, disable_pbar, debug):
     mapping = {
         'countries': generate_reports_countries,
         'germany': generate_reports_germany,
@@ -121,7 +131,7 @@ def generate(*, region, workers, kernel_name, wwwroot, disable_pbar):
 
     mapping[region](
         workers=workers, kernel_name=kernel_name, wwwroot=wwwroot,
-        disable_pbar=disable_pbar
+        disable_pbar=disable_pbar, debug=debug,
     )
 
 
@@ -163,6 +173,11 @@ def generate(*, region, workers, kernel_name, wwwroot, disable_pbar):
 @click.option(
     '--log-file', default=None,
     help='Log file.'
+)
+@click.option(
+    '--debug', default=False,
+    is_flag=True,
+    disable_pbar=False, log_level='WARNING', log_file=None, debug=False,
 )
 def cli(*,
     workers, regions,
@@ -210,6 +225,7 @@ def cli(*,
             kernel_name=kernel_name,
             wwwroot=wwwroot,
             disable_pbar=disable_pbar,
+            debug=debug,
         )
 
 if __name__ == '__main__':
