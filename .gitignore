@@ -1,6 +1,6 @@
 .ipynb_checkpoints
 __pycache__
-tools/wwwroot
+#tools/wwwroot
 cachedir
 .DS_Store
 .venv/
@@ -10,7 +10,7 @@ tools/generate-individiual-plots.html
 tools/generate-countries.html
 .coverage
 coverage.xml
-oscovida-metadata
+#oscovida-metadata
 tools/binder
 tools/status
 oscovida.egg-info
