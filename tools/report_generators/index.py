@@ -68,6 +68,7 @@ def create_markdown_index_page(
         "countries": title_prefix + " Countries of the world",
         "germany": title_prefix + " Germany",
         "us": title_prefix + " United States",
+        "all-regions": title_prefix + " All regions and countries",
     }
 
     title = title_map[category]
