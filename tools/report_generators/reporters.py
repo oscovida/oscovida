@@ -233,13 +233,9 @@ class USAReport(BaseReport):
         cases, deaths = oscovida.get_region_US(self.region)
         one_line_summary = f"US: {self.region}"
 
-        self._init_metadata(meta={
-            'source': "Johns Hopkins University CSSE",
-            'category': self.category,
-            'max-deaths': int(deaths[-1]),
-            'max-cases': int(cases[-1]),
-            'region': self.region,
-            'subregion': str(None),
-            'one-line-summary': one_line_summary,  # used as title in table
-            'cases-last-week': int(oscovida.get_cases_last_week(cases)),
-        })
+
+class AllRegions(BaseReport):
+    category = "all-regions"
+
+    def __init__(self):
+        pass
