@@ -1,13 +1,14 @@
 import logging
 from os import cpu_count
 
+from itertools import compress
+
 import click
 
 from oscovida import *
 
 from .executors import ReportExecutor
-from .index import create_markdown_index_page
-from .reporters import CountryReport, GermanyReport, USAReport
+from .reporters import CountryReport, GermanyReport, USAReport, AllRegions
 
 
 def does_wwwroot_exist(wwwroot, create=False):
@@ -105,6 +106,8 @@ def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar, deb
 
 
 def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar, debug):
+    _ = fetch_cases_US()
+    _ = fetch_deaths_US()
 
     #  TODO: The get_x_list methods should be part of Reporter class
     states = get_US_region_list()
