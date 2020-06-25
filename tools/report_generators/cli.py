@@ -12,14 +12,17 @@ from .reporters import CountryReport, GermanyReport, USAReport
 
 def does_wwwroot_exist(wwwroot, create=False):
     if not os.path.exists(wwwroot):
-        msg = "To put the html into github repo for webhosting, run "
-        msg += '"git clone git@github.com:oscovida/oscovida.github.io.git wwwroot" or similar'
         if create:
             os.mkdir(wwwroot)
             os.mkdir(wwwroot+"/ipynb")
             os.mkdir(wwwroot+"/html")
         else:
-            raise ValueError(f"directory {wwwroot} missing.")
+            raise FileNotFoundError(
+                f"Directory {wwwroot} missing. "
+                "To put the html into github repo for webhosting, run "
+                "`git clone git@github.com:oscovida/oscovida.github.io.git"
+                "wwwroot` or similar"
+            )
 
 
 def get_country_list():
