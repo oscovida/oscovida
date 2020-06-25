@@ -1,9 +1,10 @@
 import datetime
 import os
-from .executors import ReportExecutor
+
+from pandas import DataFrame
 
 
-def create_markdown_index_list(executor: ReportExecutor):
+def create_markdown_index_list(regions: DataFrame):
     """Assemble a markdown table like this:
 
     | Country/Region                       | Total cases   | Total deaths   |
@@ -15,8 +16,6 @@ def create_markdown_index_list(executor: ReportExecutor):
 
     and return as string.
     """
-
-    regions = executor.regions
 
     # change index to contain URLs and one-line summary in markdown syntax
     def compose_md_url(x):
@@ -47,8 +46,12 @@ def create_markdown_index_list(executor: ReportExecutor):
 
     return regions5.to_markdown()
 
-def create_markdown_index_page(executor:ReportExecutor, *,
-    save_as=None, slug=None, pelican_file_path=None,
+def create_markdown_index_page(
+    regions: DataFrame,
+    category: str,
+    save_as=None,
+    slug=None,
+    pelican_file_path=None,
     title_prefix="Tracking plots: "
 ):
     """Create pelican markdown file, like this:
@@ -59,7 +62,7 @@ def create_markdown_index_page(executor:ReportExecutor, *,
     date: 2020-04-11 08:00
     """
 
-    md_content = create_markdown_index_list(executor)
+    md_content = create_markdown_index_list(regions)
 
     title_map = {
         "countries": title_prefix + " Countries of the world",
@@ -67,17 +70,15 @@ def create_markdown_index_page(executor:ReportExecutor, *,
         "us": title_prefix + " United States",
     }
 
-    executor_category = executor.Reporter.category
-
-    title = title_map[executor_category]
+    title = title_map[category]
 
     if save_as is None:
-        save_as = executor_category
+        save_as = category
     if slug is None:
         slug = save_as
 
     if pelican_file_path is None:
-        pelican_file_path = f"pelican/content/{executor_category}.md"
+        pelican_file_path = f"pelican/content/{category}.md"
 
     index_path = os.path.join(pelican_file_path)
 
