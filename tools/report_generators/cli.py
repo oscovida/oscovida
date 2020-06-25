@@ -80,17 +80,17 @@ def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar, deb
 
     alt_data_sets = ["(alt)" in r[1].lower() for r in germany_regions]
     if sum(alt_data_sets) > 0:
-        bad_datasests = list(compress(germany_regions, alt_data_sets))
+        bad_datasets = list(compress(germany_regions, alt_data_sets))
 
-        print(f"Removing datasets label with '(alt)': {bad_datasests}")
+        print(f"Removing datasets label with '(alt)': {bad_datasets}")
 
-        for bd in bad_datasests:
+        for bd in bad_datasets:
             c, d, _ = germany_get_region(landkreis=bd[1])
             print(f"\tremoved: {bd} : len(cases)={len(c)}, len(deaths)={len(d)}")
 
-        bad_indecies = list(compress(range(len(alt_data_sets)), alt_data_sets))
+        bad_indices = list(compress(range(len(alt_data_sets)), alt_data_sets))
 
-        [germany_regions.pop(i) for i in bad_indecies]
+        [germany_regions.pop(i) for i in bad_indices]
 
     gre = ReportExecutor(Reporter=GermanyReport, kernel_name=kernel_name,
         wwwroot=wwwroot, expiry_hours=2, attempts=3, workers=workers, force=True,
