@@ -124,12 +124,18 @@ def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar, debug):
     usre.create_markdown_index_page()
 
 
+def generate_markdown_all_regions(*, workers, kernel_name, wwwroot, disable_pbar, debug):
+    arre = ReportExecutor(Reporter=AllRegions, wwwroot=wwwroot)
+
+    arre.create_markdown_index_page()
+
 
 def generate(*, region, workers, kernel_name, wwwroot, disable_pbar, debug):
     mapping = {
         'countries': generate_reports_countries,
         'germany': generate_reports_germany,
         'usa': generate_reports_usa,
+        'all-regions-md': generate_markdown_all_regions,
     }
 
     mapping[region](
@@ -141,7 +147,7 @@ def generate(*, region, workers, kernel_name, wwwroot, disable_pbar, debug):
 @click.command()
 @click.option(
     '--regions', '-r',
-    type=click.Choice(['countries', 'germany', 'usa', 'all'], case_sensitive=False),
+    type=click.Choice(['countries', 'germany', 'usa', 'all-regions-md', 'all'], case_sensitive=False),
     multiple=True,
     help='Region(s) to generate reports for.'
 )
@@ -180,12 +186,12 @@ def generate(*, region, workers, kernel_name, wwwroot, disable_pbar, debug):
 @click.option(
     '--debug', default=False,
     is_flag=True,
-    disable_pbar=False, log_level='WARNING', log_file=None, debug=False,
+    help='Enable debug mode, uses a small subset of regions.'
 )
 def cli(*,
     workers, regions,
     kernel_name='', wwwroot="wwwroot", create_wwwroot=False,
-    disable_pbar=False, log_level='WARNING', log_file=None,
+    disable_pbar=False, log_level='WARNING', log_file=None, debug=False,
 ):
     if log_level in ['INFO', 'DEBUG']:
         click.echo("Disabling progress bar due to log level verbosity")
@@ -219,7 +225,7 @@ def cli(*,
     if 'all' in regions:
         if len(regions) > 1:
             raise Exception("Cannot accept multiple regions if 'all' is passed")
-        regions = ['countries', 'germany', 'usa',]
+        regions = ['countries', 'germany', 'usa', 'all-regions-md']
 
     for region in regions:
         generate(
