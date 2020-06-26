@@ -1,4 +1,3 @@
-import datetime
 import json
 import os
 
@@ -41,8 +40,6 @@ class BaseReport:
             wwwroot, "html", self.sanitise(output_file) + ".html"
         )
 
-        self.create_date = datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
         self.metadata = oscovida.MetadataRegion(self.title)
 
         self.init_metadata()
@@ -72,7 +69,6 @@ class BaseReport:
             "TITLE": self.title,
             "COUNTRY": self.country,
             "BINDER_URL": self.get_binder_url,
-            "CREATION_DATE": self.create_date,
             "OVERVIEW_FUNCTION": self.overview_function,
             "OVERVIEW_ARGS": self.overview_args,
             "DATA_LOAD_FUNCTION": self.data_load_function,

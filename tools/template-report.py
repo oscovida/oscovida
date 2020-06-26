@@ -4,8 +4,13 @@
 
 * Homepage of project: https://oscovida.github.io
 * [Execute this Jupyter Notebook using myBinder]({BINDER_URL})
-* notebook creation time: {CREATION_DATE}
 """
+
+# %%
+import datetime
+
+start = datetime.datetime.now()
+print(f"Notebook executed on: {{start.strftime('%d/%m/%Y %H:%M:%S')}}")
 
 # %%
 %config InlineBackend.figure_formats = ['svg']
@@ -57,3 +62,6 @@ print(f"Download of data from Johns Hopkins university: cases at {{fetch_cases_l
 
 # %%
 # to force a fresh download of data, run "clear_cache()"
+
+# %%
+print(f"Notebook execution took: {{datetime.datetime.now()-start}}")
