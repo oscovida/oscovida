@@ -4,47 +4,56 @@ import os
 from pandas import DataFrame
 
 
+# change index to contain URLs and one-line summary in markdown syntax
+def compose_md_url(x):
+    one_line_summary, html = x
+    if isinstance(html, str):
+        return "[" + one_line_summary + "](" + os.path.join("html", html) + ")"
+    # if html was not produced, then variable html is np.nan
+    elif repr(html) == "nan":
+        print(
+            f"Missing html for {one_line_summary} - will not add link to "
+            f"html: \n{x}"
+        )
+        return one_line_summary
+    else:
+        raise NotImplementedError(
+            "Don't know how to proceed: ", one_line_summary, html, x
+        )
+
+
 def create_markdown_index_list(regions: DataFrame):
-    """Assemble a markdown table like this:
+    # Assemble a markdown table like this:
+    #
+    # | Country/Region                       | Total cases   | Total deaths   |
+    # |:-------------------------------------|:--------------|:---------------|
+    # | [Afghanistan](html/Afghanistan.html) | 1,351         | 43             |
+    # | [Albania](html/Albania.html)         | 678           | 27             |
+    # | [Algeria](html/Algeria.html)         | 3,127         | 415            |
+    # | [Andorra](html/Andorra.html)         | 731           | 40             |
+    #
+    # and return as string.
 
-    | Country/Region                       | Total cases   | Total deaths   |
-    |:-------------------------------------|:--------------|:---------------|
-    | [Afghanistan](html/Afghanistan.html) | 1,351         | 43             |
-    | [Albania](html/Albania.html)         | 678           | 27             |
-    | [Algeria](html/Algeria.html)         | 3,127         | 415            |
-    | [Andorra](html/Andorra.html)         | 731           | 40             |
-
-    and return as string.
-    """
-
-    # change index to contain URLs and one-line summary in markdown syntax
-    def compose_md_url(x):
-        one_line_summary, html = x
-        if isinstance(html, str):
-            return "[" + one_line_summary + "](" + os.path.join('html', html) +")"
-        elif repr(html) == 'nan':   # if html was not produced, then variable html is np.nan
-            print(f"Missing html for {one_line_summary} - will not add link to html: \n{x}")
-            return one_line_summary
-        else:
-            raise NotImplementedError("Don't know how to proceed: ", one_line_summary, html, x)
-
-    new_index = regions[['one-line-summary', 'html-file']].apply(compose_md_url, axis=1)
+    new_index = regions[["one-line-summary", "html-file"]].apply(compose_md_url, axis=1)
     regions2 = regions.set_index(new_index)
     regions2.index.name = "Location"
 
     # select columns
-    regions3 = regions2[['max-cases', 'max-deaths', 'cases-last-week']]
-    regions4 = regions3.applymap(lambda v: '{:,}'.format(v))  # Thousands comma separator
+    regions3 = regions2[["max-cases", "max-deaths", "cases-last-week"]]
+    regions4 = regions3.applymap(
+        lambda v: "{:,}".format(v)
+    )  # Thousands comma separator
 
     # rename columns
     rename_dict = {
-        'max-cases' : 'Total cases',
-        'max-deaths' : 'Total deaths',
-        'cases-last-week' : 'New cases last week'
+        "max-cases": "Total cases",
+        "max-deaths": "Total deaths",
+        "cases-last-week": "New cases last week",
     }
     regions5 = regions4.rename(columns=rename_dict)
 
     return regions5.to_markdown()
+
 
 def create_markdown_index_page(
     regions: DataFrame,
@@ -52,7 +61,7 @@ def create_markdown_index_page(
     save_as=None,
     slug=None,
     pelican_file_path=None,
-    title_prefix="Tracking plots: "
+    title_prefix="Tracking plots: ",
 ):
     """Create pelican markdown file, like this:
 

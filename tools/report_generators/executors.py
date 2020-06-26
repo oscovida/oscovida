@@ -15,9 +15,19 @@ from .index import create_markdown_index_page
 
 
 class ReportExecutor:
-    def __init__(self, *,
-        Reporter, wwwroot, kernel_name='', expiry_hours=2, attempts=3, workers=0,
-        force=False, verbose=False, disable_pbar=False, debug=False,
+    def __init__(
+        self,
+        *,
+        Reporter,
+        wwwroot,
+        kernel_name="",
+        expiry_hours=2,
+        attempts=3,
+        workers=0,
+        force=False,
+        verbose=False,
+        disable_pbar=False,
+        debug=False,
     ) -> None:
         self.Reporter = Reporter
         self.kernel_name = kernel_name
@@ -34,10 +44,12 @@ class ReportExecutor:
     def regions(self):
         regions_all = MetadataRegion.get_all_as_dataframe()
 
-        if self.Reporter.category == 'all-regions':
+        if self.Reporter.category == "all-regions":
             selected_regions = regions_all
         else:
-            selected_regions = regions_all[regions_all['category'] == self.Reporter.category]
+            selected_regions = regions_all[
+                regions_all["category"] == self.Reporter.category
+            ]
 
         #  TODO : Not correct as regions actually returns the regions stored in
         #  the metadata, not the regions to be analysed. This should be
@@ -58,12 +70,14 @@ class ReportExecutor:
                     region, wwwroot=self.wwwroot, verbose=self.verbose
                 )
 
-                recently_generated = report.metadata.last_updated_hours_ago() < self.expiry_hours
+                recently_generated = (
+                    report.metadata.last_updated_hours_ago() < self.expiry_hours
+                )
                 if recently_generated and not self.force:
                     break
 
                 report.generate(kernel_name=self.kernel_name)
-                break #  Without this break if force is on it will keep attempting
+                break  #  Without this break if force is on it will keep attempting
             except Exception as e:
                 if e == KeyboardInterrupt:
                     raise e
@@ -72,8 +86,9 @@ class ReportExecutor:
                     logging.warning(f"Processing {region} error\n{e}")
                     raise e
 
-                logging.warning(f"Processing {region} error {type(e)}, "
-                                f"retrying {attempt+1}")
+                logging.warning(
+                    f"Processing {region} error {type(e)}, retrying {attempt+1}"
+                )
 
     def _create_html_reports_serial(self, regions):
         if self.disable_pbar:
@@ -105,13 +120,10 @@ class ReportExecutor:
         regions_per_worker = [[] for p in range(self.workers)]
         [
             regions_per_worker[w].append(r)
-            for w, r
-            in zip(list(range(self.workers)) * per_worker, regions)
+            for w, r in zip(list(range(self.workers)) * per_worker, regions)
         ]
         regions_per_worker = [
-            list(filter(None.__ne__, worker))
-            for worker
-            in regions_per_worker
+            list(filter(None.__ne__, worker)) for worker in regions_per_worker
         ]
         regions_per_worker = list(filter(None, regions_per_worker))
 
@@ -128,7 +140,7 @@ class ReportExecutor:
             t = threading.Thread(
                 target=self._create_html_reports_serial,
                 args=(tuple(regions_per_worker[n]),),
-                name=thread_name
+                name=thread_name,
             )
 
             self.threads.append(t)
@@ -152,12 +164,18 @@ class ReportExecutor:
         else:
             self._create_html_reports_serial(regions)
 
-    def create_markdown_index_page(self, save_as=None, slug=None, pelican_file_path=None, title_prefix="Tracking plots: "):
+    def create_markdown_index_page(
+        self,
+        save_as=None,
+        slug=None,
+        pelican_file_path=None,
+        title_prefix="Tracking plots: ",
+    ):
         create_markdown_index_page(
             self.regions,
             self.Reporter.category,
             save_as,
             slug,
             pelican_file_path,
-            title_prefix
+            title_prefix,
         )

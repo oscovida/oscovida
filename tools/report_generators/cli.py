@@ -15,8 +15,8 @@ def does_wwwroot_exist(wwwroot, create=False):
     if not os.path.exists(wwwroot):
         if create:
             os.mkdir(wwwroot)
-            os.mkdir(wwwroot+"/ipynb")
-            os.mkdir(wwwroot+"/html")
+            os.mkdir(wwwroot + "/ipynb")
+            os.mkdir(wwwroot + "/html")
         else:
             raise FileNotFoundError(
                 f"Directory {wwwroot} missing. "
@@ -40,6 +40,7 @@ def get_country_list():
 
     return sorted(countries.drop_duplicates())
 
+
 def generate_reports_countries(*, workers, kernel_name, wwwroot, disable_pbar, debug):
     d, c = fetch_deaths(), fetch_cases()
 
@@ -50,9 +51,16 @@ def generate_reports_countries(*, workers, kernel_name, wwwroot, disable_pbar, d
     #  TODO: The get_x_list methods should be part of Reporter class
     countries = get_country_list()
 
-    cre = ReportExecutor(Reporter=CountryReport,
-        wwwroot=wwwroot, expiry_hours=2, attempts=3, workers=workers, force=True,
-        disable_pbar=disable_pbar, debug=debug)
+    cre = ReportExecutor(
+        Reporter=CountryReport,
+        wwwroot=wwwroot,
+        expiry_hours=2,
+        attempts=3,
+        workers=workers,
+        force=True,
+        disable_pbar=disable_pbar,
+        debug=debug,
+    )
 
     if debug:
         countries = countries[:10]
@@ -64,9 +72,10 @@ def generate_reports_countries(*, workers, kernel_name, wwwroot, disable_pbar, d
 
 def get_germany_regions_list():
     data_germany = fetch_data_germany()
-    land_kreis = data_germany[['Bundesland', 'Landkreis']]
-    ordered = land_kreis.sort_values(['Bundesland', 'Landkreis'])
+    land_kreis = data_germany[["Bundesland", "Landkreis"]]
+    ordered = land_kreis.sort_values(["Bundesland", "Landkreis"])
     return ordered.drop_duplicates().values.tolist()
+
 
 def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar, debug):
     _ = fetch_data_germany()
@@ -93,9 +102,17 @@ def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar, deb
 
         [germany_regions.pop(i) for i in bad_indices]
 
-    gre = ReportExecutor(Reporter=GermanyReport, kernel_name=kernel_name,
-        wwwroot=wwwroot, expiry_hours=2, attempts=3, workers=workers, force=True,
-        disable_pbar=disable_pbar, debug=debug)
+    gre = ReportExecutor(
+        Reporter=GermanyReport,
+        kernel_name=kernel_name,
+        wwwroot=wwwroot,
+        expiry_hours=2,
+        attempts=3,
+        workers=workers,
+        force=True,
+        disable_pbar=disable_pbar,
+        debug=debug,
+    )
 
     if debug:
         germany_regions = germany_regions[:10]
@@ -112,9 +129,16 @@ def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar, debug):
     #  TODO: The get_x_list methods should be part of Reporter class
     states = get_US_region_list()
 
-    usre = ReportExecutor(Reporter=USAReport,
-        wwwroot=wwwroot, expiry_hours=2, attempts=3, workers=workers, force=True,
-        disable_pbar=disable_pbar, debug=debug)
+    usre = ReportExecutor(
+        Reporter=USAReport,
+        wwwroot=wwwroot,
+        expiry_hours=2,
+        attempts=3,
+        workers=workers,
+        force=True,
+        disable_pbar=disable_pbar,
+        debug=debug,
+    )
 
     if debug:
         states = states[:10]
@@ -124,7 +148,9 @@ def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar, debug):
     usre.create_markdown_index_page()
 
 
-def generate_markdown_all_regions(*, workers, kernel_name, wwwroot, disable_pbar, debug):
+def generate_markdown_all_regions(
+    *, workers, kernel_name, wwwroot, disable_pbar, debug
+):
     arre = ReportExecutor(Reporter=AllRegions, wwwroot=wwwroot)
 
     arre.create_markdown_index_page()
@@ -132,68 +158,79 @@ def generate_markdown_all_regions(*, workers, kernel_name, wwwroot, disable_pbar
 
 def generate(*, region, workers, kernel_name, wwwroot, disable_pbar, debug):
     mapping = {
-        'countries': generate_reports_countries,
-        'germany': generate_reports_germany,
-        'usa': generate_reports_usa,
-        'all-regions-md': generate_markdown_all_regions,
+        "countries": generate_reports_countries,
+        "germany": generate_reports_germany,
+        "usa": generate_reports_usa,
+        "all-regions-md": generate_markdown_all_regions,
     }
 
     mapping[region](
-        workers=workers, kernel_name=kernel_name, wwwroot=wwwroot,
-        disable_pbar=disable_pbar, debug=debug,
+        workers=workers,
+        kernel_name=kernel_name,
+        wwwroot=wwwroot,
+        disable_pbar=disable_pbar,
+        debug=debug,
     )
 
 
 @click.command()
 @click.option(
-    '--regions', '-r',
-    type=click.Choice(['countries', 'germany', 'usa', 'all-regions-md', 'all'], case_sensitive=False),
+    "--regions",
+    "-r",
+    type=click.Choice(
+        ["countries", "germany", "usa", "all-regions-md", "all"], case_sensitive=False
+    ),
     multiple=True,
-    help='Region(s) to generate reports for.'
+    help="Region(s) to generate reports for.",
 )
 @click.option(
-    '--workers', default='auto',
+    "--workers",
+    default="auto",
     help="Number of workers to use, 'auto' uses nproc-2, set to 1 or False to "
-         "use a single process."
+    "use a single process.",
 )
+@click.option("--wwwroot", default="./wwwroot", help="Root directory for www content.")
 @click.option(
-    '--wwwroot', default='./wwwroot',
-    help='Root directory for www content.'
-)
-@click.option(
-    '--create-wwwroot', default=False,
+    "--create-wwwroot",
+    default=False,
     is_flag=True,
-    help='Create wwwroot directory if it does not exist.'
+    help="Create wwwroot directory if it does not exist.",
 )
 @click.option(
-    '--kernel-name', default='',
-    help='Create wwwroot directory if it does not exist.'
+    "--kernel-name", default="", help="Create wwwroot directory if it does not exist."
 )
 @click.option(
-    '--disable-pbar', default=False,
+    "--disable-pbar",
+    default=False,
     is_flag=True,
-    help='Disable progress bar, print logging output instead.'
+    help="Disable progress bar, print logging output instead.",
 )
 @click.option(
-    '--log-level', default='WARNING',
-    type=click.Choice(['CRITICAL', 'ERROR', 'WARNING', 'INFO', 'DEBUG']),
-    help='Log level.'
+    "--log-level",
+    default="WARNING",
+    type=click.Choice(["CRITICAL", "ERROR", "WARNING", "INFO", "DEBUG"]),
+    help="Log level.",
 )
+@click.option("--log-file", default=None, help="Log file.")
 @click.option(
-    '--log-file', default=None,
-    help='Log file.'
-)
-@click.option(
-    '--debug', default=False,
+    "--debug",
+    default=False,
     is_flag=True,
-    help='Enable debug mode, uses a small subset of regions.'
+    help="Enable debug mode, uses a small subset of regions.",
 )
-def cli(*,
-    workers, regions,
-    kernel_name='', wwwroot="wwwroot", create_wwwroot=False,
-    disable_pbar=False, log_level='WARNING', log_file=None, debug=False,
+def cli(
+    *,
+    workers,
+    regions,
+    kernel_name="",
+    wwwroot="wwwroot",
+    create_wwwroot=False,
+    disable_pbar=False,
+    log_level="WARNING",
+    log_file=None,
+    debug=False,
 ):
-    if log_level in ['INFO', 'DEBUG']:
+    if log_level in ["INFO", "DEBUG"]:
         click.echo("Disabling progress bar due to log level verbosity")
         disable_pbar = True
 
@@ -207,25 +244,25 @@ def cli(*,
         format="%(asctime)s %(threadName)s: %(message)s",
         level=log_level,
         handlers=handlers,
-        datefmt="%H:%M:%S"
+        datefmt="%H:%M:%S",
     )
 
     does_wwwroot_exist(wwwroot, create=create_wwwroot)
 
     #  Disable pandas scientific notation
-    pd.set_option('display.float_format', '{:.2f}'.format)
+    pd.set_option("display.float_format", "{:.2f}".format)
 
-    if workers == 'auto':
+    if workers == "auto":
         workers = max(1, cpu_count())
-        workers = max(workers-2, 1)
+        workers = max(workers - 2, 1)
 
     if workers:
-        print(f'Using {workers} processes')
+        print(f"Using {workers} processes")
 
-    if 'all' in regions:
+    if "all" in regions:
         if len(regions) > 1:
             raise Exception("Cannot accept multiple regions if 'all' is passed")
-        regions = ['countries', 'germany', 'usa', 'all-regions-md']
+        regions = ["countries", "germany", "usa", "all-regions-md"]
 
     for region in regions:
         generate(
@@ -237,5 +274,6 @@ def cli(*,
             debug=debug,
         )
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     cli()
