@@ -1,4 +1,5 @@
 import datetime
+import logging
 import os
 
 from pandas import DataFrame
@@ -52,6 +53,8 @@ def create_markdown_index_list(regions: DataFrame):
     }
     regions5 = regions4.rename(columns=rename_dict)
 
+    logging.info(f"{len(regions5)} regions in markdown index list")
+
     return regions5.to_markdown()
 
 
@@ -104,5 +107,7 @@ def create_markdown_index_page(
         f.write("\n")
         f.write(md_content)
         f.write("\n")
+
+    logging.info(f"Created markdown index file {pelican_file_path}")
 
     return os.path.join(pelican_file_path)
