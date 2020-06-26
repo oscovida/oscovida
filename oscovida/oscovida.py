@@ -1358,26 +1358,27 @@ def make_compare_plot_hungary(region: str, compare_with_local: list, v0c=10, v0d
                       "daily new cases\n(rolling 7-day mean)",
                       v0=v0c, highlight={res_c.columns[0]: "C1"}, labeloffset=0.5)
 
-    # plot_no_data_available(axes[1])
+    # plot_no_data_available(axes[1], mimic_subplot=axes[0], text="daily new deaths\n(rolling 7-day mean)")
     axes[1].set_visible(False)
 
     title = f"Daily cases for Hungary: {label_from_region_subregion(region)}"
     axes[0].set_title(title)
-
+    fig.tight_layout(pad=1)
     return axes, res_c, None
 
 
-def plot_no_data_available(ax, ylabel='', xlabel=''):
-    # not working size mismatch
-    ax.text(0.5, 0.5, 'No data available',
+def plot_no_data_available(ax, mimic_subplot, text):
+    # Hungary county deaths data missing
+    xticks = mimic_subplot.get_xticks()
+    yticks = mimic_subplot.get_yticks()
+    ax.set_xticks(xticks)
+    ax.set_yticks(yticks)
+    ax.text(xticks.mean(), yticks.mean(),
+            f'No data available\n to plot {text}',
             horizontalalignment='center',
-            verticalalignment='center',
-            fontsize=1000,
-    )
-    if ylabel != '':
-        ax.set_ylabel(ylabel)
-    if xlabel != '':
-        ax.set_xlabel(xlabel)
+            verticalalignment='center')
+    ax.set_yticklabels([])
+    ax.set_xticklabels([])
 
 
 def overview(country, region=None, subregion=None, savefig=False):
@@ -1400,12 +1401,11 @@ def overview(country, region=None, subregion=None, savefig=False):
         plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"))
         plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
         plot_doubling_time(axes[5], series=d, color="C0", labels=(region_label, "deaths"))
-
     if d is None:
-        # plot_no_data_available(axes[2], ylabel='daily change')
-        # plot_no_data_available(axes[4], ylabel='daily growth factor')
-        axes[2].set_visible(False)
-        axes[4].set_visible(False)
+        plot_no_data_available(axes[2], mimic_subplot=axes[1], text='daily change in deaths')
+        plot_no_data_available(axes[4], mimic_subplot=axes[3], text='R & growth factor (based on deaths)')
+        # axes[2].set_visible(False)
+        # axes[4].set_visible(False)
 
     # ax = axes[3]
     # plot_growth_factor(ax, series=d, color="C0")
@@ -1439,6 +1439,7 @@ def overview(country, region=None, subregion=None, savefig=False):
         # laender = list(germany['Bundesland'].drop_duplicates().sort_values())
         axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
                                                                # compare_with_local=laender)
+        fig.tight_layout(pad=10)
         return_axes = np.concatenate([axes, axes_compare])
     elif country=="US" and region is not None:
         # skip comparison plot for the US states at the moment
@@ -1446,9 +1447,9 @@ def overview(country, region=None, subregion=None, savefig=False):
         return return_axes, c, d
 
     elif country == 'Hungary':
+        # choosing random counties. not sure if this make sense or not because not every county has enough data.
         with_local = choose_random_counties(exclude_region=region, size=18)
         axes_compare, res_c, red_d = make_compare_plot_hungary(region, compare_with_local=with_local)
-
         return_axes = np.concatenate([axes, axes_compare])
         return return_axes, c, d
     else:
