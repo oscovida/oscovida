@@ -41,7 +41,7 @@ def get_country_list():
     return sorted(countries.drop_duplicates())
 
 
-def generate_reports_countries(*, workers, kernel_name, wwwroot, disable_pbar, debug):
+def generate_reports_countries(*, workers, kernel_name, wwwroot, force, disable_pbar, debug):
     d, c = fetch_deaths(), fetch_cases()
 
     countries = d.index
@@ -57,7 +57,7 @@ def generate_reports_countries(*, workers, kernel_name, wwwroot, disable_pbar, d
         expiry_hours=2,
         attempts=3,
         workers=workers,
-        force=True,
+        force=force,
         disable_pbar=disable_pbar,
         debug=debug,
     )
@@ -77,7 +77,7 @@ def get_germany_regions_list():
     return ordered.drop_duplicates().values.tolist()
 
 
-def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar, debug):
+def generate_reports_germany(*, workers, kernel_name, wwwroot, force, disable_pbar, debug):
     _ = fetch_data_germany()
 
     #  TODO: The get_x_list methods should be part of Reporter class
@@ -109,7 +109,7 @@ def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar, deb
         expiry_hours=2,
         attempts=3,
         workers=workers,
-        force=True,
+        force=force,
         disable_pbar=disable_pbar,
         debug=debug,
     )
@@ -122,7 +122,7 @@ def generate_reports_germany(*, workers, kernel_name, wwwroot, disable_pbar, deb
     gre.create_markdown_index_page()
 
 
-def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar, debug):
+def generate_reports_usa(*, workers, kernel_name, wwwroot, force, disable_pbar, debug):
     _ = fetch_cases_US()
     _ = fetch_deaths_US()
 
@@ -135,7 +135,7 @@ def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar, debug):
         expiry_hours=2,
         attempts=3,
         workers=workers,
-        force=True,
+        force=force,
         disable_pbar=disable_pbar,
         debug=debug,
     )
@@ -149,14 +149,14 @@ def generate_reports_usa(*, workers, kernel_name, wwwroot, disable_pbar, debug):
 
 
 def generate_markdown_all_regions(
-    *, workers, kernel_name, wwwroot, disable_pbar, debug
+    *, workers, kernel_name, wwwroot, force, disable_pbar, debug
 ):
     arre = ReportExecutor(Reporter=AllRegions, wwwroot=wwwroot)
 
     arre.create_markdown_index_page()
 
 
-def generate(*, region, workers, kernel_name, wwwroot, disable_pbar, debug):
+def generate(*, region, workers, kernel_name, wwwroot, force, disable_pbar, debug):
     mapping = {
         "countries": generate_reports_countries,
         "germany": generate_reports_germany,
@@ -169,6 +169,7 @@ def generate(*, region, workers, kernel_name, wwwroot, disable_pbar, debug):
         kernel_name=kernel_name,
         wwwroot=wwwroot,
         disable_pbar=disable_pbar,
+        force=force,
         debug=debug,
     )
 
@@ -213,6 +214,12 @@ def generate(*, region, workers, kernel_name, wwwroot, disable_pbar, debug):
 )
 @click.option("--log-file", default=None, help="Log file.")
 @click.option(
+    "--force",
+    default=False,
+    is_flag=True,
+    help="Force notebook re-execution even if recently executed.",
+)
+@click.option(
     "--debug",
     default=False,
     is_flag=True,
@@ -228,6 +235,7 @@ def cli(
     disable_pbar=False,
     log_level="WARNING",
     log_file=None,
+    force=False,
     debug=False,
 ):
     if log_level in ["INFO", "DEBUG"]:
@@ -271,6 +279,7 @@ def cli(
             kernel_name=kernel_name,
             wwwroot=wwwroot,
             disable_pbar=disable_pbar,
+            force=force,
             debug=debug,
         )
 
