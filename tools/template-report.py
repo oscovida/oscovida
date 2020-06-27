@@ -10,7 +10,7 @@
 import datetime
 
 start = datetime.datetime.now()
-print(f"Notebook executed on: {{start.strftime('%d/%m/%Y %H:%M:%S')}}")
+print(f"Notebook executed on: {{start.strftime('%d/%m/%Y %H:%M:%S')}} UTC")
 
 # %%
 %config InlineBackend.figure_formats = ['svg']
