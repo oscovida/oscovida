@@ -8,9 +8,10 @@
 
 # %%
 import datetime
+import time
 
 start = datetime.datetime.now()
-print(f"Notebook executed on: {{start.strftime('%d/%m/%Y %H:%M:%S')}} UTC")
+print(f"Notebook executed on: {{start.strftime('%d/%m/%Y %H:%M:%S%Z')}} {{time.tzname[time.daylight]}}")
 
 # %%
 %config InlineBackend.figure_formats = ['svg']

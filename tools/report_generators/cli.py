@@ -264,6 +264,8 @@ def cli(
     if workers == "auto":
         workers = max(1, os.cpu_count())
         workers = max(workers - 2, 1)
+    elif workers =="max":
+        workers = os.cpu_count()
 
     if workers:
         print(f"Using {workers} processes")
