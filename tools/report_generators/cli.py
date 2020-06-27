@@ -1,14 +1,13 @@
 import logging
-from os import cpu_count
-
+import os
 from itertools import compress
 
 import click
-
-from oscovida import *
+import oscovida
+import pandas
 
 from .executors import ReportExecutor
-from .reporters import CountryReport, GermanyReport, USAReport, AllRegions
+from .reporters import AllRegions, CountryReport, GermanyReport, USAReport
 
 
 def does_wwwroot_exist(wwwroot, create=False):
@@ -27,7 +26,8 @@ def does_wwwroot_exist(wwwroot, create=False):
 
 
 def get_country_list():
-    d, c = fetch_deaths(), fetch_cases()
+    d = oscovida.fetch_deaths()
+    c = oscovida.fetch_cases()
 
     countries = d.index
     countries2 = c.index
@@ -42,7 +42,8 @@ def get_country_list():
 
 
 def generate_reports_countries(*, workers, kernel_name, wwwroot, force, disable_pbar, debug):
-    d, c = fetch_deaths(), fetch_cases()
+    d = oscovida.fetch_deaths()
+    c = oscovida.fetch_cases()
 
     countries = d.index
     countries2 = c.index
@@ -71,14 +72,14 @@ def generate_reports_countries(*, workers, kernel_name, wwwroot, force, disable_
 
 
 def get_germany_regions_list():
-    data_germany = fetch_data_germany()
+    data_germany = oscovida.fetch_data_germany()
     land_kreis = data_germany[["Bundesland", "Landkreis"]]
     ordered = land_kreis.sort_values(["Bundesland", "Landkreis"])
     return ordered.drop_duplicates().values.tolist()
 
 
 def generate_reports_germany(*, workers, kernel_name, wwwroot, force, disable_pbar, debug):
-    _ = fetch_data_germany()
+    _ = oscovida.fetch_data_germany()
 
     #  TODO: The get_x_list methods should be part of Reporter class
     germany_regions = get_germany_regions_list()
@@ -95,7 +96,7 @@ def generate_reports_germany(*, workers, kernel_name, wwwroot, force, disable_pb
         print(f"Removing datasets label with '(alt)': {bad_datasets}")
 
         for bd in bad_datasets:
-            c, d, _ = germany_get_region(landkreis=bd[1])
+            c, d, _ = oscovida.germany_get_region(landkreis=bd[1])
             print(f"\tremoved: {bd} : len(cases)={len(c)}, len(deaths)={len(d)}")
 
         bad_indices = list(compress(range(len(alt_data_sets)), alt_data_sets))
@@ -123,11 +124,11 @@ def generate_reports_germany(*, workers, kernel_name, wwwroot, force, disable_pb
 
 
 def generate_reports_usa(*, workers, kernel_name, wwwroot, force, disable_pbar, debug):
-    _ = fetch_cases_US()
-    _ = fetch_deaths_US()
+    _ = oscovida.fetch_cases_US()
+    _ = oscovida.fetch_deaths_US()
 
     #  TODO: The get_x_list methods should be part of Reporter class
-    states = get_US_region_list()
+    states = oscovida.get_US_region_list()
 
     usre = ReportExecutor(
         Reporter=USAReport,
@@ -258,10 +259,10 @@ def cli(
     does_wwwroot_exist(wwwroot, create=create_wwwroot)
 
     #  Disable pandas scientific notation
-    pd.set_option("display.float_format", "{:.2f}".format)
+    pandas.set_option("display.float_format", "{:.2f}".format)
 
     if workers == "auto":
-        workers = max(1, cpu_count())
+        workers = max(1, os.cpu_count())
         workers = max(workers - 2, 1)
 
     if workers:

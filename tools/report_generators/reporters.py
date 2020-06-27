@@ -6,8 +6,8 @@ from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.writers import FilesWriter
 
-import oscovida
 import ipynb_py_convert
+import oscovida
 
 
 class BaseReport:
