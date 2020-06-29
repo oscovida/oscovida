@@ -438,7 +438,9 @@ def fetch_data_hungary_last_execution():
 @joblib_memory.cache
 def fetch_data_hungary():
     """
-    Fetch data for Hungary from :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+    Fetch data for Hungary from https://github.com/sanbrock/covid19
+
+    Dataset does not contain the number of deaths in each county/capital city.
     """
     datasource = r'https://raw.githubusercontent.com/sanbrock/covid19/master/datafile.csv'
 
@@ -460,6 +462,7 @@ def fetch_data_hungary():
 
 
 def get_counties_hungary():
+    # return fetch_data_hungary().columns[1:]
     return ['Bács-Kiskun', 'Baranya', 'Békés', 'Borsod-Abaúj-Zemplén', 'Budapest', 'Csongrád', 'Fejér',
             'Győr-Moson-Sopron', 'Hajú-Bihar', 'Heves', 'Jász-Nagykun-Szolnok', 'Komárom-Esztergom', 'Nógrád', 'Pest',
             'Somogy', 'Szabolcs-Szatmár-Bereg', 'Tolna', 'Vas', 'Veszprém', 'Zala']
