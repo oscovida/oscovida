@@ -1,0 +1,12 @@
+{
+    "__last_modified__": "datetime.datetime(2020, 6, 26, 9, 42, 24, 761104)",
+    "cases-last-week": 0,
+    "category": "Hungary",
+    "html-file": "Hungary-Baranya.html",
+    "ipynb-name": "Hungary-Baranya.ipynb",
+    "max-cases": 39,
+    "max-deaths": 0,
+    "one-line-summary": "Hungary: Baranya",
+    "region": "Baranya",
+    "source": "https://github.com/sanbrock/covid19/blob/master/datafile.csv"
+}

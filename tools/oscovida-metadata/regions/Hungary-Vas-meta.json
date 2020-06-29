@@ -1,0 +1,12 @@
+{
+    "__last_modified__": "datetime.datetime(2020, 6, 26, 9, 43, 50, 588782)",
+    "cases-last-week": 0,
+    "category": "Hungary",
+    "html-file": "Hungary-Vas.html",
+    "ipynb-name": "Hungary-Vas.ipynb",
+    "max-cases": 17,
+    "max-deaths": 0,
+    "one-line-summary": "Hungary: Vas",
+    "region": "Vas",
+    "source": "https://github.com/sanbrock/covid19/blob/master/datafile.csv"
+}

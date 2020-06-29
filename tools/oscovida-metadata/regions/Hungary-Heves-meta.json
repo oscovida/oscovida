@@ -1,0 +1,12 @@
+{
+    "__last_modified__": "datetime.datetime(2020, 6, 26, 9, 43, 5, 926446)",
+    "cases-last-week": 0,
+    "category": "Hungary",
+    "html-file": "Hungary-Heves.html",
+    "ipynb-name": "Hungary-Heves.ipynb",
+    "max-cases": 14,
+    "max-deaths": 0,
+    "one-line-summary": "Hungary: Heves",
+    "region": "Heves",
+    "source": "https://github.com/sanbrock/covid19/blob/master/datafile.csv"
+}

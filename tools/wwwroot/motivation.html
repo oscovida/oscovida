@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>  Our motivation
+ | OSCOVIDA: Open Science COVID Analysis</title>
+
+    <meta name="author" content="OSCOVIDA team"/>
+
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/magnific-popup.min.css"/>
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" href="./theme/css/jquery.mglass.css"/>
+    <link rel="stylesheet" href="./theme/css/pygment-solarized-dark.css"/>
+    <link rel="stylesheet" href="./theme/css/style.css"/>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>
+    <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js"></script>
+
+    <script type="text/javascript" class="init">
+      $(document).ready(function() {
+          $('#data_table').DataTable( {
+              "order": [[ 3, "desc" ]]
+          } );
+      } );
+    </script>
+
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'/>
+    <link href='https://fonts.googleapis.com/css?family=Istok+Web' rel='stylesheet' type='text/css'/>
+    <link href='https://fonts.googleapis.com/css?family=Droid+Sans+Mono' rel='stylesheet' type='text/css'/>
+
+
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+
+    <!-- Feeds -->
+
+
+  </head>
+
+  <body>
+
+    <div class="container">
+
+      <div class="page-header">
+        <h1><a href=".">OSCOVIDA: Open Science COVID Analysis</a> <small></small></h1>
+      </div>
+
+      <nav class="navbar navbar-default">
+
+        <!-- Hamburger menu for mobile -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#plumage-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="." title="">OSCOVIDA: Open Science COVID Analysis</a>
+        </div>
+
+        <!-- Menus and search forms -->
+        <div class="collapse navbar-collapse" id="plumage-navbar-collapse-1">
+
+          <ul class="nav navbar-nav">
+<li >
+                <a href="index.html">Home</a>
+              </li>
+<li >
+                <a href="all-regions.html">All regions</a>
+              </li>
+<li >
+                <a href="countries.html">Countries</a>
+              </li>
+<li >
+                <a href="germany.html">Germany</a>
+              </li>
+<li >
+                <a href="us.html">US</a>
+              </li>
+<li >
+                <a href="hungary.html">Hungary</a>
+              </li>
+<li >
+                <a href="category-all.html">Articles</a>
+              </li>
+<li >
+                <a href="tag-analysis">Analysis</a>
+              </li>
+<li >
+                <a href="tag-about.html">About</a>
+              </li>
+          </ul>
+
+
+
+        </div>
+
+      </nav>
+
+    </div>
+
+
+    <div class="container main">
+
+
+      <div class="row">
+        <div class=" col-md-9  ">
+  <h1>
+    <a href="./motivation.html" rel="bookmark" title="Permalink to Our motivation">Our motivation</a>
+  </h1>
+        </div>
+      </div>
+
+      <div class="row">
+
+
+        <div class=" col-md-9 " id="content" role="main">
+  
+
+  <div>
+    <h2>Motivation</h2>
+<h3>1. Understanding the pandemic</h3>
+<p>The reporting in the media on the COVID19 situation is not always providing
+sufficient context to interpret the numbers: we hear many news reports about how
+many people have been confirmed to be infected by the virus, or have died on a
+particular day. </p>
+<p>The relevant questions are though: how do these numbers compare to yesterday,
+and the week before? Can we see and understand how quickly infections are
+spreading? Can we see if the containment measures of people staying at home,
+schools and universities closing etc are showing any effect and if so, how
+strong is it? What can we learn from countries that have managed to reduce the
+number of new infections? </p>
+<p>With the plots and data available here, we hope to contribute to this.</p>
+<p>Discussion and contributions are welcome.</p>
+<h3>2. Preparing for living with COVID19 -- the later stages</h3>
+<p>Once the epidemic growth of infections is brought under control, we will need to
+find a fine balance between containment measures (such as social distancing, closure of
+schools, restaurants, shops, etc) and permitting work and live as was possible
+before the pandemic to avoid repeated exponential growth of infections. </p>
+<p>In the absence of a COVID19 vaccine, it is possible that this needs to carry on
+for many years to come. OSCOVIDA provides a tool that can help to assess the
+effectiveness of containment measures, and can help to understand the size and
+dynamics of new, hopefully fewer and more localised, COVID19 outbreaks. We want
+to enable the interested citizen to inspect and understand the data to a level
+that as barely possible with the reports in the media.</p>
+<h3>3. Enable citizen science</h3>
+<p>Headlines that attract attention may not deliver useful information. We would
+like to offer complementary information and tools with OSCOVIDA:</p>
+<ul>
+<li>
+<p>The <a href="https://github.com/fangohr/coronavirus-2020">source code</a> that creates
+  the plots is available here, can be inspected, downloaded, modified and
+  improved.</p>
+</li>
+<li>
+<p>Using <a href="https://jupyter.org/">Jupyter Notebooks</a> and the <a href="https://mybinder.org">MyBinder
+  project</a> project, anyone with a web browser can execute
+  the source (to create the same or new plots) from within a web browser, by
+  clicking <a href="https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb">this
+  link</a>.</p>
+</li>
+<li>
+<p>See also <a href="open-science.html">related post on open science</a>.</p>
+</li>
+</ul>
+<h3>4. Simplify use of the existing data sets for experts</h3>
+<p>Our project can be used to get access to the COVID19 data from the convenience
+of a Python function; this may help other scientists to build better models or
+data analysis.</p>
+<p>(<a href="contribute.html">Contributions</a> to our plots and software are welcome.)</p>
+<hr>
+<h3>Related video</h3>
+<iframe width="560" height="315" src="https://www.youtube.com/embed/1_oDc_vptBQ" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+
+
+
+        </div>
+
+          <div class="col-md-3">
+  <div class="well">
+
+    <p><abbr title="2020-04-19T10:20:00+02:00"><i class="fa fa-calendar"></i> Sun 19 April 2020</abbr></p>
+
+
+    <hr/>
+
+      <p>
+              <a href="./category-all.html" rel="tag"
+                  data-toggle="tooltip" class="label label-info"
+                  title="19 articles in this category">All</a>
+            <a href="/tag-about.html" data-toggle="tooltip"
+      class="label label-default"
+      title="10 articles with this tag">About</a>
+      </p>
+      <hr/>
+
+
+
+  </div>
+            
+          </div>
+
+      </div>
+
+    </div>
+
+    <!-- TODO: make footer sticky -->
+    <footer class="container-fluid">
+      <div class="container">
+        <div class="row">
+
+            <div class="col-md-2">
+                <h5>Social</h5>
+                <ul class="list-unstyled">
+                  <li>  <a href="https://twitter.com/OSCOVIDAproject">
+      <i class="fa fa-twitter"></i>
+    Open Science COVID Analysis
+  </a></li>
+                  <li>  <a href="https://twitter.com/Panosc_eu">
+      <i class="fa fa-twitter"></i>
+    PaNOSC
+  </a></li>
+                  <li>  <a href="https://twitter.com/ProfCompMod">
+      <i class="fa fa-twitter"></i>
+    ProfCompMod
+  </a></li>
+                </ul>
+            </div>
+            <div class="col-md-2">
+                <h5>Links</h5>
+                <ul class="list-unstyled">
+                  <li>  <a href="http://oscovida.github.io">
+      <i class="fa fa-external-link"></i>
+    OSCOVIDA project
+  </a></li>
+                  <li>  <a href="http://www.panosc.eu">
+      <i class="fa fa-external-link"></i>
+    PaNOSC project
+  </a></li>
+                  <li>  <a href="mailto:oscovidaproject@gmail.com">
+      <i class="fa fa-envelope"></i>
+    OSCOVIDA
+  </a></li>
+                </ul>
+            </div>
+
+          <div class="col-md-2">
+            <h5>Browse content by</h5>
+            <ul class="list-unstyled">
+                <li><a href="./archives-index.html"><i class="fa fa-calendar"></i> Dates</a></li>
+                <li><a href="./tags-index.html"><i class="fa fa-tag"></i> Tags</a></li>
+            </ul>
+          </div>
+
+          <div class="col-md-2 text-muted">
+            <h5>Copyright notice</h5>
+            <p>© Copyright 2020 OSCOVIDA team.</p>
+              <p>Unless contrary mentioned, the content of this site is published under a <a rel='license'
+href='https://creativecommons.org/licenses/by/4.0/'>Creative Commons
+Attribution 4.0 International license</a>. See <a href="http://oscovida.github.io/license.html">license</a> for details.</p>
+          </div>
+
+          <div class="col-md-2 text-muted">
+            <h5>Disclaimer</h5>
+              <p>Plots, data and software here are provided <a href="https://github.com/fangohr/coronavirus-2020/blob/master/LICENSE#L20">as-is without any warranties</a> by volunteers. Use the material at your own risk. See <a href="http://oscovida.github.io/license.html">license</a> for details.</p>
+          </div>
+
+          <div class="col-md-2">
+          </div>
+
+        </div>
+      </div>
+
+      <h5 class="text-right"><a href="#"><i class="fa fa-arrow-up"></i> Back to top</a></h5>
+
+      <div class="container">
+        <div class="row col-md-12 text-muted text-center">
+          Site generated by <a href="https://getpelican.com"> Pelican</a>.<br/>
+          <a href="https://github.com/kdeldycke/plumage"> Plumage</a> theme by <a href="https://kevin.deldycke.com">Kevin Deldycke</a>.
+        </div>
+      </div>
+
+    </footer>
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fitvids/1.1.0/jquery.fitvids.min.js"></script>
+    <script src="./theme/js/jquery.mglass.js"></script>
+    <script src="./theme/js/application.js"></script>
+
+    <script>
+      document.getElementsByTagName("table")[0].setAttribute("id", "data_table");
+    </script>
+
+  </body>
+</html>

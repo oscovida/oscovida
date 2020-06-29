@@ -1,0 +1,12 @@
+{
+    "__last_modified__": "datetime.datetime(2020, 6, 26, 9, 43, 34, 636976)",
+    "cases-last-week": 0,
+    "category": "Hungary",
+    "html-file": "Hungary-Somogy.html",
+    "ipynb-name": "Hungary-Somogy.ipynb",
+    "max-cases": 22,
+    "max-deaths": 0,
+    "one-line-summary": "Hungary: Somogy",
+    "region": "Somogy",
+    "source": "https://github.com/sanbrock/covid19/blob/master/datafile.csv"
+}

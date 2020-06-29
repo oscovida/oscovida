@@ -1,0 +1,12 @@
+{
+    "__last_modified__": "datetime.datetime(2020, 6, 26, 9, 43, 40, 455868)",
+    "cases-last-week": 3,
+    "category": "Hungary",
+    "html-file": "Hungary-Szabolcs-Szatm\u00e1r-Bereg.html",
+    "ipynb-name": "Hungary-Szabolcs-Szatm\u00e1r-Bereg.ipynb",
+    "max-cases": 50,
+    "max-deaths": 0,
+    "one-line-summary": "Hungary: Szabolcs-Szatm\u00e1r-Bereg",
+    "region": "Szabolcs-Szatm\u00e1r-Bereg",
+    "source": "https://github.com/sanbrock/covid19/blob/master/datafile.csv"
+}
