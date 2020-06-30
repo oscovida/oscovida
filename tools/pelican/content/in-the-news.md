@@ -2,6 +2,7 @@ title: OSCOVIDA in the news
 date: 15-06-2020
 
 
+- [30 June 2020, Update from Germany Physics Society on COVID19 research](https://www.dpg-physik.de/veroeffentlichungen/publikationen/physikkonkret/physikkonkret-46)
 - [15 June 2020, European XFEL News item (english version,](https://www.xfel.eu/news_and_events/news/index_eng.html?openDirectAnchor=1788&two_columns=0)
   [deutsche
   Version)](https://www.xfel.eu/aktuelles/news/index_ger.html?openDirectAnchor=1788&two_columns=0)
