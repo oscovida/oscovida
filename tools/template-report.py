@@ -37,7 +37,7 @@ table
 """
 # Explore the data in your web browser
 
-- If you want to execute this notebook, [click here to use myBinder](%binderurl%)
+- If you want to execute this notebook, [click here to use myBinder]({BINDER_URL})
 - and wait (~1 to 2 minutes)
 - Then press SHIFT+RETURN to advance code cell to code cell
 - See http://jupyter.org for more details on how to use Jupyter Notebook
