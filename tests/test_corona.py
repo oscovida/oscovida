@@ -80,9 +80,9 @@ def test_fetch_data_hungary():
 def test_choose_random_counties():
     # Hungary related
     with_local = c.choose_random_counties(exclude_region="Baranya", size=18)
+    print(with_local)
     assert 'Baranya' not in with_local
-    assert 'Budapest' not in with_local
-    assert len(with_local) == 18
+    assert len(with_local) == 19
 
 
 def test_make_compare_plot_hungary():

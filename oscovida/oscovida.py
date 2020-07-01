@@ -1386,7 +1386,7 @@ def plot_no_data_available(ax, mimic_subplot, text):
 
 def overview(country, region=None, subregion=None, savefig=False):
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
-
+    print(c.name)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
 
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
