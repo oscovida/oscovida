@@ -14,8 +14,8 @@ import IPython.display
 
 # choose font - can be deactivated
 from matplotlib import rcParams
-# rcParams['font.family'] = 'sans-serif'
-# rcParams['font.sans-serif'] = ['Inconsolata']
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Inconsolata']
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
 from matplotlib.ticker import ScalarFormatter, FuncFormatter
@@ -483,7 +483,7 @@ def get_region_hungary(county):
     hungary.set_index(pd.to_datetime(hungary['Dátum']), inplace=True)
     cases = hungary[county]
     region_label = f'Hungary-{county}'
-    cases.name = region_label + "cases"
+    cases.name = region_label + " cases"
 
     return cases, None, region_label
 
@@ -1343,7 +1343,7 @@ def choose_random_counties(exclude_region, size) -> list:
     return choosen
 
 
-def make_compare_plot_hungary(region: str, compare_with_local: list, v0c=10, v0d=1):
+def make_compare_plot_hungary(region: str, compare_with_local: list, v0c=10):
     rolling = 7
 
     df_c1, _ = get_compare_data_hungary(region, compare_with_local, rolling=rolling)

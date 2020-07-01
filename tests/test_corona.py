@@ -54,6 +54,46 @@ def test_get_US_region_list():
     assert len(x) > 50  # at least 50 states, plus diamond Princess
 
 
+def test_Hungary_overview():
+    axes, cases, deaths = c.overview(country="Hungary", region="Baranya")
+    assert cases.name == 'Hungary-Baranya cases'
+    assert deaths is None
+
+    isinstance(cases, pd.core.series.Series)
+    isinstance(deaths, type(None))
+
+
+def test_get_Hungary_region_list():
+    x = c.get_counties_hungary()
+    assert x[0] == "Bács-Kiskun"
+    assert "Budapest" in x
+    assert len(x) == 20  # 19 county and the capital city
+
+
+def test_fetch_data_hungary():
+    hungary = c.fetch_data_hungary()
+    assert type(hungary) == pd.core.frame.DataFrame
+    assert hungary.shape[1] == 21  # date, 19 counties, capital city
+    assert 'Budapest' in hungary.columns
+
+
+def test_choose_random_counties():
+    # Hungary related
+    with_local = c.choose_random_counties(exclude_region="Baranya", size=18)
+    assert 'Baranya' not in with_local
+    assert 'Budapest' not in with_local
+    assert len(with_local) == 18
+
+
+def test_make_compare_plot_hungary():
+    with_local = c.choose_random_counties(exclude_region="Baranya", size=18)
+    axes, cases, deaths = c.make_compare_plot_hungary("Baranya", compare_with_local=with_local)
+
+    assert deaths is None
+    assert type(cases) == pd.core.frame.DataFrame
+    assert cases.shape[1] == 20  # counties and the capital city
+
+
 def test_label_from_region_subregion():
     assert c.label_from_region_subregion(("Hamburg", None)) == "Hamburg"
     assert c.label_from_region_subregion("Hamburg") == "Hamburg"
@@ -240,3 +280,9 @@ def test_pad_cumulative_series_to_yesterday():
     y2 = c.pad_cumulative_series_to_yesterday(y)
     assert y.shape == (10,)
     assert y2.shape == y.shape
+
+test_Hungary_overview()
+test_get_Hungary_region_list()
+test_make_compare_plot_hungary()
+test_fetch_data_hungary()
+test_choose_random_counties
