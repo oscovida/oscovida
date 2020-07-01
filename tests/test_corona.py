@@ -280,9 +280,3 @@ def test_pad_cumulative_series_to_yesterday():
     y2 = c.pad_cumulative_series_to_yesterday(y)
     assert y.shape == (10,)
     assert y2.shape == y.shape
-
-test_Hungary_overview()
-test_get_Hungary_region_list()
-test_make_compare_plot_hungary()
-test_fetch_data_hungary()
-test_choose_random_counties
