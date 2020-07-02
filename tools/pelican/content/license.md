@@ -7,8 +7,8 @@ date: 2020/04/19 13:00
 The materials available from the [Open Science COVID19 Analysis](https://oscovida.github.io) project are licensed as follows:
 
 
-* The [software](http://github.com/fangohr/coronavirus-2020) is [licensed under
-  the BSD 3-Clause New license](https://github.com/fangohr/coronavirus-2020/blob/master/LICENSE).
+* The [software](http://github.com/oscovida/oscovida) is [licensed under
+  the BSD 3-Clause New license](https://github.com/oscovida/oscovida/blob/master/LICENSE).
 
 * Other material, including plots, are licensed under the 
 [Creative Commons Attribution 4.0 International License](http://creativecommons.org/licenses/by/4.0/).
