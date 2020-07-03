@@ -42,7 +42,7 @@ def create_markdown_index_list(regions: DataFrame):
     # select columns
     regions3 = regions2[["max-cases", "max-deaths", "cases-last-week"]]
     regions4 = regions3.applymap(
-        lambda v: "{:,}".format(v)
+        lambda v: "{:,}".format(v) if v else "missing"
     )  # Thousands comma separator
 
     # rename columns
@@ -80,6 +80,7 @@ def create_markdown_index_page(
         "countries": title_prefix + " Countries of the world",
         "germany": title_prefix + " Germany",
         "us": title_prefix + " United States",
+        "hungary": title_prefix + " Hungary",
         "all-regions": title_prefix + " All regions and countries",
     }
 

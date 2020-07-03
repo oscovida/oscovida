@@ -7,7 +7,7 @@ import oscovida
 import pandas
 
 from .executors import ReportExecutor
-from .reporters import AllRegions, CountryReport, GermanyReport, USAReport
+from .reporters import AllRegions, CountryReport, GermanyReport, USAReport, HungaryReport
 
 
 def does_wwwroot_exist(wwwroot, create=False):
@@ -149,6 +149,30 @@ def generate_reports_usa(*, workers, kernel_name, wwwroot, force, disable_pbar, 
     usre.create_markdown_index_page()
 
 
+def generate_reports_hungary(*, workers, kernel_name, wwwroot, force, disable_pbar, debug):
+    _ = oscovida.fetch_data_hungary()
+
+    #  TODO: The get_x_list methods should be part of Reporter class
+    counties = oscovida.get_counties_hungary()
+
+    hre = ReportExecutor(
+        Reporter=HungaryReport,
+        wwwroot=wwwroot,
+        expiry_hours=2,
+        attempts=3,
+        workers=workers,
+        force=force,
+        disable_pbar=disable_pbar,
+        debug=debug,
+    )
+
+    if debug:
+        counties = counties[:10]
+
+    hre.create_html_reports(counties)
+
+    hre.create_markdown_index_page()
+
 def generate_markdown_all_regions(
     *, workers, kernel_name, wwwroot, force, disable_pbar, debug
 ):
@@ -162,6 +186,7 @@ def generate(*, region, workers, kernel_name, wwwroot, force, disable_pbar, debu
         "countries": generate_reports_countries,
         "germany": generate_reports_germany,
         "usa": generate_reports_usa,
+        "hungary": generate_reports_hungary,
         "all-regions-md": generate_markdown_all_regions,
     }
 
@@ -180,7 +205,8 @@ def generate(*, region, workers, kernel_name, wwwroot, force, disable_pbar, debu
     "--regions",
     "-r",
     type=click.Choice(
-        ["countries", "germany", "usa", "all-regions-md", "all"], case_sensitive=False
+        ["countries", "germany", "usa", "hungary", "all-regions-md", "all"],
+        case_sensitive=False
     ),
     multiple=True,
     help="Region(s) to generate reports for.",
@@ -239,6 +265,10 @@ def cli(
     force=False,
     debug=False,
 ):
+    print(locals())
+    if debug:
+        log_level = "DEBUG"
+
     if log_level in ["INFO", "DEBUG"]:
         click.echo("Disabling progress bar due to log level verbosity")
         disable_pbar = True
@@ -273,7 +303,7 @@ def cli(
     if "all" in regions:
         if len(regions) > 1:
             raise Exception("Cannot accept multiple regions if 'all' is passed")
-        regions = ["countries", "germany", "usa", "all-regions-md"]
+        regions = ["countries", "germany", "usa", "hungary", "all-regions-md"]
 
     for region in regions:
         generate(

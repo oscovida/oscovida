@@ -257,6 +257,46 @@ class USAReport(BaseReport):
         )
 
 
+class HungaryReport(BaseReport):
+    category = "hungary"
+
+    def __init__(self, region, wwwroot="wwwroot", verbose=False):
+        self.region = region
+
+        super().__init__(
+            country="Hungary",
+            title=f"Hungary: {region}",
+            overview_function="overview",
+            overview_args=f'country="Hungary", region="{region}"',
+            data_load_function="get_region_hungary",
+            data_load_args=f'county="{region}"',
+            output_file=f"Hungary-{region}",
+            wwwroot=wwwroot,
+            verbose=verbose,
+        )
+
+    @staticmethod
+    def hungary_check_region_name_is_known(region):
+        counties = oscovida.get_counties_hungary()
+        assert region in counties, f"{region} is unknown. Known regions are {counties}"
+
+    def init_metadata(self):
+        cases, _, _ = oscovida.get_country_data("Hungary", region=self.region)
+
+        self._init_metadata(
+            meta={
+                "source": "https://github.com/sanbrock/covid19",
+                "category": self.category,
+                "max-deaths": None,
+                "max-cases": int(cases[-1]),
+                "region": self.region,
+                "subregion": str(None),
+                "one-line-summary": f"Hungary: {self.region}",  # used as title in table
+                "cases-last-week": int(oscovida.get_cases_last_week(cases)),
+            }
+        )
+
+
 class AllRegions(BaseReport):
     category = "all-regions"
 
