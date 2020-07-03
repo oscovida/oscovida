@@ -90,7 +90,7 @@ def generate_reports_germany(*, workers, kernel_name, wwwroot, force, disable_pb
     # We assume that the RKI labels unusual data with '(alt)', and remove those.
 
     alt_data_sets = ["(alt)" in r[1].lower() for r in germany_regions]
-    if sum(alt_data_sets) > 0:
+    if any(alt_data_sets):
         bad_datasets = list(compress(germany_regions, alt_data_sets))
 
         print(f"Removing datasets label with '(alt)': {bad_datasets}")
