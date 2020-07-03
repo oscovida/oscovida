@@ -247,8 +247,9 @@ def compose_dataframe_summary(cases, deaths):
     df = pd.DataFrame()
     df["total cases"] = cases
     df["daily new cases"] = cases.diff()
-    df["total deaths"] = deaths
-    df["daily new deaths"] = deaths.diff()
+    if deaths is not None:
+        df["total deaths"] = deaths
+        df["daily new deaths"] = deaths.diff()
 
     # drop first row with nan -> otherwise ints are shows as float in table
     df = df.dropna().astype(int)
@@ -426,6 +427,66 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
         return cases, deaths, region_label
 
     raise NotImplemented("Should never get to this point.")
+
+
+
+@joblib_memory.cache
+def fetch_data_hungary_last_execution():
+    return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
+
+@joblib_memory.cache
+def fetch_data_hungary():
+    """
+    Fetch data for Hungary from https://github.com/sanbrock/covid19
+
+    Dataset does not contain the number of deaths in each county/capital city.
+    """
+    datasource = r'https://raw.githubusercontent.com/sanbrock/covid19/master/datafile.csv'
+
+    t0 = time.time()
+    print(f"Please be patient - downloading data from {datasource} ...")
+    hungary = pd.read_csv(datasource)
+    delta_t = time.time() - t0
+    print(f"Completed downloading {len(hungary)} rows in {delta_t:.1f} seconds.")
+
+    # Dropping the last row, because it is a duplicate of header.
+    hungary.drop(hungary.index[-1], inplace=True)
+    # Will be at least one date with no values.
+    hungary.dropna(inplace=True)
+
+    hungary = hungary.astype({col_name: int for col_name in hungary.columns[1:]})
+
+    fetch_data_hungary_last_execution()
+    return hungary
+
+
+def get_counties_hungary():
+    # return fetch_data_hungary().columns[1:]
+    return ['Bács-Kiskun', 'Baranya', 'Békés', 'Borsod-Abaúj-Zemplén', 'Budapest', 'Csongrád', 'Fejér',
+            'Győr-Moson-Sopron', 'Hajú-Bihar', 'Heves', 'Jász-Nagykun-Szolnok', 'Komárom-Esztergom', 'Nógrád', 'Pest',
+            'Somogy', 'Szabolcs-Szatmár-Bereg', 'Tolna', 'Vas', 'Veszprém', 'Zala']
+
+
+def get_region_hungary(county):
+    """
+    Returns cases int time series and label for county in Hungary.
+
+    """
+    counties_and_the_capital_city = get_counties_hungary()
+
+    if county not in counties_and_the_capital_city:
+        raise ValueError(f'{county} must be one of: \n{counties_and_the_capital_city}')
+
+    hungary = fetch_data_hungary()
+
+    hungary.set_index(pd.to_datetime(hungary['Dátum']), inplace=True)
+    cases = hungary[county]
+    region_label = f'Hungary-{county}'
+    cases.name = region_label + " cases"
+
+    return cases, None, region_label
+
 
 
 def plot_time_step(ax, series, style="-", labels=None, logscale=True):
@@ -913,18 +974,32 @@ def get_country_data(country, region=None, subregion=None, verbose=False, pad_RK
         # load US data
         c, d = get_region_US(region)
         country_region = f"United States: {region}"
+
+    elif country.lower() == 'hungary':
+        # region -> térség
+        # subregion -> kistérség
+        # county -> megye
+
+        if region is not None:
+            c, d, country_region = get_region_hungary(county=region)
+
+        else:
+            c, d = get_country_data_johns_hopkins(country)
+            country_region = country
+
     else:
         c, d = get_country_data_johns_hopkins(country)
         country_region = country
 
     len_cases1 = len(c)
-    len_deaths1 = len(d)
+    # hungarian county data doesn't contain number of deaths
+    len_deaths1 = 0 if d is None else len(d)
     # resample data so we have one value per day
     c = c.resample("D").pad()
-    d = d.resample("D").pad()
+    d = None if d is None else d.resample("D").pad()
 
     len_cases2 = len(c)
-    len_deaths2 = len(d)
+    len_deaths2 = 0 if d is None else len(d)
 
     if verbose:
         print(f"get_country_data: cases [{len_cases1}] -> [{len_cases2}]")
@@ -967,6 +1042,7 @@ def align_sets_at(v0, df):
         res = pd.merge(res, series, how='outer', left_index=True, right_index=True)
 
     return res
+
 
 def get_compare_data(countrynames, rolling=7):
     """Given a list of country names, return two dataframes: one with cases and one with deaths
@@ -1170,6 +1246,26 @@ def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
     return df_c, df_d
 
 
+def get_compare_data_hungary(region, compare_with_local: list, rolling=7):
+    """Given a region for Hungary, and a list of regions to compare with,
+    return two dataframes: one with cases and one with deaths
+    where
+    - each column is one country
+    - data in the column is the diff of accumulated numbers
+    - any zero values are removed for italy (data error)
+    - apply some smoothing
+
+    """
+    df_c = pd.DataFrame()
+    # df_d = pd.DataFrame()
+    for reg in [region] + compare_with_local:
+        c, d, country_subregion = get_region_hungary(county=reg)
+        label = str(reg)
+        df_c[label] = c.diff().rolling(rolling, center=True).mean()  # cases
+        # df_d[label] = d.diff().rolling(rolling, center=True).mean()  # deaths
+    return df_c, None
+
+
 def make_compare_plot_germany(region_subregion,
                               compare_with=[],  # "China", "Italy", "Germany"],
                               compare_with_local=['Bayern',
@@ -1230,45 +1326,100 @@ def make_compare_plot_germany(region_subregion,
 #######################
 
 
+def choose_random_counties(exclude_region, size) -> list:
+    counties = get_counties_hungary()
+    assert exclude_region in counties
+
+    counties.remove('Budapest')
+    if exclude_region != 'Budapest':
+        counties.remove(exclude_region)
+
+    indices = np.arange(len(counties))
+    np.random.shuffle(indices)
+
+    counties = np.array(counties)
+    choosen = counties[indices[:size]]
+    choosen = list(np.concatenate((choosen, ['Budapest'])))
+    return choosen
+
+
+def make_compare_plot_hungary(region: str, compare_with_local: list, v0c=10):
+    rolling = 7
+
+    df_c1, _ = get_compare_data_hungary(region, compare_with_local, rolling=rolling)
+    # df_c2, _ = get_compare_data(['Germany', 'Italy'], rolling=rolling)
+
+    # need to get index into same timezone before merging
+    df_c1.set_index(df_c1.index.tz_localize(None), inplace=True)
+    # df_c = pd.merge(df_c1, df_c2, how='outer', left_index=True, right_index=True)
+
+    res_c = align_sets_at(v0c, df_c1)
+    res_c = res_c.interpolate(method='linear', limit=7)
+
+    fig, axes = plt.subplots(2, 1, figsize=(10, 6))
+    plot_logdiff_time(axes[0], res_c, f"days since {v0c} cases",
+                      "daily new cases\n(rolling 7-day mean)",
+                      v0=v0c, highlight={res_c.columns[0]: "C1"}, labeloffset=0.5)
+
+    # plot_no_data_available(axes[1], mimic_subplot=axes[0], text="daily new deaths\n(rolling 7-day mean)")
+    axes[1].set_visible(False)
+
+    title = f"Daily cases for Hungary: {label_from_region_subregion(region)}"
+    axes[0].set_title(title)
+    fig.tight_layout(pad=1)
+    return axes, res_c, None
+
+
+def plot_no_data_available(ax, mimic_subplot, text):
+    # Hungary county deaths data missing
+    xticks = mimic_subplot.get_xticks()
+    yticks = mimic_subplot.get_yticks()
+    ax.set_xticks(xticks)
+    ax.set_yticks(yticks)
+    ax.text(xticks.mean(), yticks.mean(),
+            f'No data available\n to plot {text}',
+            horizontalalignment='center',
+            verticalalignment='center')
+    ax.set_yticklabels([])
+    ax.set_xticklabels([])
+
+
 def overview(country, region=None, subregion=None, savefig=False):
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
-
+    print(c.name)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
-    ax = axes[0]
-    plot_time_step(ax=ax, series=c, style="-C1", labels=(region_label, "cases"))
-    plot_time_step(ax=ax, series=d, style="-C0", labels=(region_label, "deaths"))
 
-    ax = axes[1]
-    plot_daily_change(ax=ax, series=c, color="C1", labels=(region_label, "cases"))
-    # data cleaning 
+    plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
+    plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"))
+    # data cleaning
     if country == "China":
-        ax.set_ylim(0, 5000)
+        axes[1].set_ylim(0, 5000)
     elif country == "Spain":   # https://github.com/fangohr/coronavirus-2020/issues/44
-        ax.set_ylim(bottom=0)
+        axes[1].set_ylim(bottom=0)
+    plot_reproduction_number(axes[3], series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
+    plot_doubling_time(axes[5], series=c, color="C1", labels=(region_label, "cases"))
 
+    if d is not None:
+        plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
+        plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"))
+        plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
+        plot_doubling_time(axes[5], series=d, color="C0", labels=(region_label, "deaths"))
+    if d is None:
+        plot_no_data_available(axes[2], mimic_subplot=axes[1], text='daily change in deaths')
+        plot_no_data_available(axes[4], mimic_subplot=axes[3], text='R & growth factor (based on deaths)')
+        # axes[2].set_visible(False)
+        # axes[4].set_visible(False)
 
-    ax = axes[2]
-    plot_daily_change(ax=ax, series=d, color="C0", labels=(region_label, "deaths"))
-
-
-    ax = axes[3]
+    # ax = axes[3]
     # plot_growth_factor(ax, series=d, color="C0")
     # plot_growth_factor(ax, series=c, color="C1")
-    plot_reproduction_number(ax, series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
-    ax = axes[4]
-    plot_reproduction_number(ax, series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
-
-    ax = axes[5]
-    plot_doubling_time(ax, series=d, color="C0", labels=(region_label, "deaths"))
-    plot_doubling_time(ax, series=c, color="C1", labels=(region_label, "cases"))
 
     # enforce same x-axis on all plots
-    for i in range(1, 6):
+    for i in range(1, axes.shape[0]):
         axes[i].set_xlim(axes[0].get_xlim())
-    for i in range(0, 6):
+    for i in range(0, axes.shape[0]):
         axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
         axes[i].yaxis.set_ticks_position('both')
-
 
     title = f"Overview {country}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
@@ -1291,10 +1442,18 @@ def overview(country, region=None, subregion=None, savefig=False):
         # laender = list(germany['Bundesland'].drop_duplicates().sort_values())
         axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
                                                                # compare_with_local=laender)
+        fig.tight_layout(pad=10)
         return_axes = np.concatenate([axes, axes_compare])
     elif country=="US" and region is not None:
         # skip comparison plot for the US states at the moment
         return_axes = axes
+        return return_axes, c, d
+
+    elif country == 'Hungary':
+        # choosing random counties. not sure if this make sense or not because not every county has enough data.
+        with_local = choose_random_counties(exclude_region=region, size=18)
+        axes_compare, res_c, red_d = make_compare_plot_hungary(region, compare_with_local=with_local)
+        return_axes = np.concatenate([axes, axes_compare])
         return return_axes, c, d
     else:
         raise NotImplementedError

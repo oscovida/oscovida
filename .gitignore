@@ -14,3 +14,6 @@ oscovida-metadata
 tools/binder
 tools/status
 oscovida.egg-info
+
+venv/
+.idea/
