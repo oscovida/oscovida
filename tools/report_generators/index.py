@@ -42,7 +42,7 @@ def create_markdown_index_list(regions: DataFrame):
     # select columns
     regions3 = regions2[["max-cases", "max-deaths", "cases-last-week"]]
     regions4 = regions3.applymap(
-        lambda v: "{:,}".format(v) if v else "missing"
+        lambda v: "missing" if v is None else "{:,}".format(v)
     )  # Thousands comma separator
 
     # rename columns
