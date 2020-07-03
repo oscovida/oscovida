@@ -43,7 +43,7 @@ that as barely possible with the reports in the media.
 Headlines that attract attention may not deliver useful information. We would
 like to offer complementary information and tools with OSCOVIDA:
 
-* The [source code](https://github.com/fangohr/coronavirus-2020) that creates
+* The [source code](https://github.com/oscovida/oscovida) that creates
   the plots is available here, can be inspected, downloaded, modified and
   improved.
 

@@ -28,6 +28,7 @@ MENUITEMS = [("Home", "index.html"),
              ("Countries", "countries.html"),
              ("Germany", "germany.html"),
              ("US", "us.html"),
+             ("Hungary", "hungary.html"),
              ("Articles", "category-all.html"),
              ("Analysis", "tag-analysis"),
              ("About", "tag-about.html")]

@@ -10,12 +10,12 @@ library and the Jupyter Notebook.
 
 ## Source code
 All the computational steps and code are available
-[here](https://github.com/fangohr/coronavirus-2020/tree/master/oscovida).
+[here](https://github.com/oscovida/oscovida/tree/master/oscovida).
 
 ## Ways to use and execute the source code
 
 * If you know your way around Github, you can fork [the
-  repository](https://github.com/fangohr/coronavirus-2020/).
+  repository](https://github.com/oscovida/oscovida/).
 
 * All of the plots and tables can be recomputed using the Binder service (link
   in each webpage with plots and data, or use [go here and select the relevant

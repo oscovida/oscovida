@@ -11,28 +11,28 @@ General
     in RKI data -> `test-plots-for-all-regions.ipynb`
 -   \[ \] unit tests
 -   \[X\] turn python code into package
--   \[ \] set up basic continuous integration (Travis?)
+-   \[X\] set up basic continuous integration (Travis?)
     -   possible system test could be
         -   \[X\] running of `overview` function for a number of
             countries
-        -   \[ \] populating html from
+        -   \[X\] populating html from
             template-country.ipynb/template-germany.ipynb for a few
             countries /regions
         -   \[X\] set up travis
--   \[ \] tidy up code
-    -   \[ \] function names, interfaces, documentation
+-   \[X\] tidy up code
+    -   \[X\] function names, interfaces, documentation
         -   for example rename data fetch and get functions according to
             where the data comes from
-    -   \[ \] split plotting routines into (i) calculation of entities, and 
+    -   \[X\] split plotting routines into (i) calculation of entities, and 
             (ii) plotting
--   \[ \] make python package available via pip - what name? coronavirus? oscovida?
--   \[ \] tidy up urls: german URLS are sanitised (using sanitise() but world countries are not)
+-   \[X\] make python package available via pip - what name? coronavirus? oscovida?
+-   \[X\] tidy up urls: german URLS are sanitised (using sanitise() but world countries are not)
     - watch link to automatic figure creation in generate-individual-plots.ipynb
--   \[ \] refactor duplicated plotting in generate-countries.ipynb
+-   \[X\] refactor duplicated plotting in generate-countries.ipynb
     - have a class to do this with virtual methods that need to be completed for
       each category (i.e. countries of the world, US states, Germany Landkreise,
       ...)?
--   -[ \] change interface to plotting functions: get rid of attribute
+-   -[X\] change interface to plotting functions: get rid of attribute
     `.country` and `.label` in the data series - this was a nice hack in the
     beginning but is awkward now if we think about being able to modify Series
     and DataFrames interactively (the attributes are not copied when slicing a
@@ -42,9 +42,9 @@ General
 
 -   \[ \] add binderlink to index page (something like \"binder\" behind
     each entry?)
--   \[ \] style webpages
+-   \[X\] style webpages
     -   \[X\] more modern font?
-    -   \[ \] with PaNOSC logo
+    -   \[X\] with PaNOSC logo (given up)
 -   \[ \] Germany: add overview plots for each Bundesland:
     -   For Hamburg, there is only one entry in the table (Hamburg, SK
         Hamburg), so we have this
@@ -61,16 +61,16 @@ General
     -   takes about one hour at the moment (\~8 seconds per page, in
         total about 180+410 \~ 600 pages)
     -   can we parallelise?
--   \[ \] make webpage generation into a service (cronjob?) to run once
+-   \[X\] make webpage generation into a service (cronjob?) to run once
     a day and update webpages automatically
 -   \[ \] document and refactor everything
 -   \[X\] Embed google analytics snippet in html of notebooks (in `html/*`)
 
 Binder
 -------
--   \[ \] split Binder repository for ipynb files from html repository:
+-   \[X\] split Binder repository for ipynb files from html repository:
     - html repo is pretty big, poor binder needs to clone this every time it is used
--   \[ \] remove inconsolata font from oscovida.py, or install in binder (so
+-   \[X\] remove inconsolata font from oscovida.py, or install in binder (so
     that no font warning is reported when executing the notebook on binder)
 
 Bugs
@@ -78,7 +78,7 @@ Bugs
 
 -   \[X\] adjust plot size to make sure headline shows in svg/pdf files
     when saved -> latest matplotlib version seems to do this automatically
--   \[ \] the daily changes in log scale plot shows strips in
+-   \[X\] the daily changes in log scale plot shows strips in
     y-direction, for example
     <https://fangohr.github.io/coronavirus/Germany-Baden-W%C3%BCrttemberg-LK-Alb-Donau-Kreis.html>
     What is this? (accidentally dropping rows inplace?)
@@ -90,7 +90,8 @@ Functionality
 ------------
 
 -   \[ \] for tables in country over view pages, drop the rows with zeros at the beginning. [HIGH, SMALL]
--   \[ \] show states for Germany in beginning of https://fangohr.github.io/coronavirus/germany.html [HIGH
+-   \[X\] show states for Germany in beginning of https://fangohr.github.io/coronavirus/germany.html [HIGH
+    -> issue https://github.com/oscovida/oscovida/issues/54
 -   \[ \] The Johns Hopkins data has regional data for some countries (UK,
     France, US). Where available, it would be good to show those as regions, in
     addition to one page that shows a sum of all of these numbers.) [HIGH]
