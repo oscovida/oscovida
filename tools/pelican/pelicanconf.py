@@ -102,7 +102,7 @@ COPYRIGHT = """Unless contrary mentioned, the content of this site is published 
 href='https://creativecommons.org/licenses/by/4.0/'>Creative Commons
 Attribution 4.0 International license</a>. See <a href="http://oscovida.github.io/license.html">license</a> for details."""
 
-DISCLAIMER = """Plots, data and software here are provided <a href="https://github.com/fangohr/coronavirus-2020/blob/master/LICENSE#L20">as-is without any warranties</a> by volunteers. Use the material at your own risk. See <a href="http://oscovida.github.io/license.html">license</a> for details."""
+DISCLAIMER = """Plots, data and software here are provided <a href="https://github.com/oscovida/oscovida/blob/master/LICENSE#L20">as-is without any warranties</a> by volunteers. Use the material at your own risk. See <a href="http://oscovida.github.io/license.html">license</a> for details."""
 
 
 

@@ -1,5 +1,5 @@
 """Code used for notebooks and data exploration on
-https://github.com/fangohr/coronavirus-2020"""
+https://github.com/oscovida/oscovida"""
 
 
 import datetime
@@ -1394,7 +1394,7 @@ def overview(country, region=None, subregion=None, savefig=False):
     # data cleaning
     if country == "China":
         axes[1].set_ylim(0, 5000)
-    elif country == "Spain":   # https://github.com/fangohr/coronavirus-2020/issues/44
+    elif country == "Spain":   # https://github.com/oscovida/oscovida/issues/44
         axes[1].set_ylim(bottom=0)
     plot_reproduction_number(axes[3], series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
     plot_doubling_time(axes[5], series=c, color="C1", labels=(region_label, "cases"))

@@ -24,7 +24,7 @@ Overall set up of directory structure and software
 ==================================================
 
 Directory structure for repository
-<https://github.com/fangohr/coronavirus-2020>:
+<https://github.com/oscovida/oscovida>:
 
 coronavirus-2020 (root dir of repository)
 -----------------------------------------
@@ -72,7 +72,7 @@ coronavirus-2020/tools/wwwroot
     repository
 
 -   files that are added to the repository
-    <https://github.com/fangohr/coronavirus-2020>, and then pushed, will
+    <https://github.com/oscovida/oscovida>, and then pushed, will
     show up at <https://fangohr.github.io/coronavirus> a few minutes
     later
 
@@ -179,7 +179,7 @@ coronavirus-2020/dev
 Setting up a local installation for development
 ===============================================
 
-1. clone git@github.com:fangohr/coronavirus-2020.git into your chosen directory
+1. clone git@github.com:oscovida/oscovida.git into your chosen directory
    X. This provides the source code.
 
 2. Get the repository that keeps the static webpages (using github pages)
