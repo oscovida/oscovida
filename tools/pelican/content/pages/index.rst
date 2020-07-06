@@ -39,8 +39,8 @@ You can `fire up your own analysis environment in the cloud, select the relevant
 
 If you want to `contribute <contribute.html>`__, please `get in
 touch <mailto:oscovidaproject@gmail.com>`__. Ideas, suggestions and
-error reports, are welcome at our `feedback issue
-tracker <https://github.com/oscovida/feedback/issues>`__.
+error reports, are welcome at our
+`issue tracker <https://github.com/oscovida/oscovida/issues>`__.
 
 Disclaimer
 ==========
