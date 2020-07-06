@@ -57,8 +57,12 @@ Acknowledgements
    PaNOSC) <https://www.panosc.eu/>`__
 -  `European XFEL <http://www.xfel.eu>`__
 -  `University of Southampton <https://www.soton.ac.uk>`__
+-  `University of Szeged <https://u-szeged.hu/>`__
+-  `Biological Research Centre, Szeged <http://www.brc.hu/>`__
 -  Johns Hopkins University provides data for countries
 -  Robert Koch Institute provides data for within Germany
+-  Atlo Team for gathering and providing data from Hungary (`https://atlo.team/koronamonitor/
+   <https://atlo.team/koronamonitor/>`__)
 -  Open source and scientific computing community for the data tools, in particular numpy, scipy, pandas, matplotlib
 -  Github for hosting repository and html files
 -  Project Jupyter for the Notebook and Binder service
