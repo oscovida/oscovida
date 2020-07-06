@@ -393,7 +393,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
         cases = land["AnzahlFall"].groupby('date').agg('sum').cumsum()
         region_label = f'Germany-{state}'
         cases.name = region_label + " cases"
-        
+
         # group over all multiple entries per day
         deaths = land["AnzahlTodesfall"].groupby('date').agg('sum').cumsum()
         deaths.name = region_label + " deaths"
@@ -1441,8 +1441,6 @@ def overview(country, region=None, subregion=None, savefig=False):
         # germany = fetch_data_germany()
         # laender = list(germany['Bundesland'].drop_duplicates().sort_values())
         axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
-                                                               # compare_with_local=laender)
-        fig.tight_layout(pad=10)
         return_axes = np.concatenate([axes, axes_compare])
     elif country=="US" and region is not None:
         # skip comparison plot for the US states at the moment
