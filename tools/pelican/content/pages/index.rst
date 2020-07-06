@@ -27,7 +27,7 @@ We provide a standard a set of analysis plots (`explained here <plots.html>`__) 
 
 Occasionally, we try to `put COVID19 numbers reported in the news into context <tag-analysis.html>`__.
 
-You can `fire up your own analysis environment in the cloud, select the relevant analysis notebook yourself, re-execute or extend the analysis <https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb>`__.
+You can `fire up your own analysis environment in the cloud, select the relevant analysis notebook yourself, re-execute or extend the analysis <https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb>`__. See also our (growing) `set of tutorials <tag-tutorial.html>`__.
   
 
 --------------
