@@ -1,12 +1,12 @@
 import json
 import os
 
+import ipynb_py_convert
 import nbformat
 from nbconvert import HTMLExporter
 from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.writers import FilesWriter
 
-import ipynb_py_convert
 import oscovida
 
 

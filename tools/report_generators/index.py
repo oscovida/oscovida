@@ -1,18 +1,27 @@
 import datetime
 import logging
 import os
+from typing import List
 
 from pandas import DataFrame
 
 
 # change index to contain URLs and one-line summary in markdown syntax
-def compose_md_url(x):
+def compose_md_url(x: List[str]):
+    """
+    Function is applied to a pandas DataTable along axis=1, expects a list with
+    two elements: a lone line summary of the markdown table, as well as its html
+    name.
+
+    Returns a string like `[one_line_summary](html_path)` to serve as a
+    hyperlink to the generated markdown page.
+    """
     one_line_summary, html = x
     if isinstance(html, str):
         return "[" + one_line_summary + "](" + os.path.join("html", html) + ")"
     # if html was not produced, then variable html is np.nan
     elif repr(html) == "nan":
-        print(
+        logging.warn(
             f"Missing html for {one_line_summary} - will not add link to "
             f"html: \n{x}"
         )

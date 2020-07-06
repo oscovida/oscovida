@@ -1,17 +1,14 @@
 import logging
 import threading
 import time
+from typing import List, Union
 
-from oscovida import MetadataRegion
+from pandas import DataFrame
 from tqdm.auto import tqdm
 
-from .index import create_markdown_index_page
+from oscovida import MetadataRegion
 
-# logging.basicConfig(
-#     format="%(asctime)s %(threadName)s: %(message)s",
-#     level=logging.DEBUG,
-#     datefmt="%H:%M:%S"
-# )
+from .index import create_markdown_index_page
 
 
 class ReportExecutor:
@@ -41,7 +38,7 @@ class ReportExecutor:
         self.debug = debug
 
     @property
-    def regions(self):
+    def metadata_regions(self) -> DataFrame:
         regions_all = MetadataRegion.get_all_as_dataframe()
 
         if self.Reporter.category == "all-regions":
@@ -59,7 +56,9 @@ class ReportExecutor:
 
         return selected_regions
 
-    def _create_html_report_single(self, region) -> None:
+    def _create_html_report_single(
+        self, region: Union[List[str], List[List[str]]]
+    ) -> None:
         for attempt in range(self.attempts):
             if self.__stop__.is_set():
                 raise KeyboardInterrupt
@@ -90,7 +89,11 @@ class ReportExecutor:
                     f"Processing {region} error {type(e)}, retrying {attempt+1}"
                 )
 
-    def _create_html_reports_serial(self, regions):
+    def _create_html_reports_serial(
+        self, regions: Union[List[str], List[List[str]]]
+    ) -> None:
+        #  If the progress bar is disabled then pbar is set to a normal range
+        #  instead of the tqdm bar object
         if self.disable_pbar:
             pbar = range(len(regions))
         else:
@@ -98,6 +101,11 @@ class ReportExecutor:
 
         try:
             for i in pbar:
+                #  Regions can be a list of strings, or in the case of an area
+                #  with subregions it is a list of lists. The last element of
+                #  the list is the smallest/most specific region, so that is
+                #  used for the region string. e.g. for Germany the regions
+                #  are [Bundesland, Kreis], so the Kreis is the region_str
                 region = regions[i]
                 region_str = region[-1] if type(region) == list else region
                 if self.disable_pbar:
@@ -109,7 +117,9 @@ class ReportExecutor:
         except KeyboardInterrupt:
             logging.warning(f"stopped {KeyboardInterrupt}")
 
-    def _create_html_reports_parallel(self, regions):
+    def _create_html_reports_parallel(
+        self, regions: Union[List[str], List[List[str]]]
+    ) -> None:
         self.__stop__ = threading.Event()
 
         padding = self.workers - (len(regions) % self.workers)
@@ -148,7 +158,11 @@ class ReportExecutor:
 
         [t.start() for t in self.threads]
 
-    def create_html_reports(self, regions):
+        return None
+
+    def create_html_reports(
+        self, regions: Union[List[str], List[List[str]]]
+    ) -> None:
         if self.workers:
             #  Works with both ThreadPoolExecutor and ProcessPoolExecutor
             #  for this task multithreading and multiprocessing perform
@@ -166,13 +180,13 @@ class ReportExecutor:
 
     def create_markdown_index_page(
         self,
-        save_as=None,
-        slug=None,
-        pelican_file_path=None,
-        title_prefix="Tracking plots: ",
-    ):
+        save_as: str = None,
+        slug: str = None,
+        pelican_file_path: str = None,
+        title_prefix: str = "Tracking plots: ",
+    ) -> None:
         create_markdown_index_page(
-            self.regions,
+            self.metadata_regions,
             self.Reporter.category,
             save_as,
             slug,
