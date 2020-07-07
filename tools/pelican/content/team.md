@@ -9,7 +9,8 @@ European research project [Photon and Neutron Open Science Cloud
 XFEL](https://xfel.eu) contribute to the project here, including Robert Rosca,
 [Yury Kirienko](https://github.com/kirienko/), [Thomas
 Michelat](https://github.com/tmichela), [David Doblas
-Jiménez](https://git.elnota.space/daviddoji/), and Jacek Generowicz, and others.
+Jiménez](https://git.elnota.space/daviddoji/), [Ebad
+Kamil](https://github.com/ebadkamil), and Jacek Generowicz, and others.
 
 
 
