@@ -2,7 +2,7 @@ Most content has moved to the temporary website https://oscovida.github.io
 
 The remaining content here is only for developers.
 
-[![Build Status](https://travis-ci.org/oscovida/oscovida.svg?branch=master)](https://travis-ci.org/oscovida/oscovida)
+[![Build Status](https://travis-ci.com/oscovida/oscovida.svg?branch=master)](https://travis-ci.com/oscovida/oscovida)
 
 [![codecov](https://codecov.io/gh/oscovida/oscovida/branch/master/graph/badge.svg)](https://codecov.io/gh/oscovida/oscovida)
 
