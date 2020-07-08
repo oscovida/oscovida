@@ -11,8 +11,6 @@ env:
 install:
   - pip install -U pytest
   - make dev-install
-  
-
 
 script:
   - make test
