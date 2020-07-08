@@ -82,7 +82,7 @@ Reproduction number R
   average each infected person will infect 2 other people after 4 days.
 - R needs to be below 1.0 for the total number of infections to
   shrink. A value of R above 1 will lead to exponential growth.
-- See `this page <reproduction-number.html>`__ for more details.
+- See `this page <r-value.html>`__ for more details.
 
 
 Daily growth factor
@@ -114,7 +114,8 @@ Assessing success for containment measures
   changes in new infections from day to day.
 
   The reproduction number R is used in epidemiology, and by politicians. It is
-  harder to estimate than the daily growth factor. The daily growth factor and
+  `harder to estimate <r-value.html>`__ than the daily growth factor.
+  The daily growth factor and
   R cannot be compared directly, but both are qualitatively similar: they need
   to stay under 1.0 for the infections to become fewer over time.
 
@@ -143,7 +144,7 @@ yellow. See discussion of plot 4 above for details.
 
 
 This computation of R based on deaths can be of interest, for example, for the
-case of the `United Kingdom <html/United%20Kingdom.html>`__, where the daily new
+case of the `United Kingdom <html/United-Kingdom.html>`__, where the daily new
 infections remained approximately constant from about 10 April to about 10 May,
 but at the same time the daily number of deaths shows a slow but persistent
 reduction from day to day. A possible explanation for the situation would be
