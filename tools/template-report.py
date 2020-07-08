@@ -49,6 +49,7 @@ table
 
 - Johns Hopkins University provides data for countries
 - Robert Koch Institute provides data for within Germany
+- Atlo Team for gathering and providing data from Hungary (https://atlo.team/koronamonitor/)
 - Open source and scientific computing community for the data tools
 - Github for hosting repository and html files
 - Project Jupyter for the Notebook and binder service

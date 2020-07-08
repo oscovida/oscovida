@@ -57,6 +57,8 @@ Acknowledgements
    PaNOSC) <https://www.panosc.eu/>`__
 -  `European XFEL <http://www.xfel.eu>`__
 -  `University of Southampton <https://www.soton.ac.uk>`__
+-  `Biological Research Centre <http://www.brc.hu/>`__, Szeged
+-  `Dept. of Software Engineering, University of Szeged <https://u-szeged.hu/>`__, Hungary
 -  Johns Hopkins University provides data for countries
 -  Robert Koch Institute provides data for within Germany
 -  Open source and scientific computing community for the data tools, in particular numpy, scipy, pandas, matplotlib
