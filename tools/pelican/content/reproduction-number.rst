@@ -5,9 +5,8 @@ Reproduction number
 :slug: reproduction-number
 :tags: About, Data, Plots
 
-[In preparation; draft material below.]
-
-
+A much more `detailed discussion is available here <r-value.html>`__.
+   
 Reproduction number R
 #####################
 
@@ -15,8 +14,8 @@ Reproduction number R
   <https://en.wikipedia.org/wiki/Basic_reproduction_number>`__ [1] expresses how
   many people are infected from one person with COVID19.
 
-Compute K from measured data
-----------------------------
+Computation of R from measured data
+-----------------------------------
 
 The bulletin from the Robert Koch institute [2] reports that an average
 infectious period of $\tau = 4$ days is assumed. Based on that information, the
@@ -26,7 +25,10 @@ description of the method to compute $R$ is [3]
 - compute an average $<n>_2$ of daily new infections over 4 subsequent days (say days 4 to 7)
 - compute the quotient $<n>_2 / <n>_1$ 
 
-The we repeat this as a sliding calculation for all subsequent days.
+Then we repeat this as a sliding calculation for all subsequent days. This is
+the current method used in OSCOVIDA.
+
+A much more `detailed discussion of this calculation is available <r-value.html>`__.
 
 References
 ----------
