@@ -11,7 +11,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import IPython.display
-
+from typing import Tuple
 # choose font - can be deactivated
 from matplotlib import rcParams
 rcParams['font.family'] = 'sans-serif'
@@ -48,7 +48,6 @@ def display_binder_link(notebook_name):
     # print(f"url is {url}")
     IPython.display.display(
         IPython.display.Markdown(f'[Execute this notebook with Binder]({url})'))
-
 
 
 def clear_cache():
@@ -90,6 +89,7 @@ def fetch_deaths():
     fetch_deaths_last_execution()
     return df
 
+
 @joblib_memory.cache
 def fetch_deaths_US():
     """Download deaths for US states from Johns Hopkins data repository"""
@@ -109,6 +109,7 @@ def fetch_cases():
     fetch_cases_last_execution()
     return df
 
+
 @joblib_memory.cache
 def fetch_cases_US():
     """Download cases for US status from Johns Hopkins data repository"""
@@ -119,7 +120,7 @@ def fetch_cases_US():
     return df
 
 
-def get_country_data_johns_hopkins(country):
+def get_country_data_johns_hopkins(country: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Given a country name, return deaths and cases as a tuple of
     pandas time series. Works for all (?) countries in the world, or at least
     those in the Johns Hopkins data set. All rows should contain a datetime
@@ -181,7 +182,6 @@ def get_US_region_list():
     return list(deaths.groupby("Province_State").sum().index)
 
 
-
 def get_region_US(state, county=None, debug=False):
     """Given a US state name and county, return deaths and cases as a tuple of pandas time
     series. (Johns Hopkins data set)
@@ -235,7 +235,6 @@ def get_region_US(state, county=None, debug=False):
     d.name = country + " deaths"
 
     return c, d
-
 
 
 def compose_dataframe_summary(cases, deaths):
@@ -429,7 +428,6 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
     raise NotImplemented("Should never get to this point.")
 
 
-
 @joblib_memory.cache
 def fetch_data_hungary_last_execution():
     return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
@@ -486,7 +484,6 @@ def get_region_hungary(county):
     cases.name = region_label + " cases"
 
     return cases, None, region_label
-
 
 
 def plot_time_step(ax, series, style="-", labels=None, logscale=True):
@@ -565,7 +562,6 @@ def plot_daily_change(ax, series, color, labels=None):
 
     See plot_time_step for documentation on other parameters.
     """
-
     bar_alpha = 0.2
     if labels is None:
         label = ""
@@ -602,7 +598,6 @@ def plot_daily_change(ax, series, color, labels=None):
         ax.set_ylim([max(-500, ymin), min(10000, ymax)])
 
     return ax
-
 
 
 def compute_doubling_time(series, minchange=0.5, labels=None, debug=False):
@@ -766,7 +761,6 @@ def compute_growth_factor(series):
     return growth, smoothed
 
 
-
 #def plot_growth_factor(ax, series, color):
 #    """relative change of number of new cases/deaths from day to day
 #    See https://youtu.be/Kas0tIxDvrg?t=330, 5:30 onwards
@@ -928,7 +922,8 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
 
 
 
-def get_country_data(country, region=None, subregion=None, verbose=False, pad_RKI_data_to_yesterday=True):
+def get_country_data(country: str, region: str = None, subregion: str = None, verbose: bool = False,
+                     pad_RKI_data_to_yesterday: bool = True) -> Tuple[pd.Series, pd.Series, str]:
     """Given the name of a country, get the Johns Hopkins data for cases and deaths,
     and return them as a tuple of pandas.Series objects and a string describing the region:
     (cases, deaths, region_label)
@@ -1178,7 +1173,6 @@ def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Polan
     return axes, res_c, res_d
 
 
-
 ###################### Compare plots for Germany
 
 def label_from_region_subregion(region_subregion):
@@ -1191,9 +1185,6 @@ def label_from_region_subregion(region_subregion):
     else:
         label = f"{region}"
     return label
-
-
-
 
 
 def unpack_region_subregion(region_subregion):
@@ -1303,9 +1294,8 @@ def make_compare_plot_germany(region_subregion,
     res_c = res_c.interpolate(method='linear', limit=7)
     res_d = res_d.interpolate(method='linear', limit=7)
 
-
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
-    ax=axes[0]
+    ax = axes[0]
     plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
                       "daily new cases\n(rolling 7-day mean)",
                       v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
@@ -1384,11 +1374,11 @@ def plot_no_data_available(ax, mimic_subplot, text):
     ax.set_xticklabels([])
 
 
-def overview(country, region=None, subregion=None, savefig=False):
+def overview(country: str, region: str = None, subregion: str = None, savefig: bool = False, weeks: int = 5):
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
     print(c.name)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
-
+    c, d = c[- weeks * 7:], d[- weeks * 7:]
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
     plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"))
     # data cleaning
