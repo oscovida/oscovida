@@ -1378,7 +1378,7 @@ def overview(country: str, region: str = None, subregion: str = None, savefig: b
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
     print(c.name)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
-    c, d = c[- weeks * 7:], d[- weeks * 7:]
+    c = c[- weeks * 7:]
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
     plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"))
     # data cleaning
@@ -1390,6 +1390,7 @@ def overview(country: str, region: str = None, subregion: str = None, savefig: b
     plot_doubling_time(axes[5], series=c, color="C1", labels=(region_label, "cases"))
 
     if d is not None:
+        d = d[- weeks * 7:]
         plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
         plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"))
         plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
