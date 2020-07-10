@@ -19,6 +19,7 @@ rcParams['font.sans-serif'] = ['Inconsolata']
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
 from matplotlib.ticker import ScalarFormatter, FuncFormatter
+from matplotlib.dates import DateFormatter, MONDAY, WeekdayLocator
 from bisect import bisect
 
 import matplotlib.pyplot as plt
@@ -1139,6 +1140,7 @@ def set_y_axis_limit(data, current_lim):
     else:
         return current_lim
 
+
 def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Poland", "Korea, South",
                                                   "Belarus", "Switzerland", "US"],
                      v0c=10, v0d=3):
@@ -1411,6 +1413,9 @@ def overview(country: str, region: str = None, subregion: str = None, savefig: b
     for i in range(0, axes.shape[0]):
         axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
         axes[i].yaxis.set_ticks_position('both')
+        if weeks > 0:
+            axes[i].get_xaxis().set_major_locator(WeekdayLocator(byweekday=MONDAY))     # put ticks every Monday
+            axes[i].get_xaxis().set_major_formatter(DateFormatter('%d %b'))             # date format: `15 Jun`
 
     title = f"Overview {country}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
