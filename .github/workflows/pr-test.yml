@@ -1,0 +1,56 @@
+name: Generate Webpage for PR
+
+on:
+  pull_request:
+
+jobs:
+  webpage-gen-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+      - name: Checkout oscovida/staging
+        uses: actions/checkout@v2
+        with:
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
+      - name: Checkout oscovida pr branch
+        uses: actions/checkout@v2
+        with:
+          path: oscovida
+      - name: Set up oscovida and webgen
+        run: |
+          pip install ./oscovida
+          pip install -r ./base/requirements.txt
+      - name: Generate new reports
+        run: |
+          export PR_NO=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          cp -r ./base $PR_NO
+          export WWWROOT=$(readlink -f $PR_NO)
+          echo $WWWROOT
+          cd ./oscovida/tools/
+          ln -s $WWWROOT ./wwwroot
+          ls ./wwwroot
+          python3 -m report_generators.cli --debug --regions=all --workers=max --log-level=INFO --log-file=./wwwroot/report-gen.log
+      - name: Generate individual plots
+        run: |
+          cd ./oscovida/tools/
+          jupyter-nbconvert generate-individiual-plots.ipynb --execute
+      - name: Update HTML pages
+        run: |
+          cd ./oscovida/tools/pelican
+          make publish
+      - name: Add key for staging push
+        uses: webfactory/ssh-agent@v0.4.0
+        with:
+          ssh-private-key: ${{ secrets.STAGING_KEY }}
+      - name: Commit files
+        run: |
+          export PR_NO=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add $PR_NO --all
+          git commit -m "Generated preview for PR $PR_NO on $(date)" -a
+          git push
