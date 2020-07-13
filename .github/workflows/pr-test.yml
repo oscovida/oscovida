@@ -9,6 +9,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Add key for staging push
+        uses: webfactory/ssh-agent@v0.4.0
+        with:
+          ssh-private-key: ${{ secrets.STAGING_KEY }}
+
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
         with:
@@ -51,11 +56,6 @@ jobs:
         run: |
           cd ./oscovida/tools/pelican
           make publish
-
-      - name: Add key for staging push
-        uses: webfactory/ssh-agent@v0.4.0
-        with:
-          ssh-private-key: ${{ secrets.STAGING_KEY }}
 
       - name: Commit files and push
         run: |
