@@ -53,11 +53,15 @@ jobs:
           cd ./oscovida/tools/pelican
           make publish
 
-      - name: Commit files and push
+      - name: Commit files
         run: |
           export PR_NO=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add $PR_NO --all
           git commit -m "Generated preview for PR $PR_NO on $(date)" -a
-          git push
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.STAGING_KEY }}
