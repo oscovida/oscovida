@@ -18,10 +18,7 @@ jobs:
       - uses: mshick/add-pr-comment@v1
         if: ${{ failure() }} && steps.addKey.conclusion == 'failure'
         with:
-          message: |
-            Staging key could not be imported, cannot push to oscovida/staging
-            to create test website insance. If this PR is external it may not
-            have access to the required secrets.
+          message: "Staging key could not be imported, cannot push to oscovida/staging to create test website insance. If this PR is external it may not have access to the required secrets."
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]'
           allow-repeats: false
