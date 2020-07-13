@@ -16,7 +16,7 @@ jobs:
           ssh-private-key: ${{ secrets.STAGING_KEY }}
 
       - uses: mshick/add-pr-comment@v1
-        if: steps.addKey.conclusion == 'failure'
+        if: ${{ failure() }} && steps.addKey.conclusion == 'failure'
         with:
           message: |
             Staging key could not be imported, cannot push to oscovida/staging
@@ -27,7 +27,7 @@ jobs:
           allow-repeats: false
 
       - name: Early exit for missing staging keys
-        if: steps.addKey.conclusion == 'failure'
+        if: ${{ failure() }} && steps.addKey.conclusion == 'failure'
         uses: andymckay/cancel-action@0.2
 
       - name: Set up Python 3.8
