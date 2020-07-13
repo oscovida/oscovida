@@ -1,0 +1,88 @@
+name: Generate Webpage for PR
+
+on:
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  webpage-gen-pr:
+    runs-on: ubuntu-latest
+    steps:
+
+      - id: addKey
+        name: Add key for staging push
+        uses: webfactory/ssh-agent@ef0ce0cab8e3ad0aa0f3e1fb209b0811b68c0c51
+        with:
+          ssh-private-key: ${{ secrets.STAGING_KEY }}
+
+      - uses: mshick/add-pr-comment@v1
+        if: ${{ failure()  && steps.addKey.conclusion == 'failure' }}
+        with:
+          message: "Staging key could not be imported, cannot push to oscovida/staging to create test website instance. If this PR is external it may not have access to the required secrets."
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+          allow-repeats: false
+
+      - name: Early exit for missing staging keys
+        if: ${{ failure() && steps.addKey.conclusion == 'failure' }}
+        uses: andymckay/cancel-action@0.2
+
+      - name: Set up Python 3.8
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      - name: Checkout oscovida/staging
+        uses: actions/checkout@v2
+        with:
+          ssh-key: ${{ secrets.STAGING_KEY }}
+          repository: oscovida/staging
+          persist-credentials: false # otherwise, the token used is the GITHUB_TOKEN, instead of your personal token
+          fetch-depth: 0 # otherwise, you will failed to push refs to dest repo
+
+      - name: Checkout oscovida pr branch
+        uses: actions/checkout@v2
+        with:
+          path: oscovida
+
+      - name: Set up oscovida and webgen
+        run: |
+          pip install ./oscovida
+          pip install -r ./base/requirements.txt
+
+      - name: Generate new reports
+        run: |
+          export PR_NO=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          cp -r ./base $PR_NO
+          export WWWROOT=$(readlink -f $PR_NO)
+          echo $WWWROOT
+          cd ./oscovida/tools/
+          ln -s $WWWROOT ./wwwroot
+          ls ./wwwroot
+          python3 -m report_generators.cli --debug --regions=all --workers=max --log-level=INFO --log-file=./wwwroot/report-gen.log
+
+      - name: Generate individual plots
+        run: |
+          cd ./oscovida/tools/
+          jupyter-nbconvert generate-individiual-plots.ipynb --execute
+
+      - name: Update HTML pages
+        run: |
+          cd ./oscovida/tools/pelican
+          make publish
+
+      - name: Commit files
+        run: |
+          export PR_NO=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add $PR_NO --all
+          git commit -m "Generated preview for PR $PR_NO on $(date)" -a
+          git push
+
+      - uses: mshick/add-pr-comment@v1
+        with:
+          message: "View web reports generated with this branch at [staging/${{ github.event.number }}](https://oscovida.github.io/staging/${{ github.event.number }})"
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
+          allow-repeats: false # This is the default
