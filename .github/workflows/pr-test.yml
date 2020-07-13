@@ -16,7 +16,7 @@ jobs:
           ssh-private-key: ${{ secrets.STAGING_KEY }}
 
       - uses: mshick/add-pr-comment@v1
-        if: ${{ failure()  && steps.addKey.conclusion == 'failure' }}
+        if: ${{ failure()  && steps.addKey.conclusion == 'failuhttps://oscovida.github.io/staging/80/re' }}
         with:
           message: "Staging key could not be imported, cannot push to oscovida/staging to create test website instance. If this PR is external it may not have access to the required secrets."
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -82,7 +82,7 @@ jobs:
 
       - uses: mshick/add-pr-comment@v1
         with:
-          message: "View web reports generated with this branch at [staging/${{ github.event.number }}](https://oscovida.github.io/staging/${{ github.event.number }})"
+          message: "View web reports generated with this branch at [staging/${{ github.event.number }}](https://oscovida.github.io/staging/${{ github.event.number }}/)"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
           allow-repeats: false # This is the default
