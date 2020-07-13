@@ -10,7 +10,7 @@ jobs:
     steps:
 
       - name: Add key for staging push
-        uses: webfactory/ssh-agent@v0.4.0
+        uses: webfactory/ssh-agent@ef0ce0cab8e3ad0aa0f3e1fb209b0811b68c0c51
         with:
           ssh-private-key: ${{ secrets.STAGING_KEY }}
 
