@@ -9,10 +9,26 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Add key for staging push
+      - id: addKey
+        name: Add key for staging push
         uses: webfactory/ssh-agent@ef0ce0cab8e3ad0aa0f3e1fb209b0811b68c0c51
         with:
           ssh-private-key: ${{ secrets.STAGING_KEY }}
+
+      - uses: mshick/add-pr-comment@v1
+        if: steps.addKey.conclusion == 'failure'
+        with:
+          message: |
+            Staging key could not be imported, cannot push to oscovida/staging
+            to create test website insance. If this PR is external it may not
+            have access to the required secrets.
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          repo-token-user-login: 'github-actions[bot]'
+          allow-repeats: false
+
+      - name: Early exit for missing staging keys
+        if: steps.addKey.conclusion == 'failure'
+        uses: andymckay/cancel-action@0.2
 
       - name: Set up Python 3.8
         uses: actions/setup-python@v2
