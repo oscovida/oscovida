@@ -64,14 +64,14 @@ def inject_google_analytics_into_html_notebooks(GOOGLE_ANALYTICS):
             content = f_in.read()
 
         # just a sanity check this is a file generated from a notebook
-        assert "<title>Notebook</title>" in content
+        nb_in_content = "<title>Notebook</title>" in content
 
         # we assume only one "</body>" in file
-        assert content.count("</body>") == 1
+        body_correct_count = content.count("</body>") == 1
 
         # assume the snippet is not in there yet (in case we run this script
         # repeatedly)
-        if GOOGLE_ANALYTICS in content:
+        if (GOOGLE_ANALYTICS in content) or (not nb_in_content) or (not body_correct_count):
             # already injected
             counter_untouched += 1
         else:
