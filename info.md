@@ -4,20 +4,20 @@ Info on data sources, repository and software details
 Data for Germany from Robert Koch Institute
 ----------------------------------------------------
 
--   From <https://npgeo-corona-npgeo-de.hub.arcgis.com/> -\> Menu top
-    left -\> \"Data\", scroll down to \"RKI Corona Landkreise\" data
-    set, -\> select interesting data set -\>
-    -   RKI Corona Bundesländer
-    -   RKI COVID19 -\>  "Download der Daten als CSV"
-    - leading to this page: https://www.arcgis.com/home/item.html?id=f10774f1c63e40168479a1feb6c7ca74
-    - there seem to be multiple options to get to the data. One of them is the "URL" in the rigth column,
-    - which points to https://www.arcgis.com/sharing/rest/content/items/f10774f1c63e40168479a1feb6c7ca74/data
+- From <https://npgeo-corona-npgeo-de.hub.arcgis.com/> -\> Menu top
+  left -\> \"Data\", scroll down to \"RKI Corona Landkreise\" data
+  set, -\> select interesting data set -\>
+  - RKI Corona Bundesländer
+  - RKI COVID19 -\>  "Download der Daten als CSV"
+  - leading to this page: https://www.arcgis.com/home/item.html?id=f10774f1c63e40168479a1feb6c7ca74
+  - there seem to be multiple options to get to the data. One of them is the "URL" in the rigth column,
+  - which points to https://www.arcgis.com/sharing/rest/content/items/f10774f1c63e40168479a1feb6c7ca74/data
 
 - outdated as of 6 June 2020:
-    -   Download button (below image, on the right) -\> Full Data set
-        -\> Spreadsheet This provides a link to a csv file, but with a
-        URL that includes a hash. As of 9 April, this is
-        <https://opendata.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0.csv>
+  - Download button (below image, on the right) -\> Full Data set
+    -\> Spreadsheet This provides a link to a csv file, but with a
+    URL that includes a hash. As of 9 April, this is
+    <https://opendata.arcgis.com/datasets/ef4b445a53c1406892257fe63129a8ea_0.csv>
 
 
 Overall set up of directory structure and software
@@ -30,14 +30,14 @@ oscovida (root dir of repository)
 -----------------------------------------
 
 
--   [info.md](info.md) : this file, provides overview of current setup
--   [todo.md](todo.md) : things that need doing (programming/software
-    engineering/data analysis)
--   [ideas.md](ideas.md): things that could be done; might need some evaluation
-    first
--   [Dockerfile](Dockerfile): Dockerfile that allow execution of tests in
-    container (could also be used for production)
--   [Makefile](Makefile): useful targets for tests and installation
+- [info.md](info.md) : this file, provides overview of current setup
+- [todo.md](todo.md) : things that need doing (programming/software
+  engineering/data analysis)
+- [ideas.md](ideas.md): things that could be done; might need some evaluation
+  first
+- [Dockerfile](Dockerfile): Dockerfile that allow execution of tests in
+  container (could also be used for production)
+- [Makefile](Makefile): useful targets for tests and installation
 
 
 oscovida/oscovida
@@ -45,8 +45,8 @@ oscovida/oscovida
 
 contains oscovida package as the source required to create the plots
 
--   notebooks will import from this package
--   this is the authorative copy of the oscovida module
+- notebooks will import from this package
+- this is the authorative copy of the oscovida module
 
 
 oscovida/tools
@@ -58,43 +58,43 @@ contains tools to create static webpages at
 
 in particular:
 
--   generate-countries.ipynb Notebook that creates all the static
-    wepages for the world, and Germany, and US states
+- generate-countries.ipynb Notebook that creates all the static
+  wepages for the world, and Germany, and US states
 
--   template-country.ipynb (used for world countries)
--   template-germany.ipynb (used for Germany)
--   template-US.ipynb (used for US states)
+- template-country.ipynb (used for world countries)
+- template-germany.ipynb (used for Germany)
+- template-US.ipynb (used for US states)
 
 oscovida/tools/wwwroot
 ------------------------------
 
--   rootdirectory of <https://oscovida.github.io/index.html> and
-    repository
+- rootdirectory of <https://oscovida.github.io/index.html> and
+  repository
 
--   files that are added to the repository
-    <https://github.com/oscovida/oscovida>, and then pushed, will
-    show up at <https://oscovida.github.io/index.html> a few minutes
-    later
+- files that are added to the repository
+  <https://github.com/oscovida/oscovida>, and then pushed, will
+  show up at <https://oscovida.github.io/index.html> a few minutes
+  later
 
--   we use a separate repository (I.e. different from code repo) out of
-    fear that it may grow quickly in size. At that point, we can create
-    a new repository under the same name, as the history is pretty
-    irrelevant: this is only to serve the most recent data in static
-    html files.
+- we use a separate repository (I.e. different from code repo) out of
+  fear that it may grow quickly in size. At that point, we can create
+  a new repository under the same name, as the history is pretty
+  irrelevant: this is only to serve the most recent data in static
+  html files.
 
--   The total size of html file for world and Germany is around 300MB,
-    but the .git directory is smaller.
+- The total size of html file for world and Germany is around 300MB,
+  but the .git directory is smaller.
 
--   files in the `html` directory are created from notebooks. The notebooks are
-    stored in the `ipynb` subdirectory.
+- files in the `html` directory are created from notebooks. The notebooks are
+  stored in the `ipynb` subdirectory.
 
--   The files committed to the webpages repository must contain the most recent
-    `oscovida` in the `ipynb` subdirectory and `requirements.txt` as those
-    are needed by binder to execute the notebooks.
+- The files committed to the webpages repository must contain the most recent
+  `oscovida` in the `ipynb` subdirectory and `requirements.txt` as those
+  are needed by binder to execute the notebooks.
 
--   By also commiting the `cachedir`, people don\'t need to re-fetch the
-    data on the binder service (fetching of the German data set varies
-    between 1s and 60 seconds).
+- By also commiting the `cachedir`, people don\'t need to re-fetch the
+  data on the binder service (fetching of the German data set varies
+  between 1s and 60 seconds).
 
 oscovida/tools/wwwroot/ipynb
 ------------------------------------
@@ -109,26 +109,26 @@ all the html files. This is realised with the next section:
 oscovida/tools/binder
 ------------------------------
 
--   repository <https://github.com/oscovida/binder>
+- repository <https://github.com/oscovida/binder>
 
--   this started (24 May 2020) as a copy of the oscovida/tools/wwwroot/ipynb
-    directory, but in a separate repository to make the binder start up time shorter
-    (because this repo is faster to clone than the massive wwwroot one.)
+- this started (24 May 2020) as a copy of the oscovida/tools/wwwroot/ipynb
+  directory, but in a separate repository to make the binder start up time shorter
+  (because this repo is faster to clone than the massive wwwroot one.)
 
--   for now, we rsync everything from oscovida/tools/wwwroot/ipynb to
-    oscovida/tools/binder/ipynb
+- for now, we rsync everything from oscovida/tools/wwwroot/ipynb to
+  oscovida/tools/binder/ipynb
 
-    In the long run, we could consider to write ipynb files directly into the
-    binder directory.
+  In the long run, we could consider to write ipynb files directly into the
+  binder directory.
 
--   The files committed to the webpages repository must contain the most recent
-    `oscovida` in the `ipynb` subdirectory and `requirements.txt` and
-    `apt.txt` as those are needed by binder to execute the notebooks.
+- The files committed to the webpages repository must contain the most recent
+  `oscovida` in the `ipynb` subdirectory and `requirements.txt` and
+  `apt.txt` as those are needed by binder to execute the notebooks.
 
--   By also commiting the `cachedir`, people don\'t need to re-fetch the data on
-    the binder service (fetching of the German data set varies between 1s and 60
-    seconds). The downside is that the data will grow stale over time.
-    (At the moment, 25May 2020, we don't copy the cachedir into the binder directory.)
+- By also commiting the `cachedir`, people don\'t need to re-fetch the data on
+  the binder service (fetching of the German data set varies between 1s and 60
+  seconds). The downside is that the data will grow stale over time.
+  (At the moment, 25May 2020, we don't copy the cachedir into the binder directory.)
 
 
 oscovida/tools/pelican
@@ -140,14 +140,14 @@ Base directory of Pelican (static html generator) package.
 - run `make publish` here to create html that is meant to be pushed to the
   website:
   - `make publish` executes the settings is `publishconf.py` after having
-    executed `pelicanconf.py`. As such, we get absolute URL in feeds, we get
-    feeds with links to new articles. It also adds the google analytics tracker
-    that we don't want for development, and javascript to enable disqus. (Not
-    sure if we want the latter, but we might as well set it up while there is no
-    traffic on the page, and then deactivate if we don't want it.)
+  executed `pelicanconf.py`. As such, we get absolute URL in feeds, we get
+  feeds with links to new articles. It also adds the google analytics tracker
+  that we don't want for development, and javascript to enable disqus. (Not
+  sure if we want the latter, but we might as well set it up while there is no
+  traffic on the page, and then deactivate if we don't want it.)
 
-    `make publish` also copies `ipynb` files into the
-    oscovida/tools/wwwroot/ipynb directory.
+  `make publish` also copies `ipynb` files into the
+  oscovida/tools/wwwroot/ipynb directory.
 
 - the `generate-countries.ipynb` notebook creates files `germany.md` and
   `world.md` (and more) in pelican/contents
@@ -166,8 +166,8 @@ Base directory of Pelican (static html generator) package.
 oscovida/archive
 ------------------------
 
--   files for history interest - can be removed soon. There were
-    initially interesting to look up some things tried before.
+- files for history interest - can be removed soon. There were
+  initially interesting to look up some things tried before.
 
 oscovida/dev
 --------------------
@@ -195,12 +195,12 @@ Procedure to update data and webpages (manual)
 
 4. update notebooks by running (in X/tools):
 
-   - jupyter-notebook generate-countries.html:
-     - updates all ~600 html files by executing ~600 ipynb files, which are created from the templates
+  - jupyter-notebook generate-countries.html:
+  - updates all ~600 html files by executing ~600 ipynb files, which are created from the templates
 
-   - jupyter-notebook generate-individual-plots.html:
-     - updates image on home page (with one country out of the top 10)
-     - updates plots on https://oscovida.github.io/plots.html with current data
+  - jupyter-notebook generate-individual-plots.html:
+  - updates image on home page (with one country out of the top 10)
+  - updates plots on https://oscovida.github.io/plots.html with current data
 
 5. in X/tools/pelican, run ``make html` to update html pages (to develop), `make
    publish` for the final version
@@ -220,15 +220,12 @@ Procedure to update data and webpages (automatic)
 Run script `tools/cron-job-update-webpages.fish`
 
 
-
-
-
 Related resources
 =================
 
 -   <https://nextstrain.org/ncov>
 -   Jupyter notebooks as templates: <https://covid19dashboards.com/> One
-    of these is
-    -   <https://covid19dashboards.com/compare-country-death-trajectories/>
-        -   nice comparison of trajectories
-            -   would be good to have per state or \'Landkreis\'
+  of these is
+  -   <https://covid19dashboards.com/compare-country-death-trajectories/>
+    -   nice comparison of trajectories
+      -   would be good to have per state or \'Landkreis\'
