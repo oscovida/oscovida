@@ -39,7 +39,7 @@ You can `fire up your own analysis environment in the cloud, select the relevant
 
 --------------
 
-If you want to `contribute <contribute.html>`__, please either join our`Zulip
+If you want to `contribute <contribute.html>`__, please either join our `Zulip
 chat instance here <https://oscovida.zulipchat.com>`__ or `get in
 touch <mailto:oscovidaproject@gmail.com>`__. Ideas, suggestions and
 error reports, are welcome at our
