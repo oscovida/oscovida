@@ -50,6 +50,7 @@ setup(
         'ipywidgets',
         'ipynb_py_convert',
         'click',
+        "covid19dh",
     ],
     extras_require={
         'test': [
