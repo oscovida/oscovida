@@ -195,8 +195,10 @@ Procedure to update data and webpages (manual)
 
 4. update notebooks by running (in X/tools):
 
-  - jupyter-notebook generate-countries.html:
-  - updates all ~600 html files by executing ~600 ipynb files, which are created from the templates
+  - the report_generators tool, see `python -m report_generators.cli --help` for
+    help
+  - `python3 -m report_generators.cli --regions=all --workers=max` updates all
+    (~600) pages using with max workers
 
   - jupyter-notebook generate-individual-plots.html:
   - updates image on home page (with one country out of the top 10)
@@ -213,12 +215,92 @@ Procedure to update data and webpages (manual)
 
 8. in `binder`, run `git add *; git commit *`, then `git push`
 
-
 Procedure to update data and webpages (automatic)
 =================================================
 
-Run script `tools/cron-job-update-webpages.fish`
+After pip-installing `oscovida`, cd to the `tools` directory, and from there you
+can use the `report_generators` module to execute the notebooks.
 
+The [GitHub Workflow](https://github.com/oscovida/oscovida.github.io/blob/master/.github/workflows/update-webpages.yml)
+used to automatically generate the oscovida website can be used to see how to
+manually generate it. The steps would be:
+
+```
+#  Set up repositories
+git clone git@github.com/oscovida/oscovida
+git clone git@github.com/oscovida/oscovida.github.io ./oscovida/tools/wwwroot
+
+#  Set up environment
+python -m venv .venv
+source .venv/bin/activate
+pip install .
+
+#  Generate reports
+pushd tools
+python3 -m report_generators.cli --regions=all --force --workers=max --log-level=INFO --log-file=./wwwroot/report-gen.log
+popd
+
+#  Generate individual plots
+pushd tools
+jupyter-nbconvert generate-individiual-plots.ipynb --execute
+popd
+
+#  Update HTML pages
+pushd tools/pelican
+make publish
+popd
+```
+
+You can save this as a script and run it, however generating the entire website
+may take a while depending on your core count. If you are contributing to the
+project you should use the `--debug` flag to only generate 10 reports per region
+instead of all the 600+ reports.
+
+
+
+Report Generators CLI Help
+==========================
+
+```
+❯ python -m report_generators.cli --help
+Usage: cli.py [OPTIONS]
+
+  Command Line Interface used to batch-generate and execute Jupyter notebook
+  reports for oscovida.
+
+Options:
+  -r, --regions [countries|germany|usa|hungary|all-regions-md|all]
+                                  Region(s) to generate reports for.
+
+  --workers TEXT                  Number of workers to use, `auto` uses
+                                  nproc-2, set to 1 or False to use a single
+                                  process.
+
+  --wwwroot TEXT                  Root directory for www content.
+
+  --create-wwwroot                Create wwwroot directory if it does not
+                                  exist.
+
+  --kernel-name TEXT              Create wwwroot directory if it does not
+                                  exist.
+
+  --disable-pbar                  Disable progress bar, print logging output
+                                  instead.
+
+  --log-level [CRITICAL|ERROR|WARNING|INFO|DEBUG]
+                                  Log level.
+
+  --log-file TEXT                 Log file path.
+
+  --force                         Force notebook re-execution even if recently
+                                  executed.
+
+  --debug                         Enable debug mode, only generates reports
+                                  for the first 10 regions and sets the log
+                                  level to `INFO`.
+
+  --help                          Show this message and exit.
+```
 
 Related resources
 =================
