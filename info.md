@@ -46,7 +46,7 @@ oscovida/oscovida
 contains oscovida package as the source required to create the plots
 
 - notebooks will import from this package
-- this is the authorative copy of the oscovida module
+- this is the authoritative copy of the oscovida module
 
 
 oscovida/tools
@@ -59,7 +59,7 @@ contains tools to create static webpages at
 in particular:
 
 - generate-countries.ipynb Notebook that creates all the static
-  wepages for the world, and Germany, and US states
+  webpages for the world, and Germany, and US states
 
 - template-country.ipynb (used for world countries)
 - template-germany.ipynb (used for Germany)
@@ -92,7 +92,7 @@ oscovida/tools/wwwroot
   `oscovida` in the `ipynb` subdirectory and `requirements.txt` as those
   are needed by binder to execute the notebooks.
 
-- By also commiting the `cachedir`, people don\'t need to re-fetch the
+- By also committing the `cachedir`, people don\'t need to re-fetch the
   data on the binder service (fetching of the German data set varies
   between 1s and 60 seconds).
 
@@ -125,7 +125,7 @@ oscovida/tools/binder
   `oscovida` in the `ipynb` subdirectory and `requirements.txt` and
   `apt.txt` as those are needed by binder to execute the notebooks.
 
-- By also commiting the `cachedir`, people don\'t need to re-fetch the data on
+- By also committing the `cachedir`, people don\'t need to re-fetch the data on
   the binder service (fetching of the German data set varies between 1s and 60
   seconds). The downside is that the data will grow stale over time.
   (At the moment, 25May 2020, we don't copy the cachedir into the binder directory.)

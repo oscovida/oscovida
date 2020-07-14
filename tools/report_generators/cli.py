@@ -273,7 +273,7 @@ def generate(*, region, workers, kernel_name, wwwroot, force, disable_pbar, debu
     default=False,
     is_flag=True,
     help="Enable debug mode, only generates reports for the first 10 regions "
-         "and sets the log level to `DEBUG`.",
+         "and sets the log level to `INFO`.",
 )
 def cli(
     *,
