@@ -13,14 +13,16 @@ Use OSCOVIDA to monitor the pandemic, second waves, local outbreaks and motivate
 social distancing and support for other containment measures.
 
 Read more about our `motivation <motivation.html>`__, `data sources
-<data-sources.html>`__, `team <team.html>`__, or watch a `video interview <https://youtu.be/1_oDc_vptBQ>`__.
+<data-sources.html>`__, `team <team.html>`__, watch a
+`video interview <https://youtu.be/1_oDc_vptBQ>`__, or join our
+`Zulip chat instance here <https://oscovida.zulipchat.com>`__.
 
 We provide a standard a set of analysis plots (`explained here <plots.html>`__) for different regions:
 
--  `List of all regions, countries and US states <all-regions.html>`__ 
+-  `List of all regions, countries and US states <all-regions.html>`__
 
 -  `Overview for each country in the world <countries.html>`__ (Johns Hopkins data)
-   
+
 -  `States in the US <us.html>`__ (Johns Hopkins data)
 
 -  `Counties (Landkreise) in Germany <germany.html>`__ (Robert Koch Institute data)
@@ -28,16 +30,17 @@ We provide a standard a set of analysis plots (`explained here <plots.html>`__) 
 Occasionally, we try to provide `additional discussion COVID19 related news and numbers <tag-analysis.html>`__.
 
 You can `fire up your own analysis environment in the cloud, select the relevant analysis notebook yourself, re-execute or extend the analysis <https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb>`__. See also our (growing) `set of tutorials <tag-tutorial.html>`__.
-  
+
 
 --------------
 
 .. raw:: html
    :file: index-included-for-figure1-html
-         
+
 --------------
 
-If you want to `contribute <contribute.html>`__, please `get in
+If you want to `contribute <contribute.html>`__, please either join our`Zulip
+chat instance here <https://oscovida.zulipchat.com>`__ or `get in
 touch <mailto:oscovidaproject@gmail.com>`__. Ideas, suggestions and
 error reports, are welcome at our
 `issue tracker <https://github.com/oscovida/oscovida/issues>`__.
