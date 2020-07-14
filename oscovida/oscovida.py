@@ -5,28 +5,30 @@ https://github.com/oscovida/oscovida"""
 import datetime
 import math
 import os
-import pytz
 import time
-import joblib
-import numpy as np
-import pandas as pd
-import IPython.display
-
-# choose font - can be deactivated
-from matplotlib import rcParams
-rcParams['font.family'] = 'sans-serif'
-rcParams['font.sans-serif'] = ['Inconsolata']
-# need many figures for index.ipynb and germany.ipynb
-rcParams['figure.max_open_warning'] = 50
-from matplotlib.ticker import ScalarFormatter, FuncFormatter
 from bisect import bisect
 
+import IPython.display
+import joblib
 import matplotlib.pyplot as plt
-plt.style.use('ggplot')
+import numpy as np
+import pandas as pd
+import pytz
+from matplotlib import rcParams
+from matplotlib.ticker import FuncFormatter, ScalarFormatter
+from pandas.plotting import register_matplotlib_converters
 
 # suppress warning
-from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
+
+# choose font - can be deactivated
+rcParams['font.family'] = 'sans-serif'
+rcParams['font.sans-serif'] = ['Inconsolata']
+
+# need many figures for index.ipynb and germany.ipynb
+rcParams['figure.max_open_warning'] = 50
+
+plt.style.use('ggplot')
 
 LW = 3   # line width
 

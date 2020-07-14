@@ -2,8 +2,8 @@ import datetime
 import json
 import math
 import os
-import pandas as pd
 
+import pandas as pd
 
 MetadataStorageLocation = os.path.join("oscovida-metadata", "regions")
 
