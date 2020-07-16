@@ -51,6 +51,7 @@ setup(
         'ipynb_py_convert',
         'click',
         "covid19dh",
+        "pycountry",
     ],
     extras_require={
         'test': [
