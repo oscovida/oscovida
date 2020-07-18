@@ -47,14 +47,15 @@ jobs:
 
       - name: Set up oscovida and webgen
         run: |
-          pip install ./oscovida
-          pip install -r ./base/requirements.txt
+          pip install poetry
+          poetry --version
+          poetry config settings.virtualenvs.in-project true
+          poetry install -vv
 
       - name: Generate new reports
         run: |
-          export PR_NO=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
-          cp -r ./base $PR_NO
-          export WWWROOT=$(readlink -f $PR_NO)
+          cp -r ./base ${{ github.event.number }}
+          export WWWROOT=$(readlink -f ${{ github.event.number }})
           echo $WWWROOT
           cd ./oscovida/tools/
           ln -s $WWWROOT ./wwwroot
@@ -73,11 +74,10 @@ jobs:
 
       - name: Commit files
         run: |
-          export PR_NO=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add $PR_NO --all
-          git commit -m "Generated preview for PR $PR_NO on $(date)" -a
+          git add ${{ github.event.number }} --all
+          git commit -m "Generated preview for PR ${{ github.event.number }} on $(date)" -a
           git push
 
       - uses: mshick/add-pr-comment@v1
