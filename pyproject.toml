@@ -1,0 +1,35 @@
+[tool.poetry]
+name = "oscovida"
+version = "0.1.2"
+description = "Explore COVID19 case numbers and deaths related to Coronavirus outbreak 2019/2020 in Pandas and in Jupyter notebook with MyBinder"
+authors = ["Your Name <you@example.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+joblib = "^0.16.0"
+pandas = "^1.0.5"
+seaborn = "^0.10.1"
+matplotlib = "<3.3"
+markdown = "^3.2.2"
+numpy = "^1.19.0"
+scipy = "^1.5.1"
+voila = "^0.1.21"
+pelican = "^4.2.0"
+pelican-jupyter = "^0.10.0"
+tabulate = "^0.8.7"
+tqdm = "^4.48.0"
+ipywidgets = "^7.5.1"
+ipynb_py_convert = "^0.4.5"
+click = "^7.1.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.3"
+pytest-cov = "^2.10.0"
+coverage = "^5.2"
+nbval = "^0.9.5"
+testpath = "^0.4.4"
+pycodestyle = "^2.6.0"
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
