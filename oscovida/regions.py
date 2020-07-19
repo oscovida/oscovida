@@ -1,14 +1,15 @@
-from covid19dh import covid19
-import pycountry
 from functools import lru_cache
-from typing import NamedTuple, Optional
-import pandas.core.frame.DataFrame
+from typing import Optional
+
+import pycountry
+from covid19dh import covid19
+from pandas import DataFrame
 
 
 @lru_cache(maxsize=32)
 def fetch_covid19_data(
     country: str = None, level: int = 1, verbose: bool = False
-) -> pandas.core.frame.DataFrame:
+) -> DataFrame:
     """Wraps the `covid19dh.covid19` function in n `functools.lru_cache`.
 
     `covid19dh.covid19` caches the downloaded data files to disk so that it does
@@ -18,95 +19,167 @@ def fetch_covid19_data(
     return covid19(country, level=level, verbose=verbose)
 
 
-class RegionInfo(NamedTuple):
-    """Contains information that specifies a region.
-
-    Parameters
-    ----------
-    country: str
-        Country name string (e.g. "United States")
-    admin_1: str
-        Country alpha_3 string, administrative area of top level (e.g. "USA")
-    admin_2: str = ""
-        Second-level administrative area, usually states, regions or cantons (e.g. "California")
-    admin_3: str = ""
-        Third-level administrative area, usually cities or municipalities (e.g. "San Francisco")
-    level: int = -1
-        Level of administrative areas specified
-    """
-
-    country: Optional[str] = None
-    admin_1: Optional[str] = None
-    admin_2: Optional[str] = None
-    admin_3: Optional[str] = None
-    level: int = -1
+def _check_admin_level_(admin_1: str, admin_target: str, level: int):
+    data = fetch_covid19_data(admin_1, level)
+    admin_names = data[f'administrative_area_level_{level}'].unique()
+    if not admin_target in admin_names:
+        raise LookupError(
+            f'{admin_target} not found in data for {admin_1}, availabe '
+            f'regions are: {admin_names.tolist()}'
+        )
 
 
-def region_info(
-    admin_1: str, admin_2: Optional[str] = None, admin_3: Optional[str] = None
-) -> RegionInfo:
-    """Returns a RegionInfo named tuple
+class RegionData:
+    def __init__(
+        self,
+        admin_1: str,
+        admin_2: Optional[str] = None,
+        admin_3: Optional[str] = None,
+        level: Optional[int] = None,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        admin_1: str
+            Country name string (e.g. 'United States') or alpha_3 string,
+            administrative area of top level (e.g. 'USA')
+        admin_2: Optional[str] = None
+            Second-level administrative area, usually states, regions or cantons
+            (e.g. 'California')
+        admin_3: Optional[str] = None
+            Third-level administrative area, usually cities or municipalities
+            (e.g. 'San Francisco')
+        level: Optional[int] = None
+            Level is automatically detected from the number of administrative
+            levels passed. Optionally you can specify the level to return a
+            dataframe containing the information for all administrative regions
 
-    Parameters
-    ----------
-    admin_1: str
-        Country name string (e.g. "United States") or alpha_3 string,
-        administrative area of top level (e.g. "USA")
-    admin_2: str = ""
-        Second-level administrative area, usually states, regions or cantons (e.g. "California")
-    admin_3: str = ""
-        Third-level administrative area, usually cities or municipalities (e.g. "San Francisco")
+        Attributes
+        -------
+        data: DataFrame
+            Pandas dataframe containing the data for the specified region
+        country: str
+            Country name string (e.g. 'United States')
+        admin_1: str
+            Country alpha_3 string, administrative area of top level (e.g. 'USA')
+        admin_2: Optional[str]
+            Second-level administrative area, usually states, regions or cantons
+            (e.g. 'California')
+        admin_3: Optional[str]
+            Third-level administrative area, usually cities or municipalities
+            (e.g. 'San Francisco')
+        level: int
+            Level of administrative areas specified
 
-    Returns
-    -------
-    RegionInfo
-        RegionInfo: see `oscovida.data.RegionInfo` docs
+        Raises
+        ------
+        LookupError
+            Raised if the `admin_1` string is too ambiguous. For example,
+            `RegionData('UK')` will not work as the country code is GB or GBR,
+            and UK matches too many possible places.
 
-    Raises
-    ------
-    LookupError
-        Raised if the `admin_1` string is too ambiguous. For example,
-        `region_info("UK")` will not work as the country code is GB or GBR, and
-        UK matches too many possible places.
+        Examples
+        --------
+        You can create a `RegionData` object by calling it with specific levels,
+        which will return a filtered DataTable:
 
-    Examples
-    --------
-    >>> region_info("GB")
-    RegionInfo(country='United Kingdom', admin_1='GBR', admin_2=None, admin_3=None, level=1)
+        >>> RegionData('GB')
+        RegionData(country='United Kingdom', admin_1='GBR', admin_2=None, admin_3=None, level=1)
 
-    >>> region_info("United Kingdom", "England")
-    RegionInfo(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3=None, level=2)
+        >>> RegionData('United Kingdom', 'England')
+        RegionData(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3=None, level=2)
 
-    >>> region_info("United Kingdom", "England", "Westminster")
-    RegionInfo(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3='Westminster', level=3)
-    """
-    if admin_1.strip().lower() == "world":
-        return RegionInfo("world", "world", level=0)
+        >>> RegionData('United Kingdom', 'England', 'Westminster')
+        RegionData(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3='Westminster', level=3)
 
-    try:
-        pyc_admin_1: pycountry.db.Country = pycountry.countries.lookup(admin_1)
-    except LookupError:
-        pyc_admin_1_matches: list = pycountry.countries.search_fuzzy(admin_1)  # type: ignore
-        if len(pyc_admin_1_matches) > 1:
-            raise LookupError(
-                f"{admin_1} too ambiguous, {len(pyc_admin_1_matches)} possible options,"
-                f"please specify one of:"
-                f"\n{[c.name for c in pyc_admin_1_matches]}"
-            )
-        pyc_admin_1: pycountry.db.Country = pyc_admin_1_matches[0]  # type: ignore
+        Alternatively you can specify a `level` directly, which will not filter
+        the administrative regions. For example, getting all level 2 regions for
+        the United Kingdom would be:
 
-    level = 1
+        >>> RegionData('GB', level=2)
+        RegionData(country='United Kingdom', admin_1='GBR', admin_2='*', admin_3=None, level=2)
 
-    if admin_2:
-        level = 2
+        Or all level 3:
 
-    if admin_3:
-        level = 3
+        >>> RegionData('GB', level=3)
+        RegionData(country='United Kingdom', admin_1='GBR', admin_2='*', admin_3='*', level=3)
 
-    return RegionInfo(
-        country=pyc_admin_1.name,
-        admin_1=pyc_admin_1.alpha_3,
-        admin_2=admin_2,
-        admin_3=admin_3,
-        level=level,
-    )
+        Or an administrative level 2, requesting all level 3 regions in it:
+        >>> RegionData('GB', 'England', level=3)
+        RegionData(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3='*', level=3)
+        """
+        try:
+            pyc_admin_1: pycountry.db.Country = pycountry.countries.lookup(admin_1)
+        except LookupError:
+            pyc_admin_1_matches: list = pycountry.countries.search_fuzzy(admin_1)
+            if len(pyc_admin_1_matches) > 1:
+                raise LookupError(
+                    f'{admin_1} too ambiguous, {len(pyc_admin_1_matches)}'
+                    f'matches. Please use a more specific region name, or use'
+                    f'the ISO country code. Available matches are:'
+                    f'\n{[c.name for c in pyc_admin_1_matches]}'
+                )
+            pyc_admin_1: pycountry.db.Country = pyc_admin_1_matches[0]  # type: ignore
+
+        self.country: str = pyc_admin_1.name
+        self.admin_1: str = pyc_admin_1.alpha_3
+        self.admin_2: Optional[str] = None
+        self.admin_3: Optional[str] = None
+
+        #  If the level has been manually specified that (probably) means the
+        #  user wants data for all of the administrative regions at that level
+        if level or level == 0:  # Explicitly accept level == 0 to throw exception later
+            if not (1 <= level <= 3):
+                raise ValueError('Level must be between 1 and 3 (inclusive).')
+
+            #  Specifying a level and an administrative region at or below that
+            #  level doesn't make sense, so throw an exception for that here
+            if (admin_2 and level <= 2) or (admin_3):
+                raise ValueError(
+                    '`level` argument is used to return data for all '
+                    'administrative regions at that level, so passing a '
+                    '`level <= 2` and `admin_2` is not supported, neither is '
+                    'passing any level and an `admin_3`.'
+                )
+
+            if level >= 2:
+                if admin_2:
+                    _check_admin_level_(self.country, admin_2, 2)
+                    self.admin_2 = admin_2
+                else:
+                    self.admin_2 = '*'
+            if level == 3:
+                self.admin_3 = '*'
+
+            self.level = level
+        else:
+            self.level = 1
+
+            if admin_2:
+                _check_admin_level_(self.country, admin_2, 2)
+                self.level = 2
+                self.admin_2 = admin_2
+
+            if admin_3:
+                _check_admin_level_(self.country, admin_3, 3)
+                self.level = 3
+                self.admin_3 = admin_3
+
+    @property
+    def data(self) -> DataFrame:
+        data = fetch_covid19_data(self.admin_1, level=self.level)
+
+        if self.level == 2 and self.admin_2 != '*' and self.admin_2:
+            data = data[data['administrative_area_level_2'] == self.admin_2]
+        if self.level == 3 and self.admin_3 != '*' and self.admin_3:
+            data = data[data['administrative_area_level_3'] == self.admin_3]
+
+        return data
+
+    def __repr__(self):
+        fields = {
+            f: getattr(self, f)
+            for f in ['country', 'admin_1', 'admin_2', 'admin_3', 'level']
+        }
+        fields = ', '.join('%s=%r' % i for i in fields.items())
+        return f'{self.__class__.__name__}({fields})'

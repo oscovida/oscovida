@@ -3,7 +3,7 @@ Planned interface is something like:
 ```
 import oscovida
 
-region = oscovida.Region("Germany", "Hamburg", start=date, end=date)
+region = oscovida.Region("Germany", "Hamburg")
 
 region.data # Returns the data
 
