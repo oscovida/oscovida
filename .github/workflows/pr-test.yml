@@ -47,15 +47,7 @@ jobs:
 
       - name: Set up oscovida and webgen
         run: |
-          ls
-          pwd
-          cd oscovida
-          ls
-          pwd
-          pip install poetry
-          poetry --version
-          poetry config virtualenvs.create false
-          poetry install -vv
+          pip install ./oscovida
 
       - name: Generate new reports
         run: |

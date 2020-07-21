@@ -42,7 +42,7 @@ jobs:
         python -m pytest -v --cov=oscovida
     - name: Test pelican
       run: |
-        cd tools && jupyter-nbconvert --execute generate-individiual-plots.ipynb
-        cd tools/pelican && make html
+        cd $HOME/oscovida/tools && jupyter-nbconvert --execute generate-individiual-plots.ipynb
+        cd $HOME/oscovida/tools/pelican && make html
     - name: Upload coverage to Codecov
       uses: codecov/codecov-action@v1
