@@ -16,7 +16,7 @@ jobs:
           ssh-private-key: ${{ secrets.STAGING_KEY }}
 
       - uses: mshick/add-pr-comment@v1
-        if: ${{ failure()  && steps.addKey.conclusion == 'failuhttps://oscovida.github.io/staging/80/re' }}
+        if: ${{ failure()  && steps.addKey.conclusion == 'failure' }}
         with:
           message: "Staging key could not be imported, cannot push to oscovida/staging to create test website instance. If this PR is external it may not have access to the required secrets."
           repo-token: ${{ secrets.GITHUB_TOKEN }}
@@ -47,9 +47,14 @@ jobs:
 
       - name: Set up oscovida and webgen
         run: |
+          ls
+          pwd
+          cd oscovida
+          ls
+          pwd
           pip install poetry
           poetry --version
-          poetry config settings.virtualenvs.in-project true
+          poetry config virtualenvs.create false
           poetry install -vv
 
       - name: Generate new reports

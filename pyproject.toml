@@ -5,7 +5,7 @@ description = "Explore COVID19 case numbers and deaths related to Coronavirus ou
 authors = ["Your Name <you@example.com>"]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.6.7"
 joblib = "^0.16.0"
 pandas = "^1.0.5"
 seaborn = "^0.10.1"
@@ -29,6 +29,8 @@ coverage = "^5.2"
 nbval = "^0.9.5"
 testpath = "^0.4.4"
 pycodestyle = "^2.6.0"
+mypy = "^0.782"
+black = "^19.10b0"
 
 [build-system]
 requires = ["poetry>=0.12"]
