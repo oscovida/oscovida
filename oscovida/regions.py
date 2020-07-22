@@ -27,6 +27,22 @@ def _check_admin_level_(admin_1: str, admin_target: str, level: int):
             f'regions are: {admin_names.tolist()}'
         )
 
+#  Really haven't decided on how to do this yet... subclasses? Pipes? accessors?
+#
+# class SubclassedSeries(Series):
+#     @property
+#     def _constructor(self):
+#         return SubclassedSeries
+
+#     @property
+#     def _constructor_expanddim(self):
+#         return SubclassedDataFrame
+
+
+# class SubclassedDataFrame(DataFrame):
+#     @property
+#     def _constructor(self):
+#         return SubclassedDataFrame
 
 
 class Region:
