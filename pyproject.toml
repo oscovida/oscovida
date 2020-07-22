@@ -1,0 +1,52 @@
+[tool.dephell.main]
+from = {format = "poetry", path = "pyproject.toml"}
+to = {format = "setuppy", path = "setup.py"}
+
+[tool.black]
+skip-string-normalization = true
+
+[tool.poetry]
+name = "oscovida"
+version = "0.1.2"
+description = "Explore COVID19 case numbers and deaths related to Coronavirus outbreak 2019/2020 in Pandas and in Jupyter notebook with MyBinder"
+license = "BSD-3-Clause"
+classifiers = ["Intended Audience :: Developers", "Intended Audience :: Science/Research", "License :: OSI Approved :: BSD License", "Operating System :: POSIX :: Linux", "Programming Language :: Python :: 3", "Topic :: Scientific/Engineering :: Information Analysis"]
+homepage = "https://github.com/oscovida/oscovida"
+authors = ["Hans Fangohr <da-support@xfel.eu>", "Robert Rosca", "Yury Kirienko"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.6.7"
+joblib = "^0.16.0"
+pandas = "^1.0.5"
+seaborn = "^0.10.1"
+matplotlib = "<3.3"
+markdown = "^3.2.2"
+numpy = "^1.19.0"
+scipy = "^1.5.1"
+voila = "^0.1.21"
+pelican = "^4.2.0"
+pelican-jupyter = "^0.10.0"
+tabulate = "^0.8.7"
+tqdm = "^4.48.0"
+ipywidgets = "^7.5.1"
+ipynb_py_convert = "^0.4.5"
+click = "^7.1.2"
+pycountry = "^20.7.3"
+covid19dh = "^1.0.0"
+requests = "^2.24.0"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.4.3"
+pytest-cov = "^2.10.0"
+coverage = "^5.2"
+nbval = "^0.9.5"
+testpath = "^0.4.4"
+pycodestyle = "^2.6.0"
+mypy = "^0.782"
+black = "^19.10b0"
+
+[tool.poetry.extras]
+test = ["pytest", "pytest-cov", "coverage", "nbval", "testpath"]
+formatting = ["pycodestyle", "mypy", "black"]
+dev = ["pytest", "pytest-cov", "coverage", "nbval", "testpath", "pycodestyle", "mypy", "black"]
