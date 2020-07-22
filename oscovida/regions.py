@@ -1,12 +1,11 @@
 from functools import lru_cache
-from typing import Optional
+from typing import Optional, List
 
 import pycountry
-from covid19dh import covid19
-from pandas import DataFrame
+from covid19dh import covid19, cite
+from pandas import DataFrame, Series
 
 
-@lru_cache(maxsize=32)
 def fetch_covid19_data(
     country: str = None, level: int = 1, verbose: bool = False
 ) -> DataFrame:
@@ -29,7 +28,8 @@ def _check_admin_level_(admin_1: str, admin_target: str, level: int):
         )
 
 
-class RegionData:
+
+class Region:
     def __init__(
         self,
         admin_1: str,
@@ -58,6 +58,8 @@ class RegionData:
         -------
         data: DataFrame
             Pandas dataframe containing the data for the specified region
+        cite: list[str]
+            Returns a list of sources for the data
         country: str
             Country name string (e.g. 'United States')
         admin_1: str
@@ -165,8 +167,6 @@ class RegionData:
                 self.level = 3
                 self.admin_3 = admin_3
 
-    @property
-    def data(self) -> DataFrame:
         data = fetch_covid19_data(self.admin_1, level=self.level)
 
         if self.level == 2 and self.admin_2 != '*' and self.admin_2:
@@ -174,7 +174,32 @@ class RegionData:
         if self.level == 3 and self.admin_3 != '*' and self.admin_3:
             data = data[data['administrative_area_level_3'] == self.admin_3]
 
-        return data
+        #  This is kind of hacky, but full subclassing the DataFrame is complete
+        #  overkill for our needs. If you just add an attribute to a dataframe
+        #  the attribute will not persist through standard pandas operations
+        #  (e.g. `.copy()`) unless it is added to `DataFrame.._metadata`
+        #  so we add an entry of `_oscovida_metadata` to it, then create the
+        #  attribute.
+        #  https://pandas.pydata.org/pandas-docs/stable/development/extending.html#define-original-properties
+        data._metadata.append('_oscovida_metadata')
+        data._oscovida_metadata = {}
+        data._oscovida_metadata['columns'] = set()
+
+        self.data = data
+
+    @property
+    def cite(self) -> List[str]:
+        return cite(self.data)
+
+    def __str__(self) -> str:
+        a = f"{self.country} ({self.admin_1})"
+
+        b = ", ".join([r for r in [self.admin_2, self.admin_3] if not r is None])
+
+        if b == '':
+            return a
+        else:
+            return ": ".join([a, b])
 
     def __repr__(self):
         fields = {
