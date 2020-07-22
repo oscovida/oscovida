@@ -9,7 +9,14 @@ try:
 except ImportError:
     from distutils.core import setup
 
+import os.path
+
 readme = ''
+here = os.path.abspath(os.path.dirname(__file__))
+readme_path = os.path.join(here, 'README.md')
+if os.path.exists(readme_path):
+    with open(readme_path, 'rb') as stream:
+        readme = stream.read().decode('utf8')
 
 setup(
     long_description=readme,
@@ -17,9 +24,19 @@ setup(
     version='0.1.2',
     description='Explore COVID19 case numbers and deaths related to Coronavirus outbreak 2019/2020 in Pandas and in Jupyter notebook with MyBinder',
     python_requires='==3.*,>=3.6.7',
+    project_urls={"homepage": "https://github.com/oscovida/oscovida"},
     author='Hans Fangohr',
     author_email='da-support@xfel.eu',
     maintainer='Hans Fangohr',
+    license='BSD-3-Clause',
+    classifiers=[
+        'Intended Audience :: Developers',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: BSD License',
+        'Operating System :: POSIX :: Linux',
+        'Programming Language :: Python :: 3',
+        'Topic :: Scientific/Engineering :: Information Analysis',
+    ],
     packages=['oscovida'],
     package_dir={"": "."},
     package_data={},

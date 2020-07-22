@@ -9,7 +9,11 @@ skip-string-normalization = true
 name = "oscovida"
 version = "0.1.2"
 description = "Explore COVID19 case numbers and deaths related to Coronavirus outbreak 2019/2020 in Pandas and in Jupyter notebook with MyBinder"
+license = "BSD-3-Clause"
+classifiers = ["Intended Audience :: Developers", "Intended Audience :: Science/Research", "License :: OSI Approved :: BSD License", "Operating System :: POSIX :: Linux", "Programming Language :: Python :: 3", "Topic :: Scientific/Engineering :: Information Analysis"]
+homepage = "https://github.com/oscovida/oscovida"
 authors = ["Hans Fangohr <da-support@xfel.eu>", "Robert Rosca", "Yury Kirienko"]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.6.7"
