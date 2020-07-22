@@ -718,7 +718,7 @@ def plot_doubling_time(ax, series, color, minchange=0.5, labels=None, debug=Fals
     ## Adding a little bit of additional smoothing just for visual effects
     dtime_smooth2 = dtime_smooth.rolling(3, win_type='gaussian', min_periods=1, center=True).mean(std=1)
 
-    ax.set_ylim(0, ymax)
+    ax.set_ylim(0, max(ymax, ax.get_ylim()[1]))     # since we combine two plots, let's take another one into account
     ax.plot(dtime_smooth2.index, dtime_smooth2.values, "-", color=color, alpha=1.0,
             label=dtime_smooth_label,
             linewidth=LW)
@@ -1378,7 +1378,6 @@ def plot_no_data_available(ax, mimic_subplot, text):
 
 def overview(country: str, region: str = None, subregion: str = None, savefig: bool = False, weeks: int = 5):
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
-    print(c.name)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     c = c[- weeks * 7:]
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
@@ -1416,8 +1415,8 @@ def overview(country: str, region: str = None, subregion: str = None, savefig: b
         if weeks > 0:
             axes[i].get_xaxis().set_major_locator(WeekdayLocator(byweekday=MONDAY))     # put ticks every Monday
             axes[i].get_xaxis().set_major_formatter(DateFormatter('%d %b'))             # date format: `15 Jun`
-
-    title = f"Overview {country}, last data point from {c.index[-1].date().isoformat()}"
+    week_str = f", last {weeks} weeks" if weeks else ''
+    title = f"Overview {country}{week_str}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
 
     # tight_layout gives warnings, for example for Heinsberg
@@ -1427,18 +1426,22 @@ def overview(country: str, region: str = None, subregion: str = None, savefig: b
     if savefig:
         fig.savefig(filename)
 
+    if weeks != 0:
+        overview(country, region, subregion, savefig=False, weeks=0)
+
+    # ==== Compare plot ====
     if not subregion and not region: # i.e. not a region of Germany
         axes_compare, res_c, res_d = make_compare_plot(country)
         return_axes = np.concatenate([axes, axes_compare])
 
-    elif country=="Germany":   # Germany specific plots
+    elif country == "Germany":   # Germany specific plots
         # On 11 April, Mecklenburg Vorpommern data was missing from data set.
         # We thus compare only against those Laender, that are in the data set:
         # germany = fetch_data_germany()
         # laender = list(germany['Bundesland'].drop_duplicates().sort_values())
         axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
         return_axes = np.concatenate([axes, axes_compare])
-    elif country=="US" and region is not None:
+    elif country == "US" and region is not None:
         # skip comparison plot for the US states at the moment
         return_axes = axes
         return return_axes, c, d
