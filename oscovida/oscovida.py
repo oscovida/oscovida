@@ -1376,7 +1376,8 @@ def plot_no_data_available(ax, mimic_subplot, text):
     ax.set_xticklabels([])
 
 
-def overview(country: str, region: str = None, subregion: str = None, savefig: bool = False, weeks: int = 5):
+def overview(country: str, region: str = None, subregion: str = None,
+             savefig: bool = False, weeks: int = 5) -> Tuple[plt.axes, pd.Series, pd.Series]:
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     c = c[- weeks * 7:]
@@ -1425,14 +1426,17 @@ def overview(country: str, region: str = None, subregion: str = None, savefig: b
     filename = os.path.join("figures", region_label.replace(" ", "-").replace(",", "-") + '.svg')
     if savefig:
         fig.savefig(filename)
+    return axes, c, d
 
-    if weeks != 0:
-        overview(country, region, subregion, savefig=False, weeks=0)
 
-    # ==== Compare plot ====
-    if not subregion and not region: # i.e. not a region of Germany
+def compare_plot(country: str, region: str = None, subregion: str = None,
+                 savefig: bool = False) -> Tuple[plt.axes, pd.Series, pd.Series]:
+    """ Create a pair of plots which show comparison of the region with other most suffering countries
+    """
+    c, d, region_label = get_country_data(country, region=region, subregion=subregion)
+
+    if not subregion and not region:    # i.e. not a region of Germany
         axes_compare, res_c, res_d = make_compare_plot(country)
-        return_axes = np.concatenate([axes, axes_compare])
 
     elif country == "Germany":   # Germany specific plots
         # On 11 April, Mecklenburg Vorpommern data was missing from data set.
@@ -1440,18 +1444,15 @@ def overview(country: str, region: str = None, subregion: str = None, savefig: b
         # germany = fetch_data_germany()
         # laender = list(germany['Bundesland'].drop_duplicates().sort_values())
         axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
-        return_axes = np.concatenate([axes, axes_compare])
     elif country == "US" and region is not None:
         # skip comparison plot for the US states at the moment
-        return_axes = axes
-        return return_axes, c, d
+        return None, c, d
 
     elif country == 'Hungary':
         # choosing random counties. not sure if this make sense or not because not every county has enough data.
         with_local = choose_random_counties(exclude_region=region, size=18)
         axes_compare, res_c, red_d = make_compare_plot_hungary(region, compare_with_local=with_local)
-        return_axes = np.concatenate([axes, axes_compare])
-        return return_axes, c, d
+        return axes_compare, c, d
     else:
         raise NotImplementedError
 
@@ -1461,7 +1462,7 @@ def overview(country: str, region: str = None, subregion: str = None, savefig: b
         filename = os.path.join("figures", region_label.replace(" ", "-").replace(",", "-") + '2.svg')
         fig2.savefig(filename)
 
-    return return_axes, c, d
+    return axes_compare, c, d
 
 
 def get_cases_last_week(cases):
