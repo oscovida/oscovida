@@ -19,6 +19,7 @@ from oscovida import *
 
 # %%
 {OVERVIEW_FUNCTION}({OVERVIEW_ARGS});
+{COMPARE_PLOT_FUNCTION}({COMPARE_PLOT_ARGS});
 
 # %%
 # load the data
