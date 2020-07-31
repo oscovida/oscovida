@@ -18,7 +18,7 @@ print(f"Notebook executed on: {{start.strftime('%d/%m/%Y %H:%M:%S%Z')}} {{time.t
 from oscovida import *
 
 # %%
-{OVERVIEW_FUNCTION}({OVERVIEW_ARGS});
+{OVERVIEW_FUNCTION}({OVERVIEW_ARGS}, weeks=5);
 
 # %%
 {OVERVIEW_FUNCTION}({OVERVIEW_ARGS}, weeks=0);
