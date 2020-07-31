@@ -1377,7 +1377,7 @@ def plot_no_data_available(ax, mimic_subplot, text):
 
 
 def overview(country: str, region: str = None, subregion: str = None,
-             savefig: bool = False, weeks: int = 5) -> Tuple[plt.axes, pd.Series, pd.Series]:
+             savefig: bool = False, weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     c = c[- weeks * 7:]
