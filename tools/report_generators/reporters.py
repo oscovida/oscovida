@@ -18,6 +18,8 @@ class BaseReport:
         title,
         overview_function,
         overview_args,
+        compare_plot_function,
+        compare_plot_args,
         data_load_function,
         data_load_args,
         output_file,
@@ -30,6 +32,9 @@ class BaseReport:
 
         self.overview_function = overview_function
         self.overview_args = overview_args
+
+        self.compare_plot_function = compare_plot_function
+        self.compare_plot_args = compare_plot_args
 
         self.data_load_function = data_load_function
         self.data_load_args = data_load_args
@@ -71,6 +76,8 @@ class BaseReport:
             "BINDER_URL": self.get_binder_url,
             "OVERVIEW_FUNCTION": self.overview_function,
             "OVERVIEW_ARGS": self.overview_args,
+            "COMPARE_PLOT_FUNCTION": self.compare_plot_function,
+            "COMPARE_PLOT_ARGS": self.compare_plot_args,
             "DATA_LOAD_FUNCTION": self.data_load_function,
             "DATA_LOAD_ARGS": self.data_load_args,
         }
@@ -132,6 +139,8 @@ class CountryReport(BaseReport):
             title=country,
             overview_function="overview",
             overview_args=f'"{country}"',
+            compare_plot_function="compare_plot",
+            compare_plot_args=f'"{country}"',
             data_load_function="get_country_data",
             data_load_args=f'"{country}"',
             output_file=f"{country}",
@@ -179,6 +188,8 @@ class GermanyReport(BaseReport):
             title=f"Germany: {self.subregion} ({self.region})",
             overview_function="overview",
             overview_args=f'country="Germany", subregion="{self.subregion}"',
+            compare_plot_function="compare_plot",
+            compare_plot_args=f'country="Germany", subregion="{self.subregion}"',
             data_load_function="germany_get_region",
             data_load_args=f'landkreis="{self.subregion}"',
             output_file=f"Germany-{self.region}-{self.subregion}",
@@ -232,6 +243,8 @@ class USAReport(BaseReport):
             title=f"United States: {region}",
             overview_function="overview",
             overview_args=f'country="US", region="{region}"',
+            compare_plot_function="compare_plot",
+            compare_plot_args=f'country="US", region="{region}"',
             data_load_function="get_country_data",
             data_load_args=f'"US", "{region}"',
             output_file=f"US-{region}",
@@ -268,6 +281,8 @@ class HungaryReport(BaseReport):
             title=f"Hungary: {region}",
             overview_function="overview",
             overview_args=f'country="Hungary", region="{region}"',
+            compare_plot_function="compare_plot",
+            compare_plot_args=f'country="Hungary", region="{region}"',
             data_load_function="get_region_hungary",
             data_load_args=f'county="{region}"',
             output_file=f"Hungary-{region}",
