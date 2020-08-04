@@ -18,7 +18,6 @@ readme = "README.md"
 [tool.poetry.dependencies]
 python = "^3.6.7"
 joblib = "^0.16.0"
-pandas = "^1.0.5"
 seaborn = "^0.10.1"
 matplotlib = "<3.3"
 markdown = "^3.2.2"
@@ -35,6 +34,7 @@ click = "^7.1.2"
 pycountry = "^20.7.3"
 covid19dh = "^1.0.0"
 requests = "^2.24.0"
+pandas = {version = "^1.1.0-rc.0", allow-prereleases = true}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.4.3"
@@ -45,6 +45,8 @@ testpath = "^0.4.4"
 pycodestyle = "^2.6.0"
 mypy = "^0.782"
 black = "^19.10b0"
+ipython = "^7.16.1"
+jupyterlab = "^2.2.0"
 
 [tool.poetry.extras]
 test = ["pytest", "pytest-cov", "coverage", "nbval", "testpath"]

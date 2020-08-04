@@ -3,6 +3,7 @@ __pycache__
 tools/wwwroot
 cachedir
 .DS_Store
+.venv
 .venv/
 .vscode/
 default.profraw

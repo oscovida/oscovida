@@ -1,9 +1,9 @@
 from functools import lru_cache
-from typing import Optional, List
+from typing import List, Optional
 
 import pycountry
-from covid19dh import covid19, cite
-from pandas import DataFrame, Series
+from covid19dh import cite, covid19
+import pandas as pd
 
 
 def fetch_covid19_data(
@@ -27,22 +27,31 @@ def _check_admin_level_(admin_1: str, admin_target: str, level: int):
             f'regions are: {admin_names.tolist()}'
         )
 
-#  Really haven't decided on how to do this yet... subclasses? Pipes? accessors?
-#
-# class SubclassedSeries(Series):
-#     @property
-#     def _constructor(self):
-#         return SubclassedSeries
 
-#     @property
-#     def _constructor_expanddim(self):
-#         return SubclassedDataFrame
+class Series(pd.Series):
+    oscovida_metadata = {}
+    _metadata = ['oscovida_metadata']
+
+    @property
+    def _constructor(self):
+        return Series
+
+    @property
+    def _constructor_expanddim(self):
+        return DataFrame
 
 
-# class SubclassedDataFrame(DataFrame):
-#     @property
-#     def _constructor(self):
-#         return SubclassedDataFrame
+class DataFrame(pd.DataFrame):
+    oscovida_metadata = {}
+    _metadata = ['oscovida_metadata']
+
+    @property
+    def _constructor(self):
+        return DataFrame
+
+    @property
+    def _constructor_sliced(self):
+        return Series
 
 
 class Region:
@@ -194,12 +203,11 @@ class Region:
         #  overkill for our needs. If you just add an attribute to a dataframe
         #  the attribute will not persist through standard pandas operations
         #  (e.g. `.copy()`) unless it is added to `DataFrame.._metadata`
-        #  so we add an entry of `_oscovida_metadata` to it, then create the
+        #  so we add an entry of `oscovida_metadata` to it, then create the
         #  attribute.
         #  https://pandas.pydata.org/pandas-docs/stable/development/extending.html#define-original-properties
-        data._metadata.append('_oscovida_metadata')
-        data._oscovida_metadata = {}
-        data._oscovida_metadata['columns'] = set()
+        # data._metadata.append('oscovida_metadata')
+        data.attrs['columns'] = set()
 
         self.data = data
 
