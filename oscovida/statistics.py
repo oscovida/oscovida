@@ -1,278 +1,166 @@
 import pandas as pd
+import numpy as np
+import math
+from typing import Union, Tuple
+from functools import singledispatch
 
 
-@pd.api.extensions.register_series_accessor('covid')
-class CovidSeriesAccessor:
-    def __init__(self, pandas_object: pd.Series):
-        self._obj = pandas_object
+def daily(obj: pd.Series) -> pd.Series:
+    """Computes the daily change for the series
 
-    def daily_change(self) -> pd.Series:
-        """Computes the daily change for the series
+    Parameters
+    ----------
+    obj : pd.Series
+        Input column
 
-        Returns
-        -------
-        pd.Series
-            Pandas series with
+    Returns
+    -------
+    pd.Series
+        Difference between rows
 
-        Examples
-        --------
-        Expected to be used with Pandas pipe operators:
-        >>> region = oscovida.Regions('GBR')
-        >>> region.covid.smooth()
-                tests_daily  confirmed_daily  recovered_daily  deaths_daily
-        count     193.00000        193.00000       193.000000    193.000000
-        mean    41710.73057       1532.73057         1.782383    235.756477
-        std     45077.23326       1715.23285        16.026485    306.731913
-        min         0.00000          0.00000         0.000000      0.000000
-        25%         0.00000          6.00000         0.000000      0.000000
-        50%     19316.00000        807.00000         0.000000    111.000000
-        75%     81402.00000       2706.00000         0.000000    365.000000
-        max    157696.00000       5490.00000       209.000000   1173.000000
-        """
-        return self._obj.diff().dropna()
+    Examples
+    --------
+    TODO
+    """
+    return obj.diff().dropna()
 
-    # @propagate_metadata
-    def smooth(self, kind: str = 'weak') -> pd.Series:
-        smoothing_args = {
-            'weak': (
-                {
-                    'window': 9,
-                    'center': True,
-                    'win_type': 'gaussian',
-                    'min_periods': 1,
-                },
-                {'mean_std': 3,},
-            ),
-            'strong': (
-                {
-                    'window': 4,
-                    'center': True,
-                    'win_type': 'gaussian',
-                    'min_periods': 1,
-                },
-                {'mean_std': 2,},
-            ),
-        }
 
-        res = self._obj.rolling(**smoothing_args[kind][0]).mean(
-            std=smoothing_args[kind][1]['mean_std']
+def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Series:
+    """Smooths the pandas series with a rolling average and mean
+
+    Parameters
+    ----------
+    obj : Union[pd.Series, np.ndarray]
+        Input column (pandas `Series` or numpy `ndarray`)
+    kind : str, optional
+        Smoothing approach, either `'weak'` or `'strong'`, by default 'weak'
+        'weak': ({'window': 9, 'center': True, 'win_type': 'gaussian', 'min_periods': 1}, {'mean_std': 3})
+        'strong': ({'window': 4, 'center': True, 'win_type': 'gaussian', 'min_periods': 1}, {'mean_std': 2})
+    compound : bool
+        If smoothing should be compounded, default to `True`. e.g. picking
+        `strong` means that the data is first smoothed with `weak` smoothing,
+        and `strong` smoothing is applied to the already smoothed data
+
+    Returns
+    -------
+    Union[pd.Series, np.ndarray]
+        Smoothed series
+
+    Examples
+    --------
+    TODO
+    """
+    smoothing_args = {
+        'weak': (
+            {'window': 9, 'center': True, 'win_type': 'gaussian', 'min_periods': 1,},
+            {'mean_std': 3,},
+        ),
+        'strong': (
+            {'window': 4, 'center': True, 'win_type': 'gaussian', 'min_periods': 1,},
+            {'mean_std': 2,},
+        ),
+    }
+
+    if (kind == 'strong') & compound:
+        obj = obj.rolling(**smoothing_args['weak'][0]).mean(
+            std=smoothing_args['weak'][1]['mean_std']
         )
 
-        #  Metadata propagation is broken in Pandas so this doesn't work
-        # res.oscovida_metadata = {'smooth': (kind, smoothing_args[kind])}
-        # res.attrs['smooth'] = (kind, smoothing_args[kind])
+    res = obj.rolling(**smoothing_args[kind][0]).mean(
+        std=smoothing_args[kind][1]['mean_std']
+    )
 
-        return res
-
-    def doubling_time(self) -> pd.Series:
-        """Computes the doubling time for a Pandas `DataFrame` or `Series`
-
-        If called on a `DataFrame`, assumes that `daily_change` has already been
-        computed, and adds the following columns:
-        - `tests_daily` -> 'tests_doubling_time`
-        - `confirmed_daily` -> 'confirmed_doubling_time`
-        - `recovered_daily` -> 'recovered_doubling_time`
-        - `deaths_daily` -> 'deaths_doubling_time`
-
-        If called on a `Series`, computes the doubling time for the values of that
-        series
-
-        Parameters
-        ----------
-        df: Union[pd.DataFrame, pd.Series]
-            - pd.DataFrame containing a table formatted as per the Covid19DataHub standard
-            - pd.Series of numbers
-
-        Returns
-        -------
-        df: Union[pd.DataFrame, pd.Series]
-            - pd.DataFrame with daily change columns added
-            - pd.Series of doubling time
-
-        Raises
-        ------
-        ValueError
-            Raised if the first argument is not a `DataFrame` or `Series`
-
-        Examples
-        --------
-        Expected to be used with Pandas pipe operators, called with a `DataFrame`:
-        >>> region = oscovida.Regions('GBR')
-        >>> (region.data
-                .pipe(daily_change)
-                .pipe(doubling_time)
-            )
-
-        Or called with a `Series`:
-        >>> deaths_daily = oscovida.Regions('GBR').pipe(daily_change).deaths_daily
-        >>> deaths_daily.pipe(doubling_time)
-        """
-        raise NotImplementedError(
-            "`doubling_time` requires a Pandas `DataFrame` or `Series`"
-        )
-
-    def growth_factor(self) -> pd.Series:
-        raise NotImplementedError
-
-    def r_number(self) -> pd.Series:
-        raise NotImplementedError
-
-    def min_max(self) -> pd.Series:
-        raise NotImplementedError
+    return res
 
 
-@pd.api.extensions.register_dataframe_accessor('covid')
-class CovidDataFrameAccessor:
-    def __init__(self, pandas_object):
-        self._obj = pandas_object
+def doubling_time(obj: pd.Series) -> pd.Series:
+    """Compute the doubling time for a given series by shifting the rows by one.
 
-    # @propagate_metadata
-    def daily_change(self) -> pd.DataFrame:
-        """Computes the daily change for the following columns:
-        - `tests` -> `tests_daily`
-        - `confirmed` -> `confirmed_daily`
-        - `recovered` -> `recovered_daily`
-        - `deaths` -> `deaths_daily`
+    The doubling time equation is:
 
-        Parameters
-        ----------
-        df : pd.DataFrame
-            DataFrame containing a table formatted as per the Covid19DataHub standard
+    ```
+    (t2 - t1) * (ln(2)/ln(q2/q1))
+    ```
 
-        Returns
-        -------
-        pd.DataFrame
-            DataFrame with daily change columns added
+    This function assumes that `t2 - t1 = 1`. The doubling time is computed
+    between subsequent rows. If you want to change the compared periods that
+    should be done before calling this function.
 
-        Examples
-        --------
-        Expected to be used with Pandas pipe operators:
-        >>> region = oscovida.Regions('GBR')
-        >>> (region.data
-                .pipe(daily_change)
-                .filter(regex='(daily)')
-                .describe()
-            )
-                tests_daily  confirmed_daily  recovered_daily  deaths_daily
-        count     193.00000        193.00000       193.000000    193.000000
-        mean    41710.73057       1532.73057         1.782383    235.756477
-        std     45077.23326       1715.23285        16.026485    306.731913
-        min         0.00000          0.00000         0.000000      0.000000
-        25%         0.00000          6.00000         0.000000      0.000000
-        50%     19316.00000        807.00000         0.000000    111.000000
-        75%     81402.00000       2706.00000         0.000000    365.000000
-        max    157696.00000       5490.00000       209.000000   1173.000000
-        """
-        self._obj['tests_daily'] = self._obj['tests'].covid.daily_change()
-        self._obj['confirmed_daily'] = self._obj['confirmed'].covid.daily_change()
-        self._obj['recovered_daily'] = self._obj['recovered'].covid.daily_change()
-        self._obj['deaths_daily'] = self._obj['deaths'].covid.daily_change()
+    Parameters
+    ----------
+    obj : pd.Series
+        Source series
 
-        self._obj.attrs['columns'] |= set(
-            ['tests_daily', 'confirmed_daily', 'recovered_daily', 'deaths_daily']
-        )
+    Returns
+    -------
+    pd.Series
+        Doubling time
 
-        return self._obj
+    Examples
+    --------
+    TODO
+    """
+    obj_shifted = obj.shift(1)  # previous
 
-    # @propagate_metadata
-    def smooth(self, kind: str = 'weak') -> pd.DataFrame:
-        standard_columns = set(['tests', 'confirmed', 'recovered', 'deaths'])
-        oscovida_columns = self._obj.attrs['columns']
-        all_columns = oscovida_columns | standard_columns
-        for column in all_columns:
-            original_column = self._obj[column]
-            smoothed_column = original_column.covid.smooth(kind=kind)
+    dt = np.log(2) / np.log(obj / obj_shifted)
+    # dt[ dt < 0] = np.nan
 
-            original_attrs = original_column.attrs
-            smoothed_attrs = smoothed_column.attrs
+    return dt
 
-            merged_attrs = {**original_attrs, **smoothed_attrs}
-            merged_attrs = merged_attrs if merged_attrs else {}
-            print("attrs-m: ", id(merged_attrs), " ", merged_attrs)
 
-            # self._obj = self._obj.assign(**{column + '_smoothed': smoothed_column})
-            self._obj[column + '_smoothed'] = smoothed_column
-            print(
-                "attrs-a: ",
-                id(self._obj[column + '_smoothed']),
-                " ",
-                self._obj[column + '_smoothed'].attrs,
-            )
-            self._obj[column + '_smoothed'].__finalize__(smoothed_column)
-            # self._obj[column + '_smoothed'].attrs[randint(0, 100)] = 'rand'
-            # self._obj[column + '_smoothed'].attrs = merged_attrs.copy()
-            print(
-                "attrs-b: ",
-                id(self._obj[column + '_smoothed'].attrs),
-                " ",
-                self._obj[column + '_smoothed'].attrs,
-            )
-            print()
+def r_number(obj: pd.Series, tau=4) -> pd.Series:
+    """Calculate the R-number using a method similar to RKI[1]. Assumes that the
+    input series has rows per-day.
 
-        for column in all_columns:
-            print(column)
-            print(
-                "attrs-c: ",
-                id(self._obj[column + '_smoothed'].attrs),
-                " ",
-                self._obj[column + '_smoothed'].attrs,
-            )
-            print()
+    [1] Robert Koch Institute: Epidemiologisches Bulletin 17 | 23 April 2020
+    https://www.rki.de/DE/Content/Infekt/EpidBull/Archiv/2020/Ausgaben/17_20.html
 
-        return self._obj
+    Parameters
+    ----------
+    obj : pd.Series
+        Source series
+    tau : int, optional
+        Day averages, by default 4
 
-    def doubling_time(self) -> pd.DataFrame:
-        """Computes the doubling time for a Pandas `DataFrame` or `Series`
+    Returns
+    -------
+    pd.Series
+        R number per-day
+    """
+    # TODO: Look at using method from:
+    # https://www.medrxiv.org/content/10.1101/2020.04.19.20071886v2.full.pdf
+    # http://trackingr-env.eba-9muars8y.us-east-2.elasticbeanstalk.com/
+    # and
+    # https://valeriupredoi.github.io/
+    rolling_avg = obj.rolling(tau).mean()
+    R = rolling_avg / rolling_avg.shift(tau)
+    R2 = R.shift(-tau)
 
-        If called on a `DataFrame`, assumes that `daily_change` has already been
-        computed, and adds the following columns:
-        - `tests_daily` -> 'tests_doubling_time`
-        - `confirmed_daily` -> 'confirmed_doubling_time`
-        - `recovered_daily` -> 'recovered_doubling_time`
-        - `deaths_daily` -> 'deaths_doubling_time`
+    R2[(rolling_avg.shift(tau) == 0.0) & (rolling_avg == 0)] = 1
 
-        If called on a `Series`, computes the doubling time for the values of that
-        series
+    return R2
 
-        Parameters
-        ----------
-        df: Union[pd.DataFrame, pd.Series]
-            - pd.DataFrame containing a table formatted as per the Covid19DataHub standard
-            - pd.Series of numbers
 
-        Returns
-        -------
-        df: Union[pd.DataFrame, pd.Series]
-            - pd.DataFrame with daily change columns added
-            - pd.Series of doubling time
+def min_max(obj: pd.Series, n: int, at_least=(0.75, 1.25), alert=(0.1, 100)) -> Tuple:
+    if n > len(obj):
+        n = len(obj)
 
-        Raises
-        ------
-        ValueError
-            Raised if the first argument is not a `DataFrame` or `Series`
+    obj = obj.replace(math.inf, math.nan)
 
-        Examples
-        --------
-        Expected to be used with Pandas pipe operators, called with a `DataFrame`:
-        >>> region = oscovida.Regions('GBR')
-        >>> (region.data
-                .pipe(daily_change)
-                .pipe(doubling_time)
-            )
+    # the -0.1 is to make extra space because the line we draw is thick
+    min_ = obj[-n:].min() - 0.1
+    max_ = obj[-n:].max() + 0.1
 
-        Or called with a `Series`:
-        >>> deaths_daily = oscovida.Regions('GBR').pipe(daily_change).deaths_daily
-        >>> deaths_daily.pipe(doubling_time)
-        """
-        raise NotImplementedError(
-            "`doubling_time` requires a Pandas `DataFrame` or `Series`"
-        )
+    if min_ < at_least[0]:
+        min_final = min_
+    else:
+        min_final = at_least[0]
 
-    def growth_factor(self) -> pd.DataFrame:
-        raise NotImplementedError
+    if max_ > at_least[1]:
+        max_final = max_
+    else:
+        max_final = at_least[1]
 
-    def r_number(self) -> pd.DataFrame:
-        raise NotImplementedError
+    #  TODO: Add alert logging
 
-    def min_max(self) -> pd.DataFrame:
-        raise NotImplementedError
+    return min_final, max_final

@@ -2,7 +2,8 @@ from functools import lru_cache
 from typing import List, Optional
 
 import pycountry
-from covid19dh import cite, covid19
+from .covid19dh import cite, covid19
+from pandas import DataFrame
 import pandas as pd
 
 
@@ -26,32 +27,6 @@ def _check_admin_level_(admin_1: str, admin_target: str, level: int):
             f'{admin_target} not found in data for {admin_1}, availabe '
             f'regions are: {admin_names.tolist()}'
         )
-
-
-class Series(pd.Series):
-    oscovida_metadata = {}
-    _metadata = ['oscovida_metadata']
-
-    @property
-    def _constructor(self):
-        return Series
-
-    @property
-    def _constructor_expanddim(self):
-        return DataFrame
-
-
-class DataFrame(pd.DataFrame):
-    oscovida_metadata = {}
-    _metadata = ['oscovida_metadata']
-
-    @property
-    def _constructor(self):
-        return DataFrame
-
-    @property
-    def _constructor_sliced(self):
-        return Series
 
 
 class Region:
@@ -207,7 +182,7 @@ class Region:
         #  attribute.
         #  https://pandas.pydata.org/pandas-docs/stable/development/extending.html#define-original-properties
         # data._metadata.append('oscovida_metadata')
-        data.attrs['columns'] = set()
+        # data.attrs['columns'] = set()
 
         self.data = data
 

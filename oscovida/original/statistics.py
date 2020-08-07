@@ -1,5 +1,5 @@
 import math
-
+import numpy as np
 
 def compute_daily_change(series):
     """returns (change, smooth, smooth2)
@@ -41,6 +41,12 @@ def compute_daily_change(series):
     smooth2 = rolling_series2, smooth2_label
 
     return change, smooth, smooth2
+
+def double_time_exponential(q2_div_q1, t2_minus_t1=None):
+    """ See https://en.wikipedia.org/wiki/Doubling_time"""
+    if t2_minus_t1 is None:
+        t2_minus_t1 = np.ones(q2_div_q1.shape)
+    return t2_minus_t1 * np.log(2) / np.log(q2_div_q1)
 
 
 def compute_doubling_time(series, minchange=0.5, labels=None, debug=False):
@@ -145,9 +151,9 @@ def compute_growth_factor(series):
 
     # start from smooth diffs as used in plot 1
     (
-        (change, change_label),
-        (smooth, smooth_label),
-        (smooth2, smooth2_label),
+        (change, change_label),  # change
+        (smooth, smooth_label),  # smooth weak
+        (smooth2, smooth2_label),  # smooth strong
     ) = compute_daily_change(series)
 
     # Compute ratio of yesterday to day
@@ -204,12 +210,16 @@ def compute_R(daily_change, tau=4):
 def min_max_in_past_n_days(
     series, n, at_least=[0.75, 1.25], alert=[0.1, 100], print_alert=False
 ):
-    """Given a time series, find the min and max values in the time series within the last n days.
+    """Given a time series, find the min and max values in the time series within
+    the last n days.
 
-    If those values are within the interval `at_least`, then use the values in at_least as the limits.
-    if those values are outside the interval `at_least` then exchange the interval accordingly.
+    If those values are within the interval `at_least`, then use the values in
+    at_least as the limits.
+    if those values are outside the interval `at_least` then exchange the
+    interval accordingly.
 
-    If the values exceed the min and max value in 'alerts', then print an error message.
+    If the values exceed the min and max value in 'alerts', then print an error
+    message.
     Return min, max.
     """
     if n > len(series):
