@@ -42,7 +42,6 @@ setup(
     package_data={"oscovida": ["*.md"]},
     install_requires=[
         'click==7.*,>=7.1.2',
-        'covid19dh==1.*,>=1.0.0',
         'ipynb-py-convert==0.*,>=0.4.5',
         'ipywidgets==7.*,>=7.5.1',
         'joblib==0.*,>=0.16.0',
