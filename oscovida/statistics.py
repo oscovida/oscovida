@@ -160,6 +160,26 @@ def r_number(obj: pd.Series, tau=4) -> pd.Series:
     return R2
 
 
+def growth_factor(obj: pd.Series) -> pd.Series:
+    """Computes the growth factor for a series
+
+    Growth factor is just the percent change day-to-day, in this case we add one
+    to get the growth, e.g. 20% more cases than yesterday means 1.2 (120%), or
+    a 20% drop would be 0.8 (80%)
+
+    Parameters
+    ----------
+    obj : pd.Series
+        Source series
+
+    Returns
+    -------
+    pd.Series
+        Growth factor
+    """
+    return obj.pct_change() + 1
+
+
 def min_max(obj: pd.Series, n: int, at_least=(0.75, 1.25), alert=(0.1, 100)) -> Tuple:
     """Given a time series, find the min and max values in the time series
     within the last n days.
