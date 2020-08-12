@@ -59,6 +59,10 @@ def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Seri
             {'window': 4, 'center': True, 'win_type': 'gaussian', 'min_periods': 1,},
             {'mean_std': 2,},
         ),
+        '7dayrolling': (
+            {'window': 7, 'center': True, 'win_type': 'gaussian', 'min_periods': 7,},
+            {'mean_std': 3,},
+        ),
     }
 
     if (kind == 'strong') & compound:
@@ -73,7 +77,7 @@ def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Seri
     return res
 
 
-def doubling_time(obj: pd.Series) -> pd.Series:
+def doubling_time(obj: pd.Series, minchange: float = 20) -> pd.Series:
     """Compute the doubling time for a given series by shifting the rows by one.
 
     The doubling time equation is:
@@ -84,12 +88,18 @@ def doubling_time(obj: pd.Series) -> pd.Series:
 
     This function assumes that `t2 - t1 = 1`. The doubling time is computed
     between subsequent rows. If you want to change the compared periods that
-    should be done before calling this function.
+    should be done before calling this function (e.g. compute the weekly mean
+    then put that into this function and you will get the weekly doubling time).
+
+    By default
 
     Parameters
     ----------
     obj : pd.Series
         Source series
+    minchange : float
+        Values in the series under the minchange are set to 0 before computing
+        the doubling time, by default 20
 
     Returns
     -------
@@ -100,10 +110,12 @@ def doubling_time(obj: pd.Series) -> pd.Series:
     --------
     TODO
     """
+    exclude = obj < minchange
+    obj = obj.drop(exclude[exclude].index)
+
     obj_shifted = obj.shift(1)  # previous
 
     dt = np.log(2) / np.log(obj / obj_shifted)
-    # dt[ dt < 0] = np.nan
 
     return dt
 
@@ -127,11 +139,13 @@ def r_number(obj: pd.Series, tau=4) -> pd.Series:
     pd.Series
         R number per-day
     """
+
     # TODO: Look at using method from:
     # https://www.medrxiv.org/content/10.1101/2020.04.19.20071886v2.full.pdf
     # http://trackingr-env.eba-9muars8y.us-east-2.elasticbeanstalk.com/
     # and
     # https://valeriupredoi.github.io/
+
     rolling_avg = obj.rolling(tau).mean()
     R = rolling_avg / rolling_avg.shift(tau)
     R2 = R.shift(-tau)
@@ -142,6 +156,29 @@ def r_number(obj: pd.Series, tau=4) -> pd.Series:
 
 
 def min_max(obj: pd.Series, n: int, at_least=(0.75, 1.25), alert=(0.1, 100)) -> Tuple:
+    """Given a time series, find the min and max values in the time series
+    within the last n days.
+
+    If those values are within the interval `at_least`, then use the values in
+    at_least as the limits. if those values are outside the interval `at_least`
+    then exchange the interval accordingly.
+
+    Parameters
+    ----------
+    obj : pd.Series
+        Source series
+    n : int
+        Past number of days looked at
+    at_least : tuple, optional
+        by default (0.75, 1.25)
+    alert : tuple, optional
+        Currently not used, by default (0.1, 100)
+
+    Returns
+    -------
+    Tuple
+        Tuple of (min, max)
+    """
     if n > len(obj):
         n = len(obj)
 
