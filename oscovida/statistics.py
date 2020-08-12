@@ -5,6 +5,22 @@ from typing import Union, Tuple
 from functools import singledispatch
 
 
+SMOOTHING_METHODS = {
+    'weak': (
+        {'window': 9, 'center': True, 'win_type': 'gaussian', 'min_periods': 1,},
+        {'mean_std': 3,},
+    ),
+    'strong': (
+        {'window': 4, 'center': True, 'win_type': 'gaussian', 'min_periods': 1,},
+        {'mean_std': 2,},
+    ),
+    '7dayrolling': (
+        {'window': 7, 'center': True, 'win_type': 'gaussian', 'min_periods': 7,},
+        {'mean_std': 3,},
+    ),
+}
+
+
 def daily(obj: pd.Series) -> pd.Series:
     """Computes the daily change for the series
 
@@ -33,9 +49,12 @@ def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Seri
     obj : Union[pd.Series, np.ndarray]
         Input column (pandas `Series` or numpy `ndarray`)
     kind : str, optional
-        Smoothing approach, either `'weak'` or `'strong'`, by default 'weak'
-        'weak': ({'window': 9, 'center': True, 'win_type': 'gaussian', 'min_periods': 1}, {'mean_std': 3})
-        'strong': ({'window': 4, 'center': True, 'win_type': 'gaussian', 'min_periods': 1}, {'mean_std': 2})
+        Smoothing approach, either `'weak'`, `'strong'`, or `'7dayrolling`', by
+        default 'weak'. The names correspond to:
+        - 'weak': ({'window': 9, 'center': True, 'win_type': 'gaussian', 'min_periods': 1}, {'mean_std': 3})
+        - 'strong': ({'window': 4, 'center': True, 'win_type': 'gaussian', 'min_periods': 1}, {'mean_std': 2})
+        - '7dayrolling': ({'window': 7, 'center': True, 'win_type': 'gaussian', 'min_periods': 7,}, {'mean_std': 3,},
+    ),
     compound : bool
         If smoothing should be compounded, default to `True`. e.g. picking
         `strong` means that the data is first smoothed with `weak` smoothing,
@@ -50,28 +69,14 @@ def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Seri
     --------
     TODO
     """
-    smoothing_args = {
-        'weak': (
-            {'window': 9, 'center': True, 'win_type': 'gaussian', 'min_periods': 1,},
-            {'mean_std': 3,},
-        ),
-        'strong': (
-            {'window': 4, 'center': True, 'win_type': 'gaussian', 'min_periods': 1,},
-            {'mean_std': 2,},
-        ),
-        '7dayrolling': (
-            {'window': 7, 'center': True, 'win_type': 'gaussian', 'min_periods': 7,},
-            {'mean_std': 3,},
-        ),
-    }
 
     if (kind == 'strong') & compound:
-        obj = obj.rolling(**smoothing_args['weak'][0]).mean(
-            std=smoothing_args['weak'][1]['mean_std']
+        obj = obj.rolling(**SMOOTHING_METHODS['weak'][0]).mean(
+            std=SMOOTHING_METHODS['weak'][1]['mean_std']
         )
 
-    res = obj.rolling(**smoothing_args[kind][0]).mean(
-        std=smoothing_args[kind][1]['mean_std']
+    res = obj.rolling(**SMOOTHING_METHODS[kind][0]).mean(
+        std=SMOOTHING_METHODS[kind][1]['mean_std']
     )
 
     return res
