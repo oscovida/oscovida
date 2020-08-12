@@ -100,58 +100,6 @@ def plot_daily_change(ax, series, color, labels=None):
     return ax
 
 
-def plot_doubling_time(ax, series, color, minchange=0.5, labels=None, debug=False):
-    """Plot doubling time of series, assuming series is accumulated cases/deaths as
-    function of days.
-
-    Returns axis.
-
-    See plot_time_step for documentation on other parameters.
-    """
-
-    if labels is None:
-        labels = "", ""
-    region, label = labels
-
-    (dtime, dtime_label), (dtime_smooth, dtime_smooth_label) = compute_doubling_time(
-        series, minchange=minchange, debug=debug, labels=labels
-    )
-
-    if dtime is None:
-        if debug:
-            print(dtime_label)
-        return ax
-
-    ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=dtime_label)
-
-    # good to take maximum value from here
-    dtime_smooth.replace(
-        np.inf, np.nan, inplace=True
-    )  # get rid of x/0 results, which affect max()
-    ymax = min(
-        dtime_smooth.max() * 1.5, 5000
-    )  # China has doubling time of 3000 in between
-
-    ## Adding a little bit of additional smoothing just for visual effects
-    dtime_smooth2 = dtime_smooth.rolling(
-        3, win_type='gaussian', min_periods=1, center=True
-    ).mean(std=1)
-
-    ax.set_ylim(0, ymax)
-    ax.plot(
-        dtime_smooth2.index,
-        dtime_smooth2.values,
-        "-",
-        color=color,
-        alpha=1.0,
-        label=dtime_smooth_label,
-        linewidth=LW,
-    )
-    ax.legend()
-    ax.set_ylabel("doubling time [days]")
-    return ax
-
-
 def plot_reproduction_number(
     ax, series, color_g='C1', color_R='C4', yscale_days=28, max_yscale=10, labels=None
 ):
@@ -221,6 +169,58 @@ def plot_reproduction_number(
         [series.index.min(), series.index.max()], [1.0, 1.0], '-C3'
     )  # label="critical value"
     ax.legend()
+    return ax
+
+
+def plot_doubling_time(ax, series, color, minchange=0.5, labels=None, debug=False):
+    """Plot doubling time of series, assuming series is accumulated cases/deaths as
+    function of days.
+
+    Returns axis.
+
+    See plot_time_step for documentation on other parameters.
+    """
+
+    if labels is None:
+        labels = "", ""
+    region, label = labels
+
+    (dtime, dtime_label), (dtime_smooth, dtime_smooth_label) = compute_doubling_time(
+        series, minchange=minchange, debug=debug, labels=labels
+    )
+
+    if dtime is None:
+        if debug:
+            print(dtime_label)
+        return ax
+
+    ax.plot(dtime.index, dtime.values, 'o', color=color, alpha=0.3, label=dtime_label)
+
+    # good to take maximum value from here
+    dtime_smooth.replace(
+        np.inf, np.nan, inplace=True
+    )  # get rid of x/0 results, which affect max()
+    ymax = min(
+        dtime_smooth.max() * 1.5, 5000
+    )  # China has doubling time of 3000 in between
+
+    ## Adding a little bit of additional smoothing just for visual effects
+    dtime_smooth2 = dtime_smooth.rolling(
+        3, win_type='gaussian', min_periods=1, center=True
+    ).mean(std=1)
+
+    ax.set_ylim(0, ymax)
+    ax.plot(
+        dtime_smooth2.index,
+        dtime_smooth2.values,
+        "-",
+        color=color,
+        alpha=1.0,
+        label=dtime_smooth_label,
+        linewidth=LW,
+    )
+    ax.legend()
+    ax.set_ylabel("doubling time [days]")
     return ax
 
 

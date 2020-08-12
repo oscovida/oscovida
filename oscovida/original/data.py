@@ -25,13 +25,6 @@ def clear_cache():
     joblib_memory.clear()
 
 
-def double_time_exponential(q2_div_q1, t2_minus_t1=None):
-    """ See https://en.wikipedia.org/wiki/Doubling_time"""
-    if t2_minus_t1 is None:
-        t2_minus_t1 = np.ones(q2_div_q1.shape)
-    return t2_minus_t1 * np.log(2) / np.log(q2_div_q1)
-
-
 def report_download(url, df):
     print(f"Downloaded data: last data point {df.columns[-1]} from {url}")
 
