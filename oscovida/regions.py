@@ -1,10 +1,11 @@
 from functools import lru_cache
 from typing import List, Optional
 
-import pycountry
-from .covid19dh import cite, covid19
-from pandas import DataFrame
 import pandas as pd
+import pycountry
+from pandas import DataFrame
+
+from .covid19dh import cite, covid19
 
 
 def fetch_covid19_data(

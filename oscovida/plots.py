@@ -1,11 +1,12 @@
-from os import stat
-from oscovida.statistics import smooth
-from oscovida.regions import Region
-import matplotlib.pyplot as plt
-from matplotlib import rcParams
-from matplotlib.ticker import FuncFormatter, ScalarFormatter
-import pandas as pd
 from functools import singledispatch
+from typing import Optional
+
+import matplotlib.pyplot as plt
+import pandas as pd
+from matplotlib import rcParams
+from matplotlib.axes._subplots import Axes
+from matplotlib.ticker import ScalarFormatter
+from oscovida.regions import Region
 
 from . import statistics
 

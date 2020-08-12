@@ -1,9 +1,10 @@
-import pandas as pd
-import numpy as np
 import math
-from typing import Union, Tuple
 from functools import singledispatch
+from typing import Tuple, Union
 
+import numpy as np
+
+import pandas as pd
 
 SMOOTHING_METHODS = {
     'weak': (
