@@ -14,6 +14,8 @@ import IPython.display
 from typing import Tuple
 # choose font - can be deactivated
 from matplotlib import rcParams
+from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rki_data, rki_population_url
+
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
 # need many figures for index.ipynb and germany.ipynb
@@ -30,8 +32,6 @@ from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
 LW = 3   # line width
-
-base_url = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/"
 
 # set up joblib memory to avoid re-fetching files
 joblib_location = "./cachedir"
@@ -279,7 +279,7 @@ def fetch_data_germany(include_last_day=True):
     """
 
     # outdated: datasource = "https://opendata.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0.csv"
-    datasource = "https://www.arcgis.com/sharing/rest/content/items/f10774f1c63e40168479a1feb6c7ca74/data"
+    datasource = rki_data
     t0 = time.time()
     print(f"Please be patient - downloading data from {datasource} ...")
     germany = pd.read_csv(datasource)
@@ -430,6 +430,51 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
 
 
 @joblib_memory.cache
+def germany_get_population(state: str = None, landkreis: str = None) -> int:
+    """The function's behavior duplicates the one for `germany_get_region()` one."""
+    source = rki_population_url
+    population = pd.read_csv(source)
+
+    if state is None and landkreis is None:
+        return sum(population.EWZ)
+
+    elif state and landkreis:
+        raise NotImplementedError("Try to use 'None' for the state.")
+        """We need to check if this is important."""
+
+    if state:
+        assert state in population['BL'].values, \
+            f"{state} not in available German states. These are {' ,'.join(sorted(population['BL'].drop_duplicates()))}"
+
+        return population.EWZ[population['BL'] == state].sum()
+
+    if landkreis:
+        assert landkreis in population['county'].values, \
+            f"{state} not in available German states. These are {sorted(population['county'].drop_duplicates())}"
+
+        return population.EWZ[population['county'] == landkreis].sum()
+
+    raise NotImplemented("Should never get to this point.")@joblib_memory.cache
+
+
+@joblib_memory.cache
+def get_population(country: str = None, region: str = None) -> int:
+    """Only support country for now"""
+    source = jhu_population_url
+    population = pd.read_csv(source)
+    key = 'Combined_Key'
+    if country:
+        assert country in population[key].values, \
+            f"{country} not in available German states. These are {sorted(population[key].drop_duplicates())}"
+
+        if country == "Germany":
+            return germany_get_population(state=region)
+        return int(population.Population[population[key] == country])
+
+    raise NotImplemented("Should never get to this point.")
+
+
+@joblib_memory.cache
 def fetch_data_hungary_last_execution():
     return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
@@ -441,7 +486,7 @@ def fetch_data_hungary():
 
     Dataset does not contain the number of deaths in each county/capital city.
     """
-    datasource = r'https://raw.githubusercontent.com/sanbrock/covid19/master/datafile.csv'
+    datasource = hungary_data
 
     t0 = time.time()
     print(f"Please be patient - downloading data from {datasource} ...")
@@ -919,10 +964,6 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
     return ax
 
 
-
-
-
-
 def get_country_data(country: str, region: str = None, subregion: str = None, verbose: bool = False,
                      pad_RKI_data_to_yesterday: bool = True) -> Tuple[pd.Series, pd.Series, str]:
     """Given the name of a country, get the Johns Hopkins data for cases and deaths,
@@ -1025,7 +1066,7 @@ def day0atleast(v0, series):
 
 
 def align_sets_at(v0, df):
-    """Accepts data frame, and aligns so that all enttries close to v0 are on the same row.
+    """Accepts data frame, and aligns so that all entries close to v0 are on the same row.
 
     Returns new dataframe with integer index (representing days after v0).
     """
@@ -1129,7 +1170,7 @@ def set_y_axis_limit(data, current_lim):
     :return: new y-axis lower limit
     """
     data_0 = data[data.index >= 0]  # from "day 0" only
-    limits = [0.1, 1, 10, 100]
+    limits = [0.01, 0.1, 1, 10, 100]
     # if we have values within the `limits`, we set the lower `y_limit` on the graph to the value on the left of bisect
     # example: if the minimum value is 3, then y_limit = 1
     index = bisect(limits, data_0.min().min())
@@ -1143,11 +1184,16 @@ def set_y_axis_limit(data, current_lim):
 
 def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Poland", "Korea, South",
                                                   "Belarus", "Switzerland", "US"],
-                     v0c=10, v0d=3):
+                     v0c=10, v0d=3, normalize=False):
     rolling = 7
     df_c, df_d = get_compare_data([main_country] + compare_with, rolling=rolling)
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
+
+    if normalize:
+        for country in res_c.keys():
+            res_c[country] *= 100000 / get_population(country)
+            res_d[country] *= 100000 / get_population(country)
 
     # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
     # for all days.
@@ -1168,7 +1214,8 @@ def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Polan
                       "daily new deaths\n(rolling 7-day mean)",
                       v0=v0d, highlight={main_country:"C0"})
 
-    fig.tight_layout(pad=1)
+    if not normalize:
+        fig.tight_layout(pad=1)
     title = f"Daily cases (top) and deaths (below) for {main_country}"
     axes[0].set_title(title)
 
@@ -1430,13 +1477,18 @@ def overview(country: str, region: str = None, subregion: str = None,
 
 
 def compare_plot(country: str, region: str = None, subregion: str = None,
-                 savefig: bool = False) -> Tuple[plt.axes, pd.Series, pd.Series]:
+                 savefig: bool = False, normalize: bool = False) -> Tuple[plt.axes, pd.Series, pd.Series]:
     """ Create a pair of plots which show comparison of the region with other most suffering countries
     """
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
+    if normalize:
+        assert subregion is None, f"Normalization does not support subregions"
+        population = get_population(country=country, region=region)
+        c *= 100000 / population
+        d *= 100000 / population
 
     if not subregion and not region:    # i.e. not a region of Germany
-        axes_compare, res_c, res_d = make_compare_plot(country)
+        axes_compare, res_c, res_d = make_compare_plot(country, normalize=normalize)
 
     elif country == "Germany":   # Germany specific plots
         # On 11 April, Mecklenburg Vorpommern data was missing from data set.

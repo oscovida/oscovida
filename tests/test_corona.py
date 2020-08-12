@@ -280,3 +280,23 @@ def test_pad_cumulative_series_to_yesterday():
     y2 = c.pad_cumulative_series_to_yesterday(y)
     assert y.shape == (10,)
     assert y2.shape == y.shape
+
+
+def test_germany_get_population():
+    germany = c.germany_get_population()
+    assert germany > 8200000
+    hamburg = c.germany_get_population("Hamburg")
+    assert hamburg > 1800000
+    pinneberg = c.germany_get_population(landkreis="LK Pinneberg")
+    assert pinneberg > 30000
+
+
+def test_get_population():
+    germany = c.get_population("Germany")
+    assert germany > 8200000
+    bayern = c.get_population("Germany", "Bayern")
+    assert bayern > 10000000
+    russia = c.get_population("Russia")
+    assert russia > 140000000
+    kyoto = c.get_population("Japan", "Kyoto")
+    assert kyoto > 2500000
