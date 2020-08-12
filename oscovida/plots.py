@@ -19,69 +19,104 @@ rcParams['figure.max_open_warning'] = 50
 
 plt.style.use('ggplot')
 
-# COLOR_MAPPING = {
-#     'CASES': {
-#         'totals': 'C0',
-#         'daily': 'C0',
-#         'r number': ''
-#     }
-#     'DEATHS':
-# }
+COLOR_MAPPING = {
+    'cases': {
+        'totals': 'C1',
+        'daily': 'C1',
+        'r_number': 'C5',
+        'growth_factor': 'C1',
+        'doubling_time': 'C1',
+    },
+    'deaths': {
+        'totals': 'C0',
+        'daily': 'C0',
+        'r_number': 'C4',
+        'growth_factor': 'C0',
+        'doubling_time': 'C0',
+    },
+}
+
+
+def _standard_plot_formatting(plot_function):
+    def formatted_plot(*args, **kwargs) -> Axes:
+        ax = plot_function(*args, **kwargs)
+
+        # labels on the right y-axis as well
+        ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
+        ax.yaxis.set_ticks_position('both')
+        ax.legend()
+
+        return ax
+
+    return formatted_plot
 
 
 @singledispatch
-def plot_totals():
+def plot_totals() -> Axes:
     raise NotImplementedError
 
 
+#  NOTE: If you want to decorate a function when using the singledispatch
+#  decorator you have to **explicitly** specify the type to dispatch on as an
+#  argument to the decorator, otherwise the dispatch fails as it (I guess?)
+#  cannot read the type hinting through a decorated function
 @plot_totals.register(pd.DataFrame)
-def _(region_data: pd.DataFrame, ax=None, logscale=True, label_prepend=""):
+@_standard_plot_formatting
+def _(
+    region_data: pd.DataFrame,
+    ax: Optional[Axes] = None,
+    logscale=True,
+    label_prepend="",
+) -> Axes:
     if ax is None:
         ax = plt.gca()
 
     ax.step(
         region_data.index,
-        region_data.confirmed,
+        region_data['confirmed'],
         label=" ".join([label_prepend, 'cases']),
+        color='C1',
     )
 
     ax.plot(
         region_data.index,
-        region_data.deaths,
+        region_data['deaths'],
         label=" ".join([label_prepend, 'deaths']),
+        color='C0',
     )
 
     if logscale:
         ax.set_yscale('log')
 
-    ax.set_ylabel("total numbers")
     ax.yaxis.set_major_formatter(ScalarFormatter())
 
-    # labels on the right y-axis as well
-    ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
-    ax.yaxis.set_ticks_position('both')
-    ax.legend()
+    ax.set_ylabel("total numbers")
 
     return ax
 
 
 @plot_totals.register(Region)
-def _(region: Region, ax=None, logscale=True):
+def _(
+    region: Region, ax: Optional[Axes] = None, logscale=True, label_prepend=None
+) -> Axes:
+    if label_prepend is None:
+        label_prepend = region.admin_1
+
     return plot_totals(
-        region.data, ax=ax, logscale=logscale, label_prepend=region.admin_1
+        region.data, ax=ax, logscale=logscale, label_prepend=label_prepend
     )
 
 
 @singledispatch
-def plot_daily():
+def plot_daily() -> Axes:
     raise NotImplementedError
 
 
-@plot_daily.register
+@plot_daily.register(pd.Series)
+@_standard_plot_formatting
 def _(
     series: pd.Series,
-    ax=None,
-    logscale=True,
+    ax: Optional[Axes] = None,
     color=None,
     label_prepend="",
     smoothing='weak',
@@ -90,25 +125,16 @@ def _(
         ax = plt.gca()
 
     label = series.name
-    #  The series for new cases is called 'confirmed', but people usually say
-    #  'cases', so here we rename that if required
     if label == 'confirmed':
         label = 'cases'
+
+    if color is None:
+        color = COLOR_MAPPING[label]['daily']
 
     bar_alpha = 0.2
 
     series_daily = series.pipe(statistics.daily)
     series_daily_s = series_daily.pipe(statistics.smooth, kind=smoothing)
-
-    if color is None:
-        if label == 'cases':
-            color = 'C1'
-        elif label == 'deaths':
-            color = 'C0'
-        elif label == 'recovered':
-            color = 'C2'
-        else:
-            color = 'C3'
 
     ax.bar(
         series_daily.index,
@@ -125,56 +151,51 @@ def _(
         color=color,
     )
 
-    ax.legend()
     ax.set_ylabel('daily change')
-
-    # labels on the right y-axis as well
-    ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
-    ax.yaxis.set_ticks_position('both')
 
     return ax
 
 
-@plot_daily.register
+@plot_daily.register(Region)
 def _(
     region: Region,
     colname: str,
-    ax=None,
-    logscale=True,
-    label_prepend="",
+    ax: Optional[Axes] = None,
+    label_prepend=None,
     smoothing='weak',
 ):
+    if label_prepend is None:
+        label_prepend = region.admin_1
+
     return plot_daily(
-        region.data[colname],
-        ax=ax,
-        logscale=logscale,
-        label_prepend=region.admin_1,
-        smoothing=smoothing,
+        region.data[colname], ax=ax, label_prepend=label_prepend, smoothing=smoothing,
     )
 
 
 @singledispatch
-def plot_r_number():
+def plot_r_number() -> Axes:
     raise NotImplementedError
 
 
-@plot_r_number.register
+@plot_r_number.register(pd.Series)
+@_standard_plot_formatting
 def _(
     series: pd.Series,
-    ax=None,
-    color='C4',
+    ax: Optional[Axes] = None,
+    color=None,
     label_prepend="",
     smoothing='7dayrolling',
     yaxis_auto_lim=True,
-):
+) -> Axes:
     if ax is None:
         ax = plt.gca()
 
     label = series.name
-    #  The series for new cases is called 'confirmed', but people usually say
-    #  'cases', so here we rename that if required
     if label == 'confirmed':
         label = 'cases'
+
+    if color is None:
+        color = COLOR_MAPPING[label]['r_number']
 
     r_number = (
         series.pipe(statistics.daily)
@@ -194,58 +215,58 @@ def _(
 
     ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3')
 
-    ax.legend()
     ax.set_ylabel(f'r number')
-
-    # labels on the right y-axis as well
-    ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
-    ax.yaxis.set_ticks_position('both')
 
     return ax
 
 
-@plot_r_number.register
+@plot_r_number.register(Region)
 def _(
     region: Region,
     colname: str,
-    ax=None,
-    color='C4',
-    label_prepend="",
+    ax: Optional[Axes] = None,
+    color=None,
+    label_prepend=None,
     smoothing='7dayrolling',
     yaxis_auto_lim=True,
-):
+) -> Axes:
+    if label_prepend is None:
+        label_prepend = region.admin_1
+
     return plot_r_number(
         region.data[colname],
         ax=ax,
         color=color,
-        label_prepend=region.admin_1,
+        label_prepend=label_prepend,
         smoothing=smoothing,
         yaxis_auto_lim=yaxis_auto_lim,
     )
 
 
 @singledispatch
-def plot_growth_factor():
+def plot_growth_factor() -> Axes:
     raise NotImplementedError
 
 
-@plot_growth_factor.register
+@plot_growth_factor.register(pd.Series)
+@_standard_plot_formatting
 def _(
     series: pd.Series,
-    ax=None,
-    color='C1',
+    ax: Optional[Axes] = None,
+    color=None,
     label_prepend="",
     smoothing='7dayrolling',
     yaxis_auto_lim=True,
-):
+) -> Axes:
     if ax is None:
         ax = plt.gca()
 
     label = series.name
-    #  The series for new cases is called 'confirmed', but people usually say
-    #  'cases', so here we rename that if required
     if label == 'confirmed':
         label = 'cases'
+
+    if color is None:
+        color = COLOR_MAPPING[label]['growth_factor']
 
     growth_factor = (
         series.pipe(statistics.daily)
@@ -265,31 +286,99 @@ def _(
 
     ax.plot([series.index.min(), series.index.max()], [1.0, 1.0], '-C3')
 
-    ax.legend()
     ax.set_ylabel(f'growth factor')
-
-    # labels on the right y-axis as well
-    ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
-    ax.yaxis.set_ticks_position('both')
 
     return ax
 
 
-@plot_growth_factor.register
+@plot_growth_factor.register(Region)
 def _(
     region: Region,
     colname: str,
-    ax=None,
-    color='C1',
-    label_prepend="",
+    ax: Optional[Axes] = None,
+    color=None,
+    label_prepend=None,
     smoothing='7dayrolling',
     yaxis_auto_lim=True,
-):
+) -> Axes:
+    if label_prepend is None:
+        label_prepend = region.admin_1
+
     return plot_growth_factor(
         region.data[colname],
         ax=ax,
         color=color,
-        label_prepend=region.admin_1,
+        label_prepend=label_prepend,
+        smoothing=smoothing,
+        yaxis_auto_lim=yaxis_auto_lim,
+    )
+
+
+@singledispatch
+def plot_doubling_time() -> Axes:
+    raise NotImplementedError
+
+
+@plot_doubling_time.register(pd.Series)
+@_standard_plot_formatting
+def _(
+    series: pd.Series,
+    ax: Optional[Axes] = None,
+    color=None,
+    label_prepend="",
+    smoothing='7dayrolling',
+    yaxis_auto_lim=True,
+) -> Axes:
+    if ax is None:
+        ax = plt.gca()
+
+    label = series.name
+    if label == 'confirmed':
+        label = 'cases'
+
+    if color is None:
+        color = COLOR_MAPPING[label]['daily']
+
+    doubling_time = series.pipe(statistics.doubling_time)
+
+    ax.plot(
+        doubling_time.pipe(statistics.smooth, kind=smoothing),
+        label=" ".join([label_prepend, f'{label} doubling time ({smoothing})']),
+        color=color,
+    )
+
+    ax.plot(
+        doubling_time,
+        'o',
+        alpha=0.3,
+        label=" ".join([label_prepend, f'{label} doubling time']),
+        color=color,
+    )
+
+    if yaxis_auto_lim:
+        y_auto_min, y_auto_max = doubling_time.pipe(statistics.min_max, n=28)
+        ax.set_ylim(y_auto_min, y_auto_max)
+
+    return ax
+
+@plot_doubling_time.register(Region)
+def _(
+    region: Region,
+    colname: str,
+    ax: Optional[Axes] = None,
+    color=None,
+    label_prepend=None,
+    smoothing='7dayrolling',
+    yaxis_auto_lim=True,
+) -> Axes:
+    if label_prepend is None:
+        label_prepend = region.admin_1
+
+    return plot_doubling_time(
+        region.data[colname],
+        ax=ax,
+        color=color,
+        label_prepend=label_prepend,
         smoothing=smoothing,
         yaxis_auto_lim=yaxis_auto_lim,
     )
