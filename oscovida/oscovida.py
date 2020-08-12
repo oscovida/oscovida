@@ -1206,12 +1206,13 @@ def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Polan
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax=axes[0]
+    norm_str = '\nper 100K people'
     plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
-                      "daily new cases\n(rolling 7-day mean)",
+                      f"daily new cases{norm_str if normalize else ''}\n(rolling 7-day mean)",
                       v0=v0c, highlight={main_country:"C1"})
     ax = axes[1]
     plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
-                      "daily new deaths\n(rolling 7-day mean)",
+                      f"daily new deaths{norm_str if normalize else ''}\n(rolling 7-day mean)",
                       v0=v0d, highlight={main_country:"C0"})
 
     if not normalize:
