@@ -52,7 +52,7 @@ def _standard_plot_formatting(plot_function):
 
 
 @singledispatch
-def plot_totals() -> Axes:
+def plot_totals(*args, **kwargs) -> Axes:
     raise NotImplementedError
 
 
@@ -60,29 +60,27 @@ def plot_totals() -> Axes:
 #  decorator you have to **explicitly** specify the type to dispatch on as an
 #  argument to the decorator, otherwise the dispatch fails as it (I guess?)
 #  cannot read the type hinting through a decorated function
-@plot_totals.register(pd.DataFrame)
+@plot_totals.register(pd.Series)
 @_standard_plot_formatting
 def _(
-    region_data: pd.DataFrame,
+    series: pd.Series,
     ax: Optional[Axes] = None,
+    color=None,
     logscale=True,
     label_prepend="",
 ) -> Axes:
     if ax is None:
         ax = plt.gca()
 
-    ax.step(
-        region_data.index,
-        region_data['confirmed'],
-        label=" ".join([label_prepend, 'cases']),
-        color='C1',
-    )
+    label = series.name
+    if label == 'confirmed':
+        label = 'cases'
 
-    ax.plot(
-        region_data.index,
-        region_data['deaths'],
-        label=" ".join([label_prepend, 'deaths']),
-        color='C0',
+    if color is None:
+        color = COLOR_MAPPING[label]['totals']
+
+    ax.step(
+        series.index, series, label=" ".join([label_prepend, label]), color=color,
     )
 
     if logscale:
@@ -97,13 +95,17 @@ def _(
 
 @plot_totals.register(Region)
 def _(
-    region: Region, ax: Optional[Axes] = None, logscale=True, label_prepend=None
+    region: Region,
+    colname: str,
+    ax: Optional[Axes] = None,
+    logscale=True,
+    label_prepend=None,
 ) -> Axes:
     if label_prepend is None:
         label_prepend = region.admin_1
 
     return plot_totals(
-        region.data, ax=ax, logscale=logscale, label_prepend=label_prepend
+        region.data[colname], ax=ax, logscale=logscale, label_prepend=label_prepend
     )
 
 
@@ -360,6 +362,7 @@ def _(
         ax.set_ylim(y_auto_min, y_auto_max)
 
     return ax
+
 
 @plot_doubling_time.register(Region)
 def _(
