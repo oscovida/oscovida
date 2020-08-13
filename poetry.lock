@@ -141,14 +141,6 @@ toml = ["toml"]
 
 [[package]]
 category = "main"
-description = "Unified data hub for a better understanding of COVID-19 https://covid19datahub.io"
-name = "covid19dh"
-optional = false
-python-versions = "*"
-version = "1.0.0"
-
-[[package]]
-category = "main"
 description = "Composable style cycles"
 name = "cycler"
 optional = false
@@ -548,6 +540,17 @@ name = "more-itertools"
 optional = false
 python-versions = ">=3.5"
 version = "8.4.0"
+
+[[package]]
+category = "main"
+description = "Multiple dispatch"
+name = "multipledispatch"
+optional = false
+python-versions = "*"
+version = "0.6.0"
+
+[package.dependencies]
+six = "*"
 
 [[package]]
 category = "dev"
@@ -1212,7 +1215,7 @@ formatting = []
 test = []
 
 [metadata]
-content-hash = "9dd5d0d4f7ceb1de9660affa90720a27de8720d5f79335f9f8e9fd3a8560a9bb"
+content-hash = "4db7dd1abd352b0ded45e9969bbb600ddd3ab437306404dc38626ea2c4ddd9e4"
 python-versions = "^3.6.7"
 
 [metadata.files]
@@ -1302,10 +1305,6 @@ coverage = [
     {file = "coverage-5.2-cp39-cp39-win32.whl", hash = "sha256:d67599521dff98ec8c34cd9652cbcfe16ed076a2209625fca9dc7419b6370e5c"},
     {file = "coverage-5.2-cp39-cp39-win_amd64.whl", hash = "sha256:10f2a618a6e75adf64329f828a6a5b40244c1c50f5ef4ce4109e904e69c71bd2"},
     {file = "coverage-5.2.tar.gz", hash = "sha256:1874bdc943654ba46d28f179c1846f5710eda3aeb265ff029e0ac2b52daae404"},
-]
-covid19dh = [
-    {file = "covid19dh-1.0.0-py3-none-any.whl", hash = "sha256:1d94b08a8326420c5d8c594f1ee9461171defff70cb4380f3ac87bbab8d5795d"},
-    {file = "covid19dh-1.0.0.tar.gz", hash = "sha256:c3743769dec15d44daf144feec74d9ff5f2f566e99566f2b53094b055011c4f8"},
 ]
 cycler = [
     {file = "cycler-0.10.0-py2.py3-none-any.whl", hash = "sha256:1d8a5ae1ff6c5cf9b93e8811e581232ad8920aeec647c37316ceac982b08cb2d"},
@@ -1487,6 +1486,11 @@ mistune = [
 more-itertools = [
     {file = "more-itertools-8.4.0.tar.gz", hash = "sha256:68c70cc7167bdf5c7c9d8f6954a7837089c6a36bf565383919bb595efb8a17e5"},
     {file = "more_itertools-8.4.0-py3-none-any.whl", hash = "sha256:b78134b2063dd214000685165d81c154522c3ee0a1c0d4d113c80361c234c5a2"},
+]
+multipledispatch = [
+    {file = "multipledispatch-0.6.0-py2-none-any.whl", hash = "sha256:407e6d8c5fa27075968ba07c4db3ef5f02bea4e871e959570eeb69ee39a6565b"},
+    {file = "multipledispatch-0.6.0-py3-none-any.whl", hash = "sha256:a55c512128fb3f7c2efd2533f2550accb93c35f1045242ef74645fc92a2c3cba"},
+    {file = "multipledispatch-0.6.0.tar.gz", hash = "sha256:a7ab1451fd0bf9b92cab3edbd7b205622fb767aeefb4fb536c2e3de9e0a38bea"},
 ]
 mypy = [
     {file = "mypy-0.782-cp35-cp35m-macosx_10_6_x86_64.whl", hash = "sha256:2c6cde8aa3426c1682d35190b59b71f661237d74b053822ea3d748e2c9578a7c"},

@@ -729,12 +729,12 @@ def _(
 @plot_doubling_time.register(Region)
 def _(
     region: Region,
-    colname: str,
+    colnames: Sequence[str] = ["confirmed", "deaths"],
     ax: Optional[Axes] = None,
-    color=None,
-    label_prepend=None,
-    smoothing='7dayrolling',
-    yaxis_auto_lim=True,
+    color: Optional[str] = None,
+    label_prepend: Optional[str] = None,
+    smoothing: str = '7dayrolling',
+    yaxis_auto_lim: bool = True,
 ) -> Axes:
     """Plots the doubling time for an oscovida `Region`, by default plots only
     the `confirmed` and `deaths` columns.
@@ -779,11 +779,15 @@ def _(
     if label_prepend is None:
         label_prepend = region.admin_1
 
-    return plot_doubling_time(
-        region.data[colname],
-        ax=ax,
-        color=color,
-        label_prepend=label_prepend,
-        smoothing=smoothing,
-        yaxis_auto_lim=yaxis_auto_lim,
-    )
+    for colname in colnames:
+        ax = plot_doubling_time(
+            region.data[colname],
+            ax=ax,
+            color=color,
+            label_prepend=label_prepend,
+            smoothing=smoothing,
+            yaxis_auto_lim=yaxis_auto_lim,
+        )
+
+    return ax
+
