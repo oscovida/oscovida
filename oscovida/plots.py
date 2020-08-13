@@ -653,7 +653,7 @@ def _(
     ax: Optional[Axes] = None,
     color: Optional[str] = None,
     label_prepend: str = "",
-    smoothing: str = '7dayrolling',
+    smoothing: str = 'strong',
     yaxis_auto_lim: bool = True,
 ) -> Axes:
     """Plots the doubling time for a given series.
@@ -682,7 +682,7 @@ def _(
     smoothing : str, optional
         Smoothing argument to use, see `oscovida.statistics.smooth` and
         `oscovida.statistics.SMOOTHING_METHODS` for more info
-        By default '7dayrolling'
+        By default 'strong'
     yaxis_auto_lim : bool, optional
         Uses `oscovida.statistics.min_max` to work out the minimum and maximum
         r number for the past 28 days, limits the y-axis to that range
@@ -733,7 +733,7 @@ def _(
     ax: Optional[Axes] = None,
     color: Optional[str] = None,
     label_prepend: Optional[str] = None,
-    smoothing: str = '7dayrolling',
+    smoothing: str = 'strong',
     yaxis_auto_lim: bool = True,
 ) -> Axes:
     """Plots the doubling time for an oscovida `Region`, by default plots only
@@ -765,7 +765,7 @@ def _(
     smoothing : str, optional
         Smoothing argument to use, see `oscovida.statistics.smooth` and
         `oscovida.statistics.SMOOTHING_METHODS` for more info
-        By default '7dayrolling'
+        By default 'strong'
     yaxis_auto_lim : bool, optional
         Uses `oscovida.statistics.min_max` to work out the minimum and maximum
         r number for the past 28 days, limits the y-axis to that range
