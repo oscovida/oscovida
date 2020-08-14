@@ -1184,13 +1184,13 @@ def set_y_axis_limit(data, current_lim):
 
 def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Poland", "Korea, South",
                                                   "Belarus", "Switzerland", "US"],
-                     v0c=10, v0d=3, normalize=False):
+                     v0c=10, v0d=3, normalise=False):
     rolling = 7
     df_c, df_d = get_compare_data([main_country] + compare_with, rolling=rolling)
     res_c = align_sets_at(v0c, df_c)
     res_d = align_sets_at(v0d, df_d)
 
-    if normalize:
+    if normalise:
         for country in res_c.keys():
             res_c[country] *= 100000 / get_population(country)
             res_d[country] *= 100000 / get_population(country)
@@ -1208,14 +1208,14 @@ def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Polan
     ax=axes[0]
     norm_str = '\nper 100K people'
     plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
-                      f"daily new cases{norm_str if normalize else ''}\n(rolling 7-day mean)",
+                      f"daily new cases{norm_str if normalise else ''}\n(rolling 7-day mean)",
                       v0=v0c, highlight={main_country:"C1"})
     ax = axes[1]
     plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
-                      f"daily new deaths{norm_str if normalize else ''}\n(rolling 7-day mean)",
+                      f"daily new deaths{norm_str if normalise else ''}\n(rolling 7-day mean)",
                       v0=v0d, highlight={main_country:"C0"})
 
-    if not normalize:
+    if not normalise:
         fig.tight_layout(pad=1)
     title = f"Daily cases (top) and deaths (below) for {main_country}"
     axes[0].set_title(title)
@@ -1478,18 +1478,18 @@ def overview(country: str, region: str = None, subregion: str = None,
 
 
 def compare_plot(country: str, region: str = None, subregion: str = None,
-                 savefig: bool = False, normalize: bool = False) -> Tuple[plt.axes, pd.Series, pd.Series]:
+                 savefig: bool = False, normalise: bool = False) -> Tuple[plt.axes, pd.Series, pd.Series]:
     """ Create a pair of plots which show comparison of the region with other most suffering countries
     """
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
-    if normalize:
+    if normalise:
         assert subregion is None, f"Normalization does not support subregions"
         population = get_population(country=country, region=region)
         c *= 100000 / population
         d *= 100000 / population
 
     if not subregion and not region:    # i.e. not a region of Germany
-        axes_compare, res_c, res_d = make_compare_plot(country, normalize=normalize)
+        axes_compare, res_c, res_d = make_compare_plot(country, normalise=normalise)
 
     elif country == "Germany":   # Germany specific plots
         # On 11 April, Mecklenburg Vorpommern data was missing from data set.
