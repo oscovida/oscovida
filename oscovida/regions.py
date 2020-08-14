@@ -170,7 +170,7 @@ class Region:
 
         data = fetch_covid19_data(self.admin_1, level=self.level)
 
-        if self.level == 2 and self.admin_2 != '*' and self.admin_2:
+        if self.level >= 2 and self.admin_2 != '*' and self.admin_2:
             data = data[data['administrative_area_level_2'] == self.admin_2]
         if self.level == 3 and self.admin_3 != '*' and self.admin_3:
             data = data[data['administrative_area_level_3'] == self.admin_3]
