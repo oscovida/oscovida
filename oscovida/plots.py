@@ -551,8 +551,7 @@ def _(
     if color is None:
         color = COLOR_MAPPING[label]['growth_factor']
 
-    growth_factor = (
-        series.pipe(statistics.daily)
+    growth_factor = (series
         .pipe(statistics.smooth, kind=smoothing)
         .pipe(statistics.growth_factor)
     )
