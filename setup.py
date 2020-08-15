@@ -49,6 +49,10 @@ setup(name="oscovida",
           'ipywidgets',
           'ipynb_py_convert',
           'click',
+          'ipyleaflet',
+          'geopandas',
+          'folium',
+          'descartes',
       ],
       extras_require={
           'test': [
