@@ -430,10 +430,18 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
 
 
 @joblib_memory.cache
+def fetch_csv_data_from_url(source):
+    """Given a URL, fetch the csv using pandas. Put into separate function (from germany_get_population)
+    to avoid repeated download of file (for better performance)."""
+    data = pd.read_csv(source)
+    return data
+
+
+@joblib_memory.cache
 def germany_get_population(state: str = None, landkreis: str = None) -> int:
     """The function's behavior duplicates the one for `germany_get_region()` one."""
     source = rki_population_url
-    population = pd.read_csv(source)
+    population = fetch_csv_data_from_url(source)
 
     if state is None and landkreis is None:
         return sum(population.EWZ)
