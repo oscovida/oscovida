@@ -2,7 +2,7 @@ name: Generate Webpage for PR
 
 on:
   pull_request:
-    branches: [ master ]
+    # branches: [ master ]
 
 jobs:
   webpage-gen-pr:
