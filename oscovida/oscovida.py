@@ -469,7 +469,7 @@ def germany_get_population(state: str = None, landkreis: str = None) -> int:
 def get_population(country: str = None, region: str = None) -> int:
     """Only support country for now"""
     source = jhu_population_url
-    population = pd.read_csv(source)
+    population = fetch_csv_data_from_url(source)
     key = 'Combined_Key'
     if country:
         assert country in population[key].values, \
