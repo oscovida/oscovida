@@ -8,6 +8,9 @@ from pandas import DataFrame
 from .covid19dh import cite, covid19
 
 
+# TODO: Use world bank data (world-bank-data pypi)
+
+
 def fetch_covid19_data(
     country: str = None, level: int = 1, verbose: bool = False
 ) -> DataFrame:
