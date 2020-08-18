@@ -100,8 +100,6 @@ def test_label_from_region_subregion():
     assert c.label_from_region_subregion(("Schleswig Holstein", "Pinneberg")) == "Schleswig Holstein-Pinneberg"
 
 
-
-
 def test_get_country_data():
     # Germany
     cases, deaths, region_label = c.get_country_data(country="Germany",
@@ -155,7 +153,6 @@ def test_compute_daily_change():
     assert abs(smooth2_data.sum() - 82914.7) < 1
 
 
- 
 def test_plot_daily_change():
     cases, deaths = mock_get_country_data_johns_hopkins()
     fig, ax = plt.subplots()
@@ -218,7 +215,6 @@ def test_plot_reproduction_number_fetch_data():
         fig.savefig(f'test-reproduction_number-{country}.pdf')
 
 
-
 def test_compose_dataframe_summary():
     cases, deaths = mock_get_country_data_johns_hopkins()
 
@@ -228,7 +224,6 @@ def test_compose_dataframe_summary():
     # check that most recent data item is last
     print(table)
     
-
 
 def test_get_cases_last_week():
     index = pd.date_range(start='1/1/2018', end='1/08/2018', freq='D')
@@ -242,7 +237,6 @@ def test_get_cases_last_week():
 
     cases, deaths = mock_get_country_data_johns_hopkins(country="China")
     assert c.get_cases_last_week(cases) == 430
-
 
 
 def test_pad_cumulative_series_to_yesterday():
