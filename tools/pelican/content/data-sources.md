@@ -19,7 +19,9 @@ slug: data-sources
       for each of 412 regions;
 - also we use a separate dataset for COVID [cases in Hungary](https://raw.githubusercontent.com/sanbrock/covid19/master/datafile.csv).
   
-  
+The above mentioned sources are listed in [this]("https://github.com/oscovida/oscovida/blob/master/oscovida/data_sources.py")
+python file.
+
 ## Data Analysis
   
 - All computational steps and code are available (see [Open Science](open-science.html))
