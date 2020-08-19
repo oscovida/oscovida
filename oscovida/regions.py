@@ -5,26 +5,14 @@ import pandas as pd
 import pycountry
 from pandas import DataFrame
 
-from .covid19dh import cite, covid19
+from . import covid19dh
 
 
 # TODO: Use world bank data (world-bank-data pypi)
 
 
-def fetch_covid19_data(
-    country: str = None, level: int = 1, verbose: bool = False
-) -> DataFrame:
-    """Wraps the `covid19dh.covid19` function in n `functools.lru_cache`.
-
-    `covid19dh.covid19` caches the downloaded data files to disk so that it does
-    not have to download them each time, however it does not cache them
-    in-memory, and loading the larger files can be a bit slow.
-    """
-    return covid19(country, level=level, verbose=verbose)
-
-
 def _check_admin_level_(admin_1: str, admin_target: str, level: int):
-    data = fetch_covid19_data(admin_1, level)
+    data = covid19dh.get(admin_1, level)
     admin_names = data[f'administrative_area_level_{level}'].unique()
     if not admin_target in admin_names:
         raise LookupError(
@@ -115,7 +103,7 @@ class Region:
         RegionData(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3='*', level=3)
         """
         try:
-            pyc_admin_1: pycountry.db.Country = pycountry.countries.lookup(admin_1)
+            pyc_admin_1: pycountry.db.Country = pycountry.countries.lookup(admin_1)  # type: ignore
         except LookupError:
             pyc_admin_1_matches: list = pycountry.countries.search_fuzzy(admin_1)
             if len(pyc_admin_1_matches) > 1:
@@ -127,10 +115,10 @@ class Region:
                 )
             pyc_admin_1: pycountry.db.Country = pyc_admin_1_matches[0]  # type: ignore
 
-        self.country: str = pyc_admin_1.name
-        self.admin_1: str = pyc_admin_1.alpha_3
-        self.admin_2: Optional[str] = None
-        self.admin_3: Optional[str] = None
+        self.country = pyc_admin_1.name
+        self.admin_1 = pyc_admin_1.alpha_3
+        self.admin_2 = None
+        self.admin_3 = None
 
         #  If the level has been manually specified that (probably) means the
         #  user wants data for all of the administrative regions at that level
@@ -149,7 +137,7 @@ class Region:
                 )
 
             if level >= 2:
-                if admin_2:
+                if admin_2 and admin_2 != "*":
                     _check_admin_level_(self.country, admin_2, 2)
                     self.admin_2 = admin_2
                 else:
@@ -162,37 +150,29 @@ class Region:
             self.level = 1
 
             if admin_2:
-                _check_admin_level_(self.country, admin_2, 2)
+                if admin_2 != '*':
+                    _check_admin_level_(self.country, admin_2, 2)
                 self.level = 2
                 self.admin_2 = admin_2
 
             if admin_3:
-                _check_admin_level_(self.country, admin_3, 3)
+                if admin_3 != '*':
+                    _check_admin_level_(self.country, admin_3, 3)
                 self.level = 3
                 self.admin_3 = admin_3
 
-        data = fetch_covid19_data(self.admin_1, level=self.level)
+        data = covid19dh.get(self.admin_1, level=self.level)  # type: ignore
 
         if self.level >= 2 and self.admin_2 != '*' and self.admin_2:
             data = data[data['administrative_area_level_2'] == self.admin_2]
         if self.level == 3 and self.admin_3 != '*' and self.admin_3:
             data = data[data['administrative_area_level_3'] == self.admin_3]
 
-        #  This is kind of hacky, but full subclassing the DataFrame is complete
-        #  overkill for our needs. If you just add an attribute to a dataframe
-        #  the attribute will not persist through standard pandas operations
-        #  (e.g. `.copy()`) unless it is added to `DataFrame.._metadata`
-        #  so we add an entry of `oscovida_metadata` to it, then create the
-        #  attribute.
-        #  https://pandas.pydata.org/pandas-docs/stable/development/extending.html#define-original-properties
-        # data._metadata.append('oscovida_metadata')
-        # data.attrs['columns'] = set()
-
         self.data = data
 
     @property
     def cite(self) -> List[str]:
-        return cite(self.data)
+        return covid19dh.cite(self.data)
 
     def __str__(self) -> str:
         a = f"{self.country} ({self.admin_1})"
