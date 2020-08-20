@@ -52,6 +52,7 @@ jobs:
 
       - name: Run pre-generate hook
         run: |
+          source .venv/bin/activate
           ./oscovida/tools/pre-generate.sh
 
       - name: Generate new reports
@@ -67,6 +68,7 @@ jobs:
 
       - name: Run post-generate hook
         run: |
+          source .venv/bin/activate
           ./oscovida/tools/post-generate.sh
 
       - name: Update HTML pages
