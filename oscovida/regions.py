@@ -122,7 +122,7 @@ class Region:
 
         #  If the level has been manually specified that (probably) means the
         #  user wants data for all of the administrative regions at that level
-        if level or level == 0:  # Explicitly accept level == 0 to throw exception later
+        if not level is None:
             if not (1 <= level <= 3):
                 raise ValueError('Level must be between 1 and 3 (inclusive).')
 
@@ -135,38 +135,39 @@ class Region:
                     '`level <= 2` and `admin_2` is not supported, neither is '
                     'passing any level and an `admin_3`.'
                 )
-
-            if level >= 2:
-                if admin_2 and admin_2 != "*":
-                    _check_admin_level_(self.country, admin_2, 2)
-                    self.admin_2 = admin_2
-                else:
-                    self.admin_2 = '*'
-            if level == 3:
-                self.admin_3 = '*'
-
-            self.level = level
         else:
-            self.level = 1
+            #  Sets level to the highest specified administrative region
+            level = max(
+                [
+                    i + 1
+                    for (i, v) in enumerate((admin_1, admin_2, admin_3))
+                    if not v is None
+                ]
+            )
 
-            if admin_2:
-                if admin_2 != '*':
-                    _check_admin_level_(self.country, admin_2, 2)
-                self.level = 2
-                self.admin_2 = admin_2
-
-            if admin_3:
-                if admin_3 != '*':
-                    _check_admin_level_(self.country, admin_3, 3)
-                self.level = 3
-                self.admin_3 = admin_3
+        self.level = level
 
         data = covid19dh.get(self.admin_1, level=self.level)  # type: ignore
 
-        if self.level >= 2 and self.admin_2 != '*' and self.admin_2:
-            data = data[data['administrative_area_level_2'] == self.admin_2]
-        if self.level == 3 and self.admin_3 != '*' and self.admin_3:
-            data = data[data['administrative_area_level_3'] == self.admin_3]
+        if self.level >= 2:
+            if admin_2:
+                if admin_2 != '*':
+                    _check_admin_level_(self.country, admin_2, 2)
+                self.admin_2 = admin_2
+
+                data = data[data['administrative_area_level_2'] == self.admin_2]
+            else:
+                self.admin_2 = '*'
+
+        if self.level == 3:
+            if admin_3:
+                if admin_3 != '*':
+                    _check_admin_level_(self.country, admin_3, 3)
+                self.admin_3 = admin_3
+
+                data = data[data['administrative_area_level_3'] == self.admin_3]
+            else:
+                self.admin_3 = '*'
 
         self.data = data
 
