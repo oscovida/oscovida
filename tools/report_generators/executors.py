@@ -6,7 +6,7 @@ from typing import List, Union
 from pandas import DataFrame
 from tqdm.auto import tqdm
 
-from oscovida import MetadataRegion
+from oscovida import MetadataRegion, get_incidence_rates_countries, get_incidence_rates_germany
 
 from .index import create_markdown_index_page
 from .incidence_rates import create_markdown_incidence_page
@@ -202,12 +202,24 @@ class ReportExecutor:
         pelican_file_path: str = None,
         title_prefix: str = "14 Day Incidence Rates: ",
     ) -> None:
+        #  1st element of incidence_rates is the cases, second is deaths
+        if self.Reporter.category == 'germany':
+            incidence_rates = get_incidence_rates_germany()[0]
+            # strip 'Germany' and brackets with county from name
+            mdr = self.metadata_regions.copy()
+            mdr.index = [x[:x.find("(")].strip('Germany: ') for x in mdr.index]
+            incidence_rates = incidence_rates.join(mdr)
+        elif self.Reporter.category == 'countries':
+            incidence_rates = get_incidence_rates_countries()[0]
+            incidence_rates = incidence_rates.join(self.metadata_regions)
+        else:
+            raise NotImplementedError
+
         create_markdown_incidence_page(
-            self.metadata_regions,
+            incidence_rates,
             self.Reporter.category,
             save_as,
             slug,
             pelican_file_path,
             title_prefix,
         )
-
