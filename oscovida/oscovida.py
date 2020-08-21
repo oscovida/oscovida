@@ -430,57 +430,27 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
 
 
 @joblib_memory.cache
-def fetch_csv_data_from_url(source):
+def fetch_csv_data_from_url(source) -> pd.DataFrame:
     """Given a URL, fetch the csv using pandas. Put into separate function (from germany_get_population)
     to avoid repeated download of file (for better performance)."""
     data = pd.read_csv(source)
-    return data
+    return data # type: ignore
 
 
 @joblib_memory.cache
-def germany_get_population(state: str = None, landkreis: str = None) -> int:
+def germany_get_population() -> pd.DataFrame:
     """The function's behavior duplicates the one for `germany_get_region()` one."""
     source = rki_population_url
     population = fetch_csv_data_from_url(source)
-
-    if state is None and landkreis is None:
-        return sum(population.EWZ)
-
-    elif state and landkreis:
-        raise NotImplementedError("Try to use 'None' for the state.")
-        """We need to check if this is important."""
-
-    if state:
-        assert state in population['BL'].values, \
-            f"{state} not in available German states. These are {' ,'.join(sorted(population['BL'].drop_duplicates()))}"
-
-        return population.EWZ[population['BL'] == state].sum()
-
-    if landkreis:
-        assert landkreis in population['county'].values, \
-            f"{state} not in available German states. These are {sorted(population['county'].drop_duplicates())}"
-
-        return population.EWZ[population['county'] == landkreis].sum()
-
-    raise NotImplemented("Should never get to this point.")@joblib_memory.cache
+    return population # type: ignore
 
 
 @joblib_memory.cache
-def get_population(country: str = None, region: str = None) -> int:
+def get_population() -> pd.DataFrame:
     """Only support country for now"""
     source = jhu_population_url
     population = fetch_csv_data_from_url(source)
-    key = 'Combined_Key'
-    if country:
-        assert country in population[key].values, \
-            f"{country} not in available German states. These are {sorted(population[key].drop_duplicates())}"
-
-        if country == "Germany":
-            return germany_get_population(state=region)
-        return int(population.Population[population[key] == country])
-
-    raise NotImplemented("Should never get to this point.")
-
+    return population # type: ignore
 
 @joblib_memory.cache
 def fetch_data_hungary_last_execution():
