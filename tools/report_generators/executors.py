@@ -211,6 +211,8 @@ class ReportExecutor:
             raise NotImplementedError
 
         incidence_rates = incidence_rates.join(self.metadata_regions)
+        #  This way even if the entry is missing from the metadata (because the
+        #  data was not downloaded to create a notebook) it'll still have a name
         incidence_rates['one-line-summary'] = incidence_rates.index
 
         create_markdown_incidence_page(
