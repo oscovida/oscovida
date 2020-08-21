@@ -8,144 +8,7 @@ import numpy as np
 
 from .index import compose_md_url
 
-### TEMPORARY
-import datetime as dt
-import pandas as pd
-
-pd.set_option("max_rows", None)
-from oscovida import (
-    get_population,
-    germany_get_population,
-    fetch_cases,
-    fetch_deaths,
-    fetch_data_germany,
-)
-
-from urllib.error import HTTPError
-from http.client import RemoteDisconnected
-
-
-def get_incidence_rates_countries(period=14):
-    cases = fetch_cases()
-    deaths = fetch_deaths()
-
-    #  Sanity checks that the column format is as expected
-    assert all(cases.columns == deaths.columns)
-    assert all(cases.columns[:3] == ["Province/State", "Lat", "Long"])
-
-    yesterday = dt.datetime.now() - dt.timedelta(days=1)
-    fortnight_ago = yesterday - dt.timedelta(days=period)
-    periods = (fortnight_ago < pd.to_datetime(cases.columns[3:])) & (
-        pd.to_datetime(cases.columns[3:]) < yesterday
-    )
-    periods = np.concatenate((np.full(3, False), periods))  # Add the 3 ignored columns
-
-    assert len(periods) == len(cases.columns)
-
-    cases_sum = (
-        cases[cases.columns[periods]]
-        .diff(axis=1)
-        .sum(axis=1)
-        .to_frame(f"{period}-day-sum")
-    )
-    deaths_sum = (
-        deaths[deaths.columns[periods]]
-        .diff(axis=1)
-        .sum(axis=1)
-        .to_frame(f"{period}-day-sum")
-    )
-
-    # Now we have tables like:
-    #                     14-day-sum
-    # Country/Region
-    # Afghanistan              841.0
-    # ...                        ...
-    # Zimbabwe                1294.0
-    #
-    # [266 rows x 1 columns]
-    # Where the values are the total cases/deaths in the past `period` days
-
-    population = (
-        get_population()
-        .set_index('Combined_Key')
-        .rename(columns={"Population": "population"})
-        .population
-    )
-
-    cases_incidence = cases_sum.join(population)
-    cases_incidence.index.name = "Country"
-    cases_incidence["incidence"] = (
-        cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
-    )
-    deaths_incidence = deaths_sum.join(population)
-    deaths_incidence.index.name = "Country"
-    deaths_incidence["incidence"] = (
-        deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
-    )
-
-    # We could join the tables, but it's easier to join them than to split so
-    # we'll just return two instead
-    return cases_incidence, deaths_incidence
-
-
-def get_incidence_rates_germany(period=14):
-    germany = fetch_data_germany()
-    germany = germany.rename(
-        columns={"AnzahlFall": "cases", "AnzahlTodesfall": "deaths"}
-    )
-
-    yesterday = dt.datetime.now() - dt.timedelta(days=1)
-    fortnight_ago = yesterday - dt.timedelta(days=period)
-    periods = (fortnight_ago < germany.index) & (germany.index < yesterday)
-    germany = germany.iloc[periods]
-
-    cases = germany[["Landkreis", "cases"]]
-    deaths = germany[["Landkreis", "deaths"]]
-
-    cases_sum = (
-        cases.groupby("Landkreis")
-        .sum()
-        .rename(columns={"cases": f"{period}-day-sum"})
-    )
-    deaths_sum = (
-        deaths.groupby("Landkreis")
-        .sum()
-        .rename(columns={"deaths": f"{period}-day-sum"})
-    )
-
-    # Now we have tables like:
-    #                            cases
-    # Landkreis
-    # LK Ahrweiler                       32
-    # ...                               ...
-    # StadtRegion Aachen                109
-    # [406 rows x 1 columns]
-    # Where the values are the total cases/deaths in the past `period` days
-
-    population = (
-        germany_get_population()
-        .set_index('county')
-        .rename(columns={"EWZ": "population"})
-        .population
-        .to_frame()
-    )
-
-    cases_incidence = cases_sum.join(population)
-    cases_incidence["incidence"] = (
-        cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
-    )
-    deaths_incidence = deaths_sum.join(population)
-    deaths_incidence["incidence"] = (
-        deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
-    )
-
-    # We could join the tables, but it's easier to join them than to split so
-    # we'll just return two instead
-    return cases_incidence, deaths_incidence
-
-
-### TEMPORARY
-
+from oscovida import get_incidence_rates_countries, get_incidence_rates_germany
 
 def create_markdown_incidence_list(regions: DataFrame):
     # Assemble a markdown table like this:
@@ -163,9 +26,12 @@ def create_markdown_incidence_list(regions: DataFrame):
     regions2 = regions.set_index(new_index)
     regions2.index.name = "Location"
 
+    period = [x for x in regions.columns if x.endswith('-day-incidence-rate')][0]
+    period = period.strip('-day-incidence-rate')
+
     # select columns
     regions3 = regions2[
-        ["max-cases", "max-deaths", "cases-last-week", "14-day-incidence-rate"]
+        [f"{period}-day-sum", "population", f"{period}-day-incidence-rate"]
     ]
     regions4 = regions3.applymap(
         lambda v: "missing" if v is None else "{:,}".format(v)
@@ -173,10 +39,9 @@ def create_markdown_incidence_list(regions: DataFrame):
 
     # rename columns
     rename_dict = {
-        "max-cases": "Total cases",
-        "max-deaths": "Total deaths",
-        "cases-last-week": "New cases last week",
-        "14-day-incidence-rate": "14 Day Incidence Rate",
+        f"{period}-day-sum": f"Cases in last {period} days",
+        "population": "Population",
+        f"{period}-day-incidence-rate": f"{period} Day Incidence Rate",
     }
     regions5 = regions4.rename(columns=rename_dict)
 
@@ -186,7 +51,7 @@ def create_markdown_incidence_list(regions: DataFrame):
 
 
 def create_markdown_incidence_page(
-    regions: DataFrame,
+    incidence_rates: DataFrame,
     category: str,
     save_as=None,
     slug=None,
@@ -201,9 +66,7 @@ def create_markdown_incidence_page(
     date: 2020-04-11 08:00
     """
 
-    regions = append_incidence_rates(regions, category)
-
-    md_content = create_markdown_incidence_list(regions)
+    md_content = create_markdown_incidence_list(incidence_rates)
 
     title_map = {
         "countries": title_prefix + " Countries of the world",
