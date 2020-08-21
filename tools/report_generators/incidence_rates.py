@@ -13,70 +13,135 @@ import datetime as dt
 import pandas as pd
 
 pd.set_option("max_rows", None)
-from oscovida import get_population, germany_get_population, get_country_data
+from oscovida import (
+    get_population,
+    germany_get_population,
+    fetch_cases,
+    fetch_deaths,
+    fetch_data_germany,
+)
 
 from urllib.error import HTTPError
 from http.client import RemoteDisconnected
 
 
-def compute_incidence_rates_countries(region_name: str):
-    yesterday = dt.date.today() - dt.timedelta(days=1)
+def get_incidence_rates_countries(period=14):
+    cases = fetch_cases()
+    deaths = fetch_deaths()
 
-    c, _, _ = get_country_data(region_name)
-    if c.index[-1].date() < yesterday:
-        origin = c.index[0].date()
-        # Fill data series forward up to yesterday
-        new_idx = pd.date_range(origin, periods=(yesterday - origin).days, freq="D")
-        c.reindex(new_idx, method="pad")
+    #  Sanity checks that the column format is as expected
+    assert all(cases.columns == deaths.columns)
+    assert all(cases.columns[:3] == ["Province/State", "Lat", "Long"])
 
-    c = c[-15:]
+    yesterday = dt.datetime.now() - dt.timedelta(days=1)
+    fortnight_ago = yesterday - dt.timedelta(days=period)
+    periods = (fortnight_ago < pd.to_datetime(cases.columns[3:])) & (
+        pd.to_datetime(cases.columns[3:]) < yesterday
+    )
+    periods = np.concatenate((np.full(3, False), periods))  # Add the 3 ignored columns
 
-    try:
-        population = get_population(region_name)
-        new_cases = int(c[-1] - c[-15])
-        incidence = new_cases / population * 100000.0
-        return round(incidence, 1)
-    except (ValueError, HTTPError, RemoteDisconnected):
-        return np.nan
+    assert len(periods) == len(cases.columns)
+
+    cases_sum = (
+        cases[cases.columns[periods]]
+        .diff(axis=1)
+        .sum(axis=1)
+        .to_frame(f"{period}-day-sum")
+    )
+    deaths_sum = (
+        deaths[deaths.columns[periods]]
+        .diff(axis=1)
+        .sum(axis=1)
+        .to_frame(f"{period}-day-sum")
+    )
+
+    # Now we have tables like:
+    #                     14-day-sum
+    # Country/Region
+    # Afghanistan              841.0
+    # ...                        ...
+    # Zimbabwe                1294.0
+    #
+    # [266 rows x 1 columns]
+    # Where the values are the total cases/deaths in the past `period` days
+
+    population = (
+        get_population()
+        .set_index('Combined_Key')
+        .rename(columns={"Population": "population"})
+        .population
+    )
+
+    cases_incidence = cases_sum.join(population)
+    cases_incidence.index.name = "Country"
+    cases_incidence["incidence"] = (
+        cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
+    )
+    deaths_incidence = deaths_sum.join(population)
+    deaths_incidence.index.name = "Country"
+    deaths_incidence["incidence"] = (
+        deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
+    )
+
+    # We could join the tables, but it's easier to join them than to split so
+    # we'll just return two instead
+    return cases_incidence, deaths_incidence
 
 
-def compute_incidence_rates_germany(subregion_name: str):
-    yesterday = dt.date.today() - dt.timedelta(days=1)
+def get_incidence_rates_germany(period=14):
+    germany = fetch_data_germany()
+    germany = germany.rename(
+        columns={"AnzahlFall": "cases", "AnzahlTodesfall": "deaths"}
+    )
 
-    c, _, _ = get_country_data(country="Germany", subregion=subregion_name)
-    if c.index[-1].date() < yesterday:
-        origin = c.index[0].date()
-        # Fill data series forward up to yesterday
-        new_idx = pd.date_range(origin, periods=(yesterday - origin).days, freq="D")
-        c.reindex(new_idx, method="pad")
+    yesterday = dt.datetime.now() - dt.timedelta(days=1)
+    fortnight_ago = yesterday - dt.timedelta(days=period)
+    periods = (fortnight_ago < germany.index) & (germany.index < yesterday)
+    germany = germany.iloc[periods]
 
-    c = c[-15:]
+    cases = germany[["Landkreis", "cases"]]
+    deaths = germany[["Landkreis", "deaths"]]
 
-    try:
-        population = germany_get_population(landkreis=subregion_name)
-        new_cases = int(c[-1] - c[-15])
-        incidence = new_cases / population * 100000.0
-        return round(incidence, 1)
-    except (ValueError, HTTPError, RemoteDisconnected):
-        return np.nan
+    cases_sum = (
+        cases.groupby("Landkreis")
+        .sum()
+        .rename(columns={"cases": f"{period}-day-sum"})
+    )
+    deaths_sum = (
+        deaths.groupby("Landkreis")
+        .sum()
+        .rename(columns={"deaths": f"{period}-day-sum"})
+    )
 
+    # Now we have tables like:
+    #                            cases
+    # Landkreis
+    # LK Ahrweiler                       32
+    # ...                               ...
+    # StadtRegion Aachen                109
+    # [406 rows x 1 columns]
+    # Where the values are the total cases/deaths in the past `period` days
 
-def append_incidence_rates(regions: pd.DataFrame, category: str):
-    # This is terrible but it'll have to do since we have to finish this today...
-    if category == "countries":
-        regions["14-day-incidence-rate"] = regions.index.to_frame().applymap(
-            compute_incidence_rates_countries
-        )
-    elif category == "germany":
-        regions["14-day-incidence-rate"] = regions["subregion"].map(
-            compute_incidence_rates_germany
-        )
-    else:
-        raise Exception("Unknown caterory")
+    population = (
+        germany_get_population()
+        .set_index('county')
+        .rename(columns={"EWZ": "population"})
+        .population
+        .to_frame()
+    )
 
-    regions = regions.sort_values(by=["14-day-incidence-rate"])
+    cases_incidence = cases_sum.join(population)
+    cases_incidence["incidence"] = (
+        cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
+    )
+    deaths_incidence = deaths_sum.join(population)
+    deaths_incidence["incidence"] = (
+        deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
+    )
 
-    return regions
+    # We could join the tables, but it's easier to join them than to split so
+    # we'll just return two instead
+    return cases_incidence, deaths_incidence
 
 
 ### TEMPORARY
@@ -151,7 +216,7 @@ def create_markdown_incidence_page(
     title = title_map[category]
 
     if save_as is None:
-        save_as = category+'-incidence-rate'
+        save_as = category + "-incidence-rate"
     if slug is None:
         slug = save_as
 
