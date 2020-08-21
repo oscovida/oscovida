@@ -8,7 +8,6 @@ import numpy as np
 
 from .index import compose_md_url
 
-from oscovida import get_incidence_rates_countries, get_incidence_rates_germany
 
 def create_markdown_incidence_list(regions: DataFrame):
     # Assemble a markdown table like this:
@@ -26,13 +25,20 @@ def create_markdown_incidence_list(regions: DataFrame):
     regions2 = regions.set_index(new_index)
     regions2.index.name = "Location"
 
-    period = [x for x in regions.columns if x.endswith('-day-incidence-rate')][0]
-    period = period.strip('-day-incidence-rate')
+    period = [x for x in regions.columns if x.endswith("-day-incidence-rate")][0]
+    period = period.strip("-day-incidence-rate")
 
     # select columns
     regions3 = regions2[
         [f"{period}-day-sum", "population", f"{period}-day-incidence-rate"]
     ]
+
+    regions3[f"{period}-day-sum"] = regions3[f"{period}-day-sum"].astype(int)
+    regions3[f"population"] = regions3[f"population"].astype(int)
+    regions3[f"{period}-day-incidence-rate"] = regions3[
+        f"{period}-day-incidence-rate"
+    ].round(1)
+
     regions4 = regions3.applymap(
         lambda v: "missing" if v is None else "{:,}".format(v)
     )  # Thousands comma separator
@@ -90,7 +96,7 @@ def create_markdown_incidence_page(
 
     intro_text = f"""The searchable table below shows 14-day incidence rate per
 100,000 for all countries. ([An explanation of the calculation is
-available](https://oscovida.github.io/14-day-incidence-rate.html).
+available](https://oscovida.github.io/14-day-incidence-rate.html)).
     """
 
     with open(index_path, "tw") as f:
