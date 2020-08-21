@@ -2,11 +2,17 @@ title: 14 Day Incidence Rates:  Germany
 tags: Data, Plots, 14 Day Incidence Rates:  Germany
 save-as: germany-incidence-rate
 slug: germany-incidence-rate
-date: 2020/08/22 00:42
+date: 2020/08/22 00:49
 
 The searchable table below shows 14-day incidence rate per
 100,000 for all countries. ([An explanation of the calculation is
-available](https://oscovida.github.io/14-day-incidence-rate.html)).
+available](./14-day-incidence-rate.html)).
+
+Two of these pages are provided:
+
+- [German region incidence rates](./germany-incidence-rate.html)
+
+- [Worldwide incidence rates](./countries-incidence-rate.html)
     
 | Location                             |   Cases in last 14 days | Population   |   14 Day Incidence Rate |
 |:-------------------------------------|------------------------:|:-------------|------------------------:|
@@ -416,3 +422,4 @@ available](https://oscovida.github.io/14-day-incidence-rate.html)).
 | SK Würzburg                          |                       7 | 127,880      |                     5.5 |
 | SK Zweibrücken                       |                       2 | 34,209       |                     5.8 |
 | StadtRegion Aachen                   |                     109 | 555,465      |                    19.6 |
+[Data sources ](./data-sources.html)

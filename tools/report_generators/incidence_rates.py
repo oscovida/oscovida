@@ -96,7 +96,13 @@ def create_markdown_incidence_page(
 
     intro_text = f"""The searchable table below shows 14-day incidence rate per
 100,000 for all countries. ([An explanation of the calculation is
-available](https://oscovida.github.io/14-day-incidence-rate.html)).
+available](./14-day-incidence-rate.html)).
+
+Two of these pages are provided:
+
+- [German region incidence rates](./germany-incidence-rate.html)
+
+- [Worldwide incidence rates](./countries-incidence-rate.html)
     """
 
     with open(index_path, "tw") as f:
@@ -111,6 +117,8 @@ available](https://oscovida.github.io/14-day-incidence-rate.html)).
         f.write(intro_text)
         f.write("\n")
         f.write(md_content)
+        f.write("\n")
+        f.write("[Data sources ](./data-sources.html)")
         f.write("\n")
 
     logging.info(f"Created markdown index file {pelican_file_path}")

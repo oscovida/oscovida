@@ -2,7 +2,7 @@ title: Tracking plots:  Countries of the world
 tags: Data, Plots, Tracking plots:  Countries of the world
 save-as: countries
 slug: countries
-date: 2020/08/22 00:42
+date: 2020/08/22 00:49
 
 
 | Location                                             | Total cases   | Total deaths   | New cases last week   |

@@ -2,11 +2,17 @@ title: 14 Day Incidence Rates:  Countries of the world
 tags: Data, Plots, 14 Day Incidence Rates:  Countries of the world
 save-as: countries-incidence-rate
 slug: countries-incidence-rate
-date: 2020/08/22 00:42
+date: 2020/08/22 00:49
 
 The searchable table below shows 14-day incidence rate per
 100,000 for all countries. ([An explanation of the calculation is
-available](https://oscovida.github.io/14-day-incidence-rate.html)).
+available](./14-day-incidence-rate.html)).
+
+Two of these pages are provided:
+
+- [German region incidence rates](./germany-incidence-rate.html)
+
+- [Worldwide incidence rates](./countries-incidence-rate.html)
     
 | Location                                             | Cases in last 14 days   | Population    |   14 Day Incidence Rate |
 |:-----------------------------------------------------|:------------------------|:--------------|------------------------:|
@@ -198,3 +204,4 @@ available](https://oscovida.github.io/14-day-incidence-rate.html)).
 | Yemen                                                | 103                     | 29,825,968    |                     0.3 |
 | Zambia                                               | 2,886                   | 18,383,956    |                    15.7 |
 | Zimbabwe                                             | 1,294                   | 14,862,927    |                     8.7 |
+[Data sources ](./data-sources.html)
