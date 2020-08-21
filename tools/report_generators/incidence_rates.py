@@ -15,6 +15,8 @@ import pandas as pd
 pd.set_option("max_rows", None)
 from oscovida import get_population, germany_get_population, get_country_data
 
+from urllib.error import HTTPError
+
 
 def compute_incidence_rates_countries(region_name: str):
     yesterday = dt.date.today() - dt.timedelta(days=1)
@@ -33,7 +35,7 @@ def compute_incidence_rates_countries(region_name: str):
         new_cases = int(c[-1] - c[-15])
         incidence = new_cases / population * 100000.0
         return round(incidence, 1)
-    except ValueError:
+    except (ValueError, HTTPError):
         return np.nan
 
 
@@ -54,7 +56,7 @@ def compute_incidence_rates_germany(subregion_name: str):
         new_cases = int(c[-1] - c[-15])
         incidence = new_cases / population * 100000.0
         return round(incidence, 1)
-    except ValueError:
+    except (ValueError, HTTPError):
         return np.nan
 
 
