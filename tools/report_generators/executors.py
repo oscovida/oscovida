@@ -205,15 +205,13 @@ class ReportExecutor:
         #  1st element of incidence_rates is the cases, second is deaths
         if self.Reporter.category == 'germany':
             incidence_rates = get_incidence_rates_germany()[0]
-            # strip 'Germany' and brackets with county from name
-            mdr = self.metadata_regions.copy()
-            mdr.index = [x[:x.find("(")].strip('Germany: ') for x in mdr.index]
-            incidence_rates = incidence_rates.join(mdr)
         elif self.Reporter.category == 'countries':
             incidence_rates = get_incidence_rates_countries()[0]
-            incidence_rates = incidence_rates.join(self.metadata_regions)
         else:
             raise NotImplementedError
+
+        incidence_rates = incidence_rates.join(self.metadata_regions)
+        incidence_rates['one-line-summary'] = incidence_rates.index
 
         create_markdown_incidence_page(
             incidence_rates,
