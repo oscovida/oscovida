@@ -52,6 +52,14 @@ def create_markdown_incidence_list(regions: DataFrame):
     }
     regions5 = regions4.rename(columns=rename_dict)
 
+    #  Stupid workaround to fix colours for the DataTables JS rendering.
+    #  Basically, datatables can format rows based on the **row** values, but it
+    #  does not know the name of the column for some reason, so there's no way
+    #  to check "If the 3rd column is >= 20 AND it is called 'incidence rate'",
+    #  instead we add a flag column and check if this flag column is True, and
+    #  if it is the row is coloured red...
+    regions5['FLAG'] = regions5[[f"{period} Day Incidence Rate"]].astype(float) >= 20
+
     logging.info(f"{len(regions5)} regions in markdown index list")
 
     return regions5.to_markdown()

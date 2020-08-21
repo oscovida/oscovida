@@ -29,7 +29,7 @@
       $(document).ready(function() {
           $('#data_table').DataTable( {
               "rowCallback": function( row, data, index ) {
-                  if ( data[3] >= 20 )
+                  if ( data[4] == "True" ) // 4th column is a flag to set the colour red
                   {
                       $('td', row).css('background-color', 'LightPink');
                   }
@@ -38,7 +38,8 @@
               "pageLength": 100,
               "columnDefs": [
                 { "type": "string", "targets": 0 },
-                { "type": "num-fmt", "targets": "_all" }
+                { "type": "num-fmt", "targets": "_all" },
+                { "visible": false,  "targets": [ 4 ] } // hide flag column
               ]
           } );
       } );
