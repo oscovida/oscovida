@@ -28,6 +28,12 @@
     <script type="text/javascript" class="init">
       $(document).ready(function() {
           $('#data_table').DataTable( {
+              "rowCallback": function( row, data, index ) {
+                  if ( data[3] >= 20 )
+                  {
+                      $('td', row).css('background-color', 'LightPink');
+                  }
+              },
               "order": [[ 3, "desc" ]],
               "pageLength": 100,
               "columnDefs": [
