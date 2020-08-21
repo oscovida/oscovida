@@ -132,7 +132,7 @@ def create_markdown_incidence_page(
 
     title: Germany
     tags: Data, Plots, Germany
-    save-as: germany
+    save-as: germany-incidence-rate
     date: 2020-04-11 08:00
     """
 
@@ -151,7 +151,7 @@ def create_markdown_incidence_page(
     title = title_map[category]
 
     if save_as is None:
-        save_as = category
+        save_as = category+'-incidence-rate'
     if slug is None:
         slug = save_as
 
