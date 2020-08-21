@@ -16,6 +16,7 @@ pd.set_option("max_rows", None)
 from oscovida import get_population, germany_get_population, get_country_data
 
 from urllib.error import HTTPError
+from http.client import RemoteDisconnected
 
 
 def compute_incidence_rates_countries(region_name: str):
@@ -35,7 +36,7 @@ def compute_incidence_rates_countries(region_name: str):
         new_cases = int(c[-1] - c[-15])
         incidence = new_cases / population * 100000.0
         return round(incidence, 1)
-    except (ValueError, HTTPError):
+    except (ValueError, HTTPError, RemoteDisconnected):
         return np.nan
 
 
@@ -56,7 +57,7 @@ def compute_incidence_rates_germany(subregion_name: str):
         new_cases = int(c[-1] - c[-15])
         incidence = new_cases / population * 100000.0
         return round(incidence, 1)
-    except (ValueError, HTTPError):
+    except (ValueError, HTTPError, RemoteDisconnected):
         return np.nan
 
 
