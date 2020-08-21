@@ -452,6 +452,129 @@ def get_population() -> pd.DataFrame:
     population = fetch_csv_data_from_url(source)
     return population # type: ignore
 
+
+@joblib_memory.cache
+def get_incidence_rates_countries(period=14):
+    cases = fetch_cases()
+    deaths = fetch_deaths()
+
+    #  Sanity checks that the column format is as expected
+    assert all(cases.columns == deaths.columns)
+    assert all(cases.columns[:3] == ["Province/State", "Lat", "Long"])
+
+    yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+    fortnight_ago = yesterday - datetime.timedelta(days=period)
+    periods = (fortnight_ago < pd.to_datetime(cases.columns[3:])) & (
+        pd.to_datetime(cases.columns[3:]) < yesterday
+    )
+    periods = np.concatenate((np.full(3, False), periods))  # Add the 3 ignored columns
+
+    assert len(periods) == len(cases.columns)
+
+    cases_sum = (
+        cases[cases.columns[periods]]
+        .diff(axis=1)
+        .sum(axis=1)
+        .to_frame(f"{period}-day-sum")
+    )
+    deaths_sum = (
+        deaths[deaths.columns[periods]]
+        .diff(axis=1)
+        .sum(axis=1)
+        .to_frame(f"{period}-day-sum")
+    )
+
+    # Now we have tables like:
+    #                     14-day-sum
+    # Country/Region
+    # Afghanistan              841.0
+    # ...                        ...
+    # Zimbabwe                1294.0
+    #
+    # [266 rows x 1 columns]
+    # Where the values are the total cases/deaths in the past `period` days
+
+    population = (
+        get_population()
+        .set_index('Combined_Key')
+        .rename(columns={"Population": "population"})
+        .population
+    )
+
+    cases_incidence = cases_sum.join(population)
+    cases_incidence.index.name = "Country"
+    cases_incidence[f"{period}-day-incidence-rate"] = (
+        cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
+    )
+    deaths_incidence = deaths_sum.join(population)
+    deaths_incidence.index.name = "Country"
+    deaths_incidence[f"{period}-day-incidence-rate"] = (
+        deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
+    )
+
+    # We could join the tables, but it's easier to join them than to split so
+    # we'll just return two instead
+    return cases_incidence, deaths_incidence
+
+
+@joblib_memory.cache
+def get_incidence_rates_germany(period=14):
+    germany = fetch_data_germany()
+    germany = germany.rename(
+        columns={"AnzahlFall": "cases", "AnzahlTodesfall": "deaths"}
+    )
+
+    yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+    fortnight_ago = yesterday - datetime.timedelta(days=period)
+    periods = (fortnight_ago < germany.index) & (germany.index < yesterday)
+    germany = germany.iloc[periods]
+
+    cases = germany[["Landkreis", "cases"]]
+    deaths = germany[["Landkreis", "deaths"]]
+
+    cases_sum = (
+        cases.groupby("Landkreis")
+        .sum()
+        .rename(columns={"cases": f"{period}-day-sum"})
+    )
+    deaths_sum = (
+        deaths.groupby("Landkreis")
+        .sum()
+        .rename(columns={"deaths": f"{period}-day-sum"})
+    )
+
+    # Now we have tables like:
+    #                            cases
+    # Landkreis
+    # LK Ahrweiler                       32
+    # ...                               ...
+    # StadtRegion Aachen                109
+    # [406 rows x 1 columns]
+    # Where the values are the total cases/deaths in the past `period` days
+
+    population = (
+        germany_get_population()
+        .set_index('county')
+        .rename(columns={"EWZ": "population"})
+        .population
+        .to_frame()
+    )
+
+    cases_incidence = cases_sum.join(population)
+    cases_incidence[f"{period}-day-incidence-rate"] = (
+        cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
+    )
+    deaths_incidence = deaths_sum.join(population)
+    deaths_incidence[f"{period}-day-incidence-rate"] = (
+        deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
+    )
+
+    # We could join the tables, but it's easier to join them than to split so
+    # we'll just return two instead
+    return cases_incidence, deaths_incidence
+
+
+
 @joblib_memory.cache
 def fetch_data_hungary_last_execution():
     return datetime.datetime.now().strftime("%d/%m/%Y %H:%M:%S")
