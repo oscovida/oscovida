@@ -88,10 +88,9 @@ def create_markdown_incidence_page(
 
     index_path = os.path.join(pelican_file_path)
 
-    intro_text = f"""These are the 14 day incident rate numbers for {category},
-any areas with over 20 cases per 100 000 are considered high risk be EuXFEL and
-if you have travelled to one of these regions recently you should self-quarantine
-at home for two weeks before returning to EuXFEL.
+    intro_text = f"""The searchable table below shows 14-day incidence rate per
+100,000 for all countries. ([An explanation of the calculation is
+available](https://oscovida.github.io/14-day-incidence-rate.html).
     """
 
     with open(index_path, "tw") as f:
