@@ -38,6 +38,7 @@ def create_markdown_incidence_list(regions: DataFrame):
     regions3[f"{period}-day-incidence-rate"] = regions3[
         f"{period}-day-incidence-rate"
     ].round(1)
+    regions3[f"{period}-day-incidence-rate"][regions3[f"{period}-day-incidence-rate"].isnull()] = -1
 
     regions4 = regions3.applymap(
         lambda v: "missing" if v is None else "{:,}".format(v)
