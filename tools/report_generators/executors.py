@@ -9,6 +9,7 @@ from tqdm.auto import tqdm
 from oscovida import MetadataRegion
 
 from .index import create_markdown_index_page
+from .incidence_rates import create_markdown_incidence_page
 
 
 class ReportExecutor:
@@ -193,3 +194,20 @@ class ReportExecutor:
             pelican_file_path,
             title_prefix,
         )
+
+    def create_markdown_incidence_page(
+        self,
+        save_as: str = None,
+        slug: str = None,
+        pelican_file_path: str = None,
+        title_prefix: str = "14 Day Incidence Rates: ",
+    ) -> None:
+        create_markdown_incidence_page(
+            self.metadata_regions,
+            self.Reporter.category,
+            save_as,
+            slug,
+            pelican_file_path,
+            title_prefix,
+        )
+
