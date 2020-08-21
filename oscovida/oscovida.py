@@ -452,22 +452,23 @@ def get_population() -> pd.DataFrame:
     population = fetch_csv_data_from_url(source)
     return population # type: ignore
 
-
 @joblib_memory.cache
 def get_incidence_rates_countries(period=14):
     cases = fetch_cases()
+    cases = cases.groupby(cases.index).sum()
     deaths = fetch_deaths()
+    deaths = deaths.groupby(deaths.index).sum()
 
     #  Sanity checks that the column format is as expected
     assert all(cases.columns == deaths.columns)
-    assert all(cases.columns[:3] == ["Province/State", "Lat", "Long"])
+    assert all(cases.columns[:2] == ["Lat", "Long"])
 
     yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
     fortnight_ago = yesterday - datetime.timedelta(days=period)
-    periods = (fortnight_ago < pd.to_datetime(cases.columns[3:])) & (
-        pd.to_datetime(cases.columns[3:]) < yesterday
+    periods = (fortnight_ago < pd.to_datetime(cases.columns[2:])) & (
+        pd.to_datetime(cases.columns[2:]) < yesterday
     )
-    periods = np.concatenate((np.full(3, False), periods))  # Add the 3 ignored columns
+    periods = np.concatenate((np.full(2, False), periods))  # Add the 3 ignored columns
 
     assert len(periods) == len(cases.columns)
 
@@ -496,7 +497,8 @@ def get_incidence_rates_countries(period=14):
 
     population = (
         get_population()
-        .set_index('Combined_Key')
+        .groupby('Country_Region')
+        .sum()
         .rename(columns={"Population": "population"})
         .population
     )
