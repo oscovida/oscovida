@@ -28,7 +28,12 @@
     <script type="text/javascript" class="init">
       $(document).ready(function() {
           $('#data_table').DataTable( {
-              "order": [[ 3, "desc" ]]
+              "order": [[ 3, "desc" ]],
+              "pageLength": 100,
+              "columnDefs": [
+                { "type": "string", "targets": 0 },
+                { "type": "num-fmt", "targets": "_all" }
+              ]
           } );
       } );
     </script>
