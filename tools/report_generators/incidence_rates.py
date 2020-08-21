@@ -118,7 +118,8 @@ Two of these pages are provided:
         f.write("\n")
         f.write(md_content)
         f.write("\n")
-        f.write("[Data sources ](./data-sources.html)")
+        f.write("\n")
+        f.write("You can view our data sources [here](./data-sources.html)")
         f.write("\n")
 
     logging.info(f"Created markdown index file {pelican_file_path}")
