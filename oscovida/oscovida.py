@@ -453,6 +453,7 @@ def get_population() -> pd.DataFrame:
     #  Only include population of entire countries by excluding rows that belong
     #  to a province or state
     population = population[population['Province_State'].isnull()]
+    population = population[population["Population"] != 0]
     return population # type: ignore
 
 @joblib_memory.cache
