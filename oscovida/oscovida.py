@@ -450,13 +450,17 @@ def get_population() -> pd.DataFrame:
     """Only support country for now"""
     source = jhu_population_url
     population = fetch_csv_data_from_url(source)
+    #  Only include population of entire countries by excluding rows that belong
+    #  to a province or state
+    population = population[population['Province_State'].isnull()]
     return population # type: ignore
 
 @joblib_memory.cache
 def get_incidence_rates_countries(period=14):
     cases = fetch_cases()
-    cases = cases.groupby(cases.index).sum()
     deaths = fetch_deaths()
+
+    cases = cases.groupby(cases.index).sum()
     deaths = deaths.groupby(deaths.index).sum()
 
     #  Sanity checks that the column format is as expected
