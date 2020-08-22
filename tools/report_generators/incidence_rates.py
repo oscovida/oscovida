@@ -85,7 +85,7 @@ def create_markdown_incidence_page(
 
     title_map = {
         "countries": title_prefix + " Countries of the world",
-        "germany": title_prefix + " Germany",
+        "germany": title_prefix + " Districts (Landkreise) in Germany",
         "us": title_prefix + " United States",
         "hungary": title_prefix + " Hungary",
         "all-regions": title_prefix + " All regions and countries",
@@ -105,7 +105,8 @@ def create_markdown_incidence_page(
 
     intro_text = f"""The searchable table below shows 14-day incidence rate per
 100,000 for all countries. ([An explanation of the calculation is
-available](./14-day-incidence-rate.html)).
+available](./14-day-incidence-rate.html)), entries with this incidence rate
+greater than 20 are highlighted.
 
 Two of these pages are provided:
 
@@ -128,7 +129,7 @@ Two of these pages are provided:
         f.write(md_content)
         f.write("\n")
         f.write("\n")
-        f.write("You can view our data sources [here](./data-sources.html)")
+        f.write("You can view our data sources [here](./data-sources.html).")
         f.write("\n")
 
     logging.info(f"Created markdown index file {pelican_file_path}")
