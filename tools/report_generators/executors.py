@@ -201,15 +201,17 @@ class ReportExecutor:
         slug: str = None,
         pelican_file_path: str = None,
         title_prefix: str = "14 Day Incidence Rates: ",
+        period=14,
+        threshold=20
     ) -> None:
         #  1st element of incidence_rates is the cases, second is deaths
         if self.Reporter.category == 'germany':
-            incidence_rates = get_incidence_rates_germany()[0]
+            incidence_rates = get_incidence_rates_germany(period)[0]
             incidence_rates.index = incidence_rates.index.map(
                 lambda x: x.replace("SK ", "").replace("LK ", "")
             )
         elif self.Reporter.category == 'countries':
-            incidence_rates = get_incidence_rates_countries()[0]
+            incidence_rates = get_incidence_rates_countries(period)[0]
         else:
             raise NotImplementedError
 
@@ -225,4 +227,6 @@ class ReportExecutor:
             slug,
             pelican_file_path,
             title_prefix,
+            period,
+            threshold
         )

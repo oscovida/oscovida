@@ -9,7 +9,7 @@ import numpy as np
 from .index import compose_md_url
 
 
-def create_markdown_incidence_list(regions: DataFrame):
+def create_markdown_incidence_list(regions: DataFrame, threshold):
     # Assemble a markdown table like this:
     #
     # | Country/Region                       | Total cases   | Total deaths   |
@@ -58,7 +58,7 @@ def create_markdown_incidence_list(regions: DataFrame):
     #  to check "If the 3rd column is >= 20 AND it is called 'incidence rate'",
     #  instead we add a flag column and check if this flag column is True, and
     #  if it is the row is coloured red...
-    regions5['FLAG'] = regions5[[f"{period} Day Incidence Rate"]].astype(float) >= 20
+    regions5['FLAG'] = regions5[[f"{period} Day Incidence Rate"]].astype(float) >= threshold
 
     logging.info(f"{len(regions5)} regions in markdown index list")
 
@@ -72,6 +72,8 @@ def create_markdown_incidence_page(
     slug=None,
     pelican_file_path=None,
     title_prefix="Tracking plots: ",
+    period=14,
+    threshold=20
 ):
     """Create pelican markdown file, like this:
 
@@ -81,7 +83,7 @@ def create_markdown_incidence_page(
     date: 2020-04-11 08:00
     """
 
-    md_content = create_markdown_incidence_list(incidence_rates)
+    md_content = create_markdown_incidence_list(incidence_rates, threshold)
 
     title_map = {
         "countries": title_prefix + " Countries of the world",
@@ -99,14 +101,14 @@ def create_markdown_incidence_page(
         slug = save_as
 
     if pelican_file_path is None:
-        pelican_file_path = f"pelican/content/{category}-incidence-rate.md"
+        pelican_file_path = f"pelican/content/{category}-incidence-rate-{period}day-{threshold}cases.md"
 
     index_path = os.path.join(pelican_file_path)
 
-    intro_text = f"""The searchable table below shows 14-day incidence rate per
+    intro_text = f"""The searchable table below shows {period}-day incidence rate per
 100,000 for all countries. ([An explanation of the calculation is
 available](./14-day-incidence-rate.html)), entries with this incidence rate
-greater than 20 are highlighted.
+greater than {threshold} are highlighted.
 
 Two of these pages are provided:
 
