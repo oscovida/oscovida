@@ -112,9 +112,9 @@ greater than {threshold} are highlighted.
 
 Two of these pages are provided:
 
-- [German region incidence rates](./germany-incidence-rate.html)
+- [German region incidence rates](./germany-incidence-rate-{period}day-{threshold}cases.html)
 
-- [Worldwide incidence rates](./countries-incidence-rate.html)
+- [Worldwide incidence rates](./countries-incidence-rate-{period}day-{threshold}cases.html)
     """
 
     with open(index_path, "tw") as f:
