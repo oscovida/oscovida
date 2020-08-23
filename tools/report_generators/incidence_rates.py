@@ -30,7 +30,7 @@ def create_markdown_incidence_list(regions: DataFrame, threshold):
 
     # select columns
     regions3 = regions2[
-        [f"{period}-day-sum", "population", f"{period}-day-incidence-rate"]
+        ["population", f"{period}-day-sum", f"{period}-day-incidence-rate"]
     ]
 
     regions3[f"{period}-day-sum"] = regions3[f"{period}-day-sum"].astype(int)
