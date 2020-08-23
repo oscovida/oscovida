@@ -96,7 +96,7 @@ def create_markdown_incidence_page(
     title = title_map[category]
 
     if save_as is None:
-        save_as = category + "-incidence-rate"
+        save_as = f"{category}-incidence-rate-{period}day-{threshold}cases"
     if slug is None:
         slug = save_as
 
