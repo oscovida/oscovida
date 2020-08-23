@@ -430,56 +430,156 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
 
 
 @joblib_memory.cache
-def fetch_csv_data_from_url(source):
+def fetch_csv_data_from_url(source) -> pd.DataFrame:
     """Given a URL, fetch the csv using pandas. Put into separate function (from germany_get_population)
     to avoid repeated download of file (for better performance)."""
     data = pd.read_csv(source)
-    return data
+    return data # type: ignore
 
 
 @joblib_memory.cache
-def germany_get_population(state: str = None, landkreis: str = None) -> int:
+def germany_get_population() -> pd.DataFrame:
     """The function's behavior duplicates the one for `germany_get_region()` one."""
     source = rki_population_url
     population = fetch_csv_data_from_url(source)
-
-    if state is None and landkreis is None:
-        return sum(population.EWZ)
-
-    elif state and landkreis:
-        raise NotImplementedError("Try to use 'None' for the state.")
-        """We need to check if this is important."""
-
-    if state:
-        assert state in population['BL'].values, \
-            f"{state} not in available German states. These are {' ,'.join(sorted(population['BL'].drop_duplicates()))}"
-
-        return population.EWZ[population['BL'] == state].sum()
-
-    if landkreis:
-        assert landkreis in population['county'].values, \
-            f"{state} not in available German states. These are {sorted(population['county'].drop_duplicates())}"
-
-        return population.EWZ[population['county'] == landkreis].sum()
-
-    raise NotImplemented("Should never get to this point.")@joblib_memory.cache
+    return population # type: ignore
 
 
 @joblib_memory.cache
-def get_population(country: str = None, region: str = None) -> int:
+def get_population() -> pd.DataFrame:
     """Only support country for now"""
     source = jhu_population_url
     population = fetch_csv_data_from_url(source)
-    key = 'Combined_Key'
-    if country:
-        assert country in population[key].values, \
-            f"{country} not in available German states. These are {sorted(population[key].drop_duplicates())}"
+    #  Only include population of entire countries by excluding rows that belong
+    #  to a province or state
+    population = population[population['Province_State'].isnull()]
+    population = population[population["Population"] != 0]
+    return population # type: ignore
 
-        if country == "Germany":
-            return germany_get_population(state=region)
-        return int(population.Population[population[key] == country])
+@joblib_memory.cache
+def get_incidence_rates_countries(period=14):
+    cases = fetch_cases()
+    deaths = fetch_deaths()
 
-    raise NotImplemented("Should never get to this point.")
+    cases = cases.groupby(cases.index).sum()
+    deaths = deaths.groupby(deaths.index).sum()
+
+    #  Sanity checks that the column format is as expected
+    assert all(cases.columns == deaths.columns)
+    assert all(cases.columns[:2] == ["Lat", "Long"])
+
+    yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+    fortnight_ago = yesterday - datetime.timedelta(days=period)
+    periods = (fortnight_ago < pd.to_datetime(cases.columns[2:])) & (
+        pd.to_datetime(cases.columns[2:]) < yesterday
+    )
+    periods = np.concatenate((np.full(2, False), periods))  # Add the 3 ignored columns
+
+    assert len(periods) == len(cases.columns)
+
+    cases_sum = (
+        cases[cases.columns[periods]]
+        .diff(axis=1)
+        .sum(axis=1)
+        .to_frame(f"{period}-day-sum")
+    )
+    deaths_sum = (
+        deaths[deaths.columns[periods]]
+        .diff(axis=1)
+        .sum(axis=1)
+        .to_frame(f"{period}-day-sum")
+    )
+
+    # Now we have tables like:
+    #                     14-day-sum
+    # Country/Region
+    # Afghanistan              841.0
+    # ...                        ...
+    # Zimbabwe                1294.0
+    #
+    # [266 rows x 1 columns]
+    # Where the values are the total cases/deaths in the past `period` days
+
+    population = (
+        get_population()
+        .groupby('Country_Region')
+        .sum()
+        .rename(columns={"Population": "population"})
+        .population
+    )
+
+    cases_incidence = cases_sum.join(population)
+    cases_incidence.index.name = "Country"
+    cases_incidence[f"{period}-day-incidence-rate"] = (
+        cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
+    )
+    deaths_incidence = deaths_sum.join(population)
+    deaths_incidence.index.name = "Country"
+    deaths_incidence[f"{period}-day-incidence-rate"] = (
+        deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
+    )
+
+    # We could join the tables, but it's easier to join them than to split so
+    # we'll just return two instead
+    return cases_incidence, deaths_incidence
+
+
+@joblib_memory.cache
+def get_incidence_rates_germany(period=14):
+    germany = fetch_data_germany()
+    germany = germany.rename(
+        columns={"AnzahlFall": "cases", "AnzahlTodesfall": "deaths"}
+    )
+
+    yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
+    fortnight_ago = yesterday - datetime.timedelta(days=period)
+    periods = (fortnight_ago < germany.index) & (germany.index < yesterday)
+    germany = germany.iloc[periods]
+
+    cases = germany[["Landkreis", "cases"]]
+    deaths = germany[["Landkreis", "deaths"]]
+
+    cases_sum = (
+        cases.groupby("Landkreis")
+        .sum()
+        .rename(columns={"cases": f"{period}-day-sum"})
+    )
+    deaths_sum = (
+        deaths.groupby("Landkreis")
+        .sum()
+        .rename(columns={"deaths": f"{period}-day-sum"})
+    )
+
+    # Now we have tables like:
+    #                            cases
+    # Landkreis
+    # LK Ahrweiler                       32
+    # ...                               ...
+    # StadtRegion Aachen                109
+    # [406 rows x 1 columns]
+    # Where the values are the total cases/deaths in the past `period` days
+
+    population = (
+        germany_get_population()
+        .set_index('county')
+        .rename(columns={"EWZ": "population"})
+        .population
+        .to_frame()
+    )
+
+    cases_incidence = cases_sum.join(population)
+    cases_incidence[f"{period}-day-incidence-rate"] = (
+        cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
+    )
+    deaths_incidence = deaths_sum.join(population)
+    deaths_incidence[f"{period}-day-incidence-rate"] = (
+        deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
+    )
+
+    # We could join the tables, but it's easier to join them than to split so
+    # we'll just return two instead
+    return cases_incidence, deaths_incidence
+
 
 
 @joblib_memory.cache

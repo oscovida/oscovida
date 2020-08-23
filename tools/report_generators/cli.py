@@ -8,8 +8,13 @@ import pandas
 import oscovida
 
 from .executors import ReportExecutor
-from .reporters import (AllRegions, CountryReport, GermanyReport,
-                        HungaryReport, USAReport)
+from .reporters import (
+    AllRegions,
+    CountryReport,
+    GermanyReport,
+    HungaryReport,
+    USAReport,
+)
 
 ALL_REGIONS = ["countries", "germany", "usa", "hungary", "all-regions-md", "all"]
 
@@ -77,6 +82,7 @@ def generate_reports_countries(
 
     cre.create_markdown_index_page()
 
+    cre.create_markdown_incidence_page()
 
 def get_germany_regions_list():
     data_germany = oscovida.fetch_data_germany()
@@ -134,6 +140,7 @@ def generate_reports_germany(
 
     gre.create_markdown_index_page()
 
+    gre.create_markdown_incidence_page()
 
 def generate_reports_usa(
     *, workers, kernel_name, wwwroot, force, disable_pbar, debug
@@ -325,7 +332,7 @@ def cli(
     if workers == "auto":
         workers = max(1, os.cpu_count())
         workers = max(workers - 2, 1)
-    elif workers =="max":
+    elif workers == "max":
         workers = os.cpu_count()
 
     if workers:

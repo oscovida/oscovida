@@ -1,39 +1,15 @@
 import datetime
 import logging
 import os
-import numpy as np
 from typing import List
 
 from pandas import DataFrame
+import numpy as np
+
+from .index import compose_md_url
 
 
-# change index to contain URLs and one-line summary in markdown syntax
-def compose_md_url(x: List[str]):
-    """
-    Function is applied to a pandas DataTable along axis=1, expects a list with
-    two elements: a lone line summary of the markdown table, as well as its html
-    name.
-
-    Returns a string like `[one_line_summary](html_path)` to serve as a
-    hyperlink to the generated markdown page.
-    """
-    one_line_summary, html = x
-    if isinstance(html, str):
-        return "[" + one_line_summary + "](" + os.path.join("html", html) + ")"
-    # if html was not produced, then variable html is np.nan
-    elif repr(html) == "nan":
-        logging.warn(
-            f"Missing html for {one_line_summary} - will not add link to "
-            f"html: \n{x}"
-        )
-        return one_line_summary
-    else:
-        raise NotImplementedError(
-            "Don't know how to proceed: ", one_line_summary, html, x
-        )
-
-
-def create_markdown_index_list(regions: DataFrame):
+def create_markdown_incidence_list(regions: DataFrame, threshold):
     # Assemble a markdown table like this:
     #
     # | Country/Region                       | Total cases   | Total deaths   |
@@ -49,17 +25,30 @@ def create_markdown_index_list(regions: DataFrame):
     regions2 = regions.set_index(new_index)
     regions2.index.name = "Location"
 
+    period = [x for x in regions.columns if x.endswith("-day-incidence-rate")][0]
+    period = period.strip("-day-incidence-rate")
+
     # select columns
-    regions3 = regions2[["max-cases", "max-deaths", "cases-last-week"]]
+    regions3 = regions2[
+        ["population", f"{period}-day-sum", f"{period}-day-incidence-rate"]
+    ]
+
+    regions3[f"{period}-day-sum"] = regions3[f"{period}-day-sum"].astype(int)
+    regions3[f"population"] = regions3[f"population"].astype(int)
+    regions3[f"{period}-day-incidence-rate"] = regions3[
+        f"{period}-day-incidence-rate"
+    ].round(1)
+    regions3[f"{period}-day-incidence-rate"][regions3[f"{period}-day-incidence-rate"].isnull()] = -1
+
     regions4 = regions3.applymap(
         lambda v: "missing" if v is None else "{:,}".format(v)
     )  # Thousands comma separator
 
     # rename columns
     rename_dict = {
-        "max-cases": "Total cases",
-        "max-deaths": "Total deaths",
-        "cases-last-week": "New cases last week",
+        f"{period}-day-sum": f"Cases in last {period} days",
+        "population": "Population",
+        f"{period}-day-incidence-rate": f"{period} Day Incidence Rate",
     }
     regions5 = regions4.rename(columns=rename_dict)
 
@@ -69,35 +58,36 @@ def create_markdown_index_list(regions: DataFrame):
     #  to check "If the 3rd column is >= 20 AND it is called 'incidence rate'",
     #  instead we add a flag column and check if this flag column is True, and
     #  if it is the row is coloured red...
-    #  For the index this is currently always false.
-    regions5['FLAG'] = np.full(len(regions5.index), False, dtype=bool)
+    regions5['FLAG'] = regions5[[f"{period} Day Incidence Rate"]].astype(float) >= threshold
 
     logging.info(f"{len(regions5)} regions in markdown index list")
 
     return regions5.to_markdown()
 
 
-def create_markdown_index_page(
-    regions: DataFrame,
+def create_markdown_incidence_page(
+    incidence_rates: DataFrame,
     category: str,
     save_as=None,
     slug=None,
     pelican_file_path=None,
     title_prefix="Tracking plots: ",
+    period=14,
+    threshold=20
 ):
     """Create pelican markdown file, like this:
 
     title: Germany
     tags: Data, Plots, Germany
-    save-as: germany
+    save-as: germany-incidence-rate
     date: 2020-04-11 08:00
     """
 
-    md_content = create_markdown_index_list(regions)
+    md_content = create_markdown_incidence_list(incidence_rates, threshold)
 
     title_map = {
         "countries": title_prefix + " Countries of the world",
-        "germany": title_prefix + " Germany",
+        "germany": title_prefix + " Districts (Landkreise) in Germany",
         "us": title_prefix + " United States",
         "hungary": title_prefix + " Hungary",
         "all-regions": title_prefix + " All regions and countries",
@@ -106,14 +96,26 @@ def create_markdown_index_page(
     title = title_map[category]
 
     if save_as is None:
-        save_as = category
+        save_as = f"{category}-incidence-rate-{period}day-{threshold}cases"
     if slug is None:
         slug = save_as
 
     if pelican_file_path is None:
-        pelican_file_path = f"pelican/content/{category}.md"
+        pelican_file_path = f"pelican/content/{category}-incidence-rate-{period}day-{threshold}cases.md"
 
     index_path = os.path.join(pelican_file_path)
+
+    intro_text = f"""The searchable table below shows {period}-day incidence rate per
+100,000 for all countries. ([An explanation of the calculation is
+available](./14-day-incidence-rate.html)), entries with this incidence rate
+greater than {threshold} are highlighted.
+
+Two of these pages are provided:
+
+- [German region incidence rates](./germany-incidence-rate-{period}day-{threshold}cases.html)
+
+- [Worldwide incidence rates](./countries-incidence-rate-{period}day-{threshold}cases.html)
+    """
 
     with open(index_path, "tw") as f:
         f.write(f"title: {title}\n")
@@ -124,8 +126,12 @@ def create_markdown_index_page(
         date_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
         f.write(f"date: {date_time}\n")
         f.write("\n")
+        f.write(intro_text)
         f.write("\n")
         f.write(md_content)
+        f.write("\n")
+        f.write("\n")
+        f.write("You can view our data sources [here](./data-sources.html).")
         f.write("\n")
 
     logging.info(f"Created markdown index file {pelican_file_path}")
