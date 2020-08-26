@@ -513,9 +513,6 @@ def get_incidence_rates_countries(period=14):
 
     population = (
         get_population()
-        .groupby('Country_Region')
-        .sum()
-        .rename(columns={"Population": "population"})
         .population
     )
 
@@ -572,8 +569,6 @@ def get_incidence_rates_germany(period=14):
 
     population = (
         germany_get_population()
-        .set_index('county')
-        .rename(columns={"EWZ": "population"})
         .population
         .to_frame()
     )
