@@ -287,7 +287,7 @@ def test_germany_get_population():
 
 def test_get_population():
     world = c.get_population()
-    assert world.shape == (188, 12)
+    assert world.shape == (188, 6)
     assert world.loc['Russia'].population > 140000000
     assert world.loc['Japan'].population > 120_000_000
     assert world.loc['US'].population > 320_000_000
