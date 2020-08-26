@@ -208,7 +208,7 @@ class ReportExecutor:
         if self.Reporter.category == 'germany':
             incidence_rates = get_incidence_rates_germany(period)[0]
             incidence_rates.index = incidence_rates.index.map(
-                lambda x: x.replace("SK ", "").replace("LK ", "")
+                lambda x:  x[3:] + " (LK)" if x.startswith("LK ") else x[3:] + " (SK)"
             )
         elif self.Reporter.category == 'countries':
             incidence_rates = get_incidence_rates_countries(period)[0]
