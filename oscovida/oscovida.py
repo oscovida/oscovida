@@ -442,6 +442,11 @@ def germany_get_population() -> pd.DataFrame:
     """The function's behavior duplicates the one for `germany_get_region()` one."""
     source = rki_population_url
     population = fetch_csv_data_from_url(source)
+    population = (
+        population
+        .set_index('county')
+    )
+    population = population.rename(columns={"EWZ": "population"})
     return population # type: ignore
 
 
@@ -454,6 +459,12 @@ def get_population() -> pd.DataFrame:
     #  to a province or state
     population = population[population['Province_State'].isnull()]
     population = population[population["Population"] != 0]
+    population = (
+        population
+        .groupby('Country_Region')
+        .sum() # Here we sum over individual regions in a country to get the total country population
+        .rename(columns={"Population": "population"}) # Rename Population to population
+    )
     return population # type: ignore
 
 @joblib_memory.cache
