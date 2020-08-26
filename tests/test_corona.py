@@ -288,7 +288,11 @@ def test_germany_get_population():
 def test_get_population():
     world = c.get_population()
     assert world.shape == (188, 6)
-    assert world.loc['Russia'].population > 140000000
-    assert world.loc['Japan'].population > 120_000_000
-    assert world.loc['US'].population > 320_000_000
-    assert world.loc['Germany'].population > 80_000_000
+    # Tests will have to be updated in 20+ years when the populations increase
+    # more than the 'sensible' lower bound placed here
+    # The lower bound exists in case the summing over regions fails somehow
+    # and includes areas multiple times
+    assert 140_000_000 * 1.5 > world.loc['Russia'].population > 140_000_000
+    assert 120_000_000 * 1.5 > world.loc['Japan'].population > 120_000_000
+    assert 320_000_000 * 1.5 > world.loc['US'].population > 320_000_000
+    assert 80_000_000 * 1.5 > world.loc['Germany'].population > 80_000_000
