@@ -50,7 +50,7 @@
                   <dl class="dl-horizontal">
                 {% endif %}
 
-                <dt><abbr class="published" title="{{ article.date.isoformat() }}">{{ article.date.strftime('%b. %d') }}</abbr></dt>
+                <dt>{{ article.date.strftime('%b. %d') }}</dt>
                 <dd><a href="{{ SITEURL }}/{{ article.url }}">{{ article.title }}</a></dd>
 
                 {% if loop.last %}
