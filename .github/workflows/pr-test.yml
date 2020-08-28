@@ -50,6 +50,10 @@ jobs:
           pip install ./oscovida
           pip install -r ./base/requirements.txt
 
+      - name: Run pre-generate hook
+        run: |
+          ./oscovida/tools/oscovida.github.io/pre-generate.sh
+
       - name: Generate new reports
         run: |
           export PR_NO=$(jq --raw-output .pull_request.number "$GITHUB_EVENT_PATH")
@@ -61,10 +65,9 @@ jobs:
           ls ./wwwroot
           python3 -m report_generators.cli --debug --regions=all --workers=max --log-level=INFO --log-file=./wwwroot/report-gen.log
 
-      - name: Generate individual plots
+      - name: Run post-generate hook
         run: |
-          cd ./oscovida/tools/
-          jupyter-nbconvert generate-individiual-plots.ipynb --execute
+          ./oscovida/tools/oscovida.github.io/post-generate.sh
 
       - name: Update HTML pages
         run: |
