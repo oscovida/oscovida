@@ -278,16 +278,30 @@ def test_pad_cumulative_series_to_yesterday():
 
 def test_germany_get_population():
     germany = c.germany_get_population()
-    assert germany.shape == (412, 38)
+
+    assert germany.index.name == 'county'
+    assert 'population' in germany.columns
+    assert 'cases7_per_100k' in germany.columns
+
+    germany_data = c.fetch_data_germany()
+    assert set(germany_data['Landkreis']) == set(germany.index)
+
     hamburg = germany.loc['SK Hamburg'].population
     assert hamburg > 1800000
+
     pinneberg = germany.loc['LK Pinneberg'].population
     assert pinneberg > 30000
 
 
 def test_get_population():
     world = c.get_population()
-    assert world.shape == (188, 6)
+
+    assert world.index.name == 'Country_Region'
+    assert 'population' in world.columns
+
+    # Check that the case regions and population regions match
+    assert set(c.fetch_cases().index) == set(world.index)
+
     # Tests will have to be updated in 20+ years when the populations increase
     # more than the 'sensible' lower bound placed here
     # The lower bound exists in case the summing over regions fails somehow
