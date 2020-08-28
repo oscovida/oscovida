@@ -138,7 +138,7 @@ def test_compute_daily_change():
     assert abs(change_data.sum() + cases[0] - cases[-1]) < 1e-8
 
     # for the mock data: cases[-1] - cases[0] is 82393. Explicitely done:
-    assert abs(change_data.sum() - 82393) < 1e-8  
+    assert abs(change_data.sum() - 82393) < 1e-8
 
     # assure that we haven't changed the data significantly when averaging and smoothing:
     # some change can come from
@@ -223,7 +223,7 @@ def test_compose_dataframe_summary():
 
     # check that most recent data item is last
     print(table)
-    
+
 
 def test_get_cases_last_week():
     index = pd.date_range(start='1/1/2018', end='1/08/2018', freq='D')
@@ -278,19 +278,35 @@ def test_pad_cumulative_series_to_yesterday():
 
 def test_germany_get_population():
     germany = c.germany_get_population()
-    assert germany > 8200000
-    hamburg = c.germany_get_population("Hamburg")
+
+    assert germany.index.name == 'county'
+    assert 'population' in germany.columns
+    assert 'cases7_per_100k' in germany.columns
+
+    germany_data = c.fetch_data_germany()
+    assert set(germany_data['Landkreis']) == set(germany.index)
+
+    hamburg = germany.loc['SK Hamburg'].population
     assert hamburg > 1800000
-    pinneberg = c.germany_get_population(landkreis="LK Pinneberg")
+
+    pinneberg = germany.loc['LK Pinneberg'].population
     assert pinneberg > 30000
 
 
 def test_get_population():
-    germany = c.get_population("Germany")
-    assert germany > 8200000
-    bayern = c.get_population("Germany", "Bayern")
-    assert bayern > 10000000
-    russia = c.get_population("Russia")
-    assert russia > 140000000
-    kyoto = c.get_population("Japan", "Kyoto")
-    assert kyoto > 2500000
+    world = c.get_population()
+
+    assert world.index.name == 'Country_Region'
+    assert 'population' in world.columns
+
+    # Check that the case regions and population regions match
+    assert set(c.fetch_cases().index) == set(world.index)
+
+    # Tests will have to be updated in 20+ years when the populations increase
+    # more than the 'sensible' lower bound placed here
+    # The lower bound exists in case the summing over regions fails somehow
+    # and includes areas multiple times
+    assert 140_000_000 * 1.5 > world.loc['Russia'].population > 140_000_000
+    assert 120_000_000 * 1.5 > world.loc['Japan'].population > 120_000_000
+    assert 320_000_000 * 1.5 > world.loc['US'].population > 320_000_000
+    assert 80_000_000 * 1.5 > world.loc['Germany'].population > 80_000_000
