@@ -472,8 +472,8 @@ def get_incidence_rates_countries(period=14):
     cases = fetch_cases()
     deaths = fetch_deaths()
 
-    cases = cases.groupby(cases.index).sum()
-    deaths = deaths.groupby(deaths.index).sum()
+    cases = cases.groupby(cases.index).sum().astype(int)
+    deaths = deaths.groupby(deaths.index).sum().astype(int)
 
     #  Sanity checks that the column format is as expected
     assert all(cases.columns == deaths.columns)
@@ -491,13 +491,13 @@ def get_incidence_rates_countries(period=14):
     cases_sum = (
         cases[cases.columns[periods]]
         .diff(axis=1)
-        .sum(axis=1)
+        .sum(axis=1).astype(int)
         .to_frame(f"{period}-day-sum")
     )
     deaths_sum = (
         deaths[deaths.columns[periods]]
         .diff(axis=1)
-        .sum(axis=1)
+        .sum(axis=1).astype(int)
         .to_frame(f"{period}-day-sum")
     )
 
@@ -513,19 +513,19 @@ def get_incidence_rates_countries(period=14):
 
     population = (
         get_population()
-        .population
+        .population.astype(int)
     )
 
     cases_incidence = cases_sum.join(population)
     cases_incidence.index.name = "Country"
     cases_incidence[f"{period}-day-incidence-rate"] = (
         cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
-    )
+    ).round(decimals=1)
     deaths_incidence = deaths_sum.join(population)
     deaths_incidence.index.name = "Country"
     deaths_incidence[f"{period}-day-incidence-rate"] = (
         deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
-    )
+    ).round(decimals=1)
 
     # We could join the tables, but it's easier to join them than to split so
     # we'll just return two instead
@@ -549,12 +549,12 @@ def get_incidence_rates_germany(period=14):
 
     cases_sum = (
         cases.groupby("Landkreis")
-        .sum()
+        .sum().astype(int)
         .rename(columns={"cases": f"{period}-day-sum"})
     )
     deaths_sum = (
         deaths.groupby("Landkreis")
-        .sum()
+        .sum().astype(int)
         .rename(columns={"deaths": f"{period}-day-sum"})
     )
 
@@ -569,18 +569,18 @@ def get_incidence_rates_germany(period=14):
 
     population = (
         germany_get_population()
-        .population
+        .population.astype(int)
         .to_frame()
     )
 
     cases_incidence = cases_sum.join(population)
     cases_incidence[f"{period}-day-incidence-rate"] = (
         cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
-    )
+    ).round(decimals=1)
     deaths_incidence = deaths_sum.join(population)
     deaths_incidence[f"{period}-day-incidence-rate"] = (
         deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
-    )
+    ).round(decimals=1)
 
     # We could join the tables, but it's easier to join them than to split so
     # we'll just return two instead
