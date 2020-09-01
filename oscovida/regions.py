@@ -23,7 +23,8 @@ class Region:
         ----------
         admin_1: str
             Country name string (e.g. 'United States') or alpha_3 string,
-            administrative area of top level (e.g. 'USA')
+            administrative area of top level
+            (e.g. 'USA')
         admin_2: Optional[str] = None
             Second-level administrative area, usually states, regions or cantons
             (e.g. 'California')
@@ -34,6 +35,8 @@ class Region:
             Level is automatically detected from the number of administrative
             levels passed. Optionally you can specify the level to return a
             dataframe containing the information for all administrative regions
+            up to and including the specified level
+            (e.g. `Region('USA', level=2)` returns all USA states)
 
         Attributes
         -------
@@ -47,68 +50,113 @@ class Region:
             Country alpha_3 string, administrative area of top level (e.g. 'USA')
         admin_2: Optional[str]
             Second-level administrative area, usually states, regions or cantons
-            (e.g. 'California')
         admin_3: Optional[str]
             Third-level administrative area, usually cities or municipalities
-            (e.g. 'San Francisco')
         level: int
             Level of administrative areas specified
 
         Raises
         ------
         LookupError
-            Raised if the `admin_1` string is too ambiguous. For example,
-            `RegionData('UK')` will not work as the country code is GB or GBR,
-            and UK matches too many possible places.
+            Raised if an administrative level string is too ambiguous. For example,
+            `Region('UK')` will not work as the country code is GB or GBR, and UK
+            matches too many possible places.
 
         Examples
         --------
-        You can create a `RegionData` object by calling it with specific levels,
-        which will return a filtered DataTable:
+        You can create a `Region` object by calling it with specific levels, which
+        will return a filtered DataTable:
 
-        >>> RegionData('GB')
-        RegionData(country='United Kingdom', admin_1='GBR', admin_2=None, admin_3=None, level=1)
+        >>> Region('USA')
+        Region(country='United States', admin_1='USA', admin_2=None, admin_3=None, level=1)
 
-        >>> RegionData('United Kingdom', 'England')
-        RegionData(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3=None, level=2)
+        >>> Region('USA', 'California')
+        Region(country='United States', admin_1='USA', admin_2='California', admin_3=None, level=2)
 
-        >>> RegionData('United Kingdom', 'England', 'Westminster')
-        RegionData(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3='Westminster', level=3)
+        >>> Region('USA', 'California', 'San Francisco')
+        Region(country='United States', admin_1='USA', admin_2='California', admin_3='San Francisco', level=3)
 
         Alternatively you can specify a `level` directly, which will not filter
         the administrative regions. For example, getting all level 2 regions for
         the United Kingdom would be:
 
-        >>> RegionData('GB', level=2)
-        RegionData(country='United Kingdom', admin_1='GBR', admin_2='*', admin_3=None, level=2)
+        >>> Region('USA', level=2)
+        Region(country='United States', admin_1='USA', admin_2='*', admin_3=None, level=2)
 
         Or all level 3:
 
-        >>> RegionData('GB', level=3)
-        RegionData(country='United Kingdom', admin_1='GBR', admin_2='*', admin_3='*', level=3)
+        >>> Region('USA', level=3)
+        Region(country='United States', admin_1='USA', admin_2='*', admin_3='*', level=3)
 
         Or an administrative level 2, requesting all level 3 regions in it:
-        >>> RegionData('GB', 'England', level=3)
-        RegionData(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3='*', level=3)
+        >>> Region('USA', 'California', level=3)
+        Region(country='United States', admin_1='USA', admin_2='California', admin_3='*', level=3)
         """
+        self._admin_1 = admin_1
+        self._admin_2 = admin_2
+        self._admin_3 = admin_3
+
+        self.admin_1 = admin_1  # WARNING: Implicitly also sets _country through setter
+
+        self.level = level
+
+        #  The full data is always stored even if you end up filtering it down
+        self._data = covid19dh.get(self.admin_1, level=self.level)  # type: ignore
+        self.data = self._data.copy()
+
+        self.admin_2 = admin_2
+        self.admin_3 = admin_3
+
+    def _check_admin_level(self, admin_1: str, admin_target: str, level: int):
+        admin_names = self.data[f'administrative_area_level_{level}'].unique()
+        if not admin_target in admin_names:
+            raise LookupError(
+                f'{admin_target} not found in data for {admin_1}, availabe '
+                f'regions are: {admin_names.tolist()}'
+            )
+
+    @staticmethod
+    def _top_level_region_parser(region: str):
         try:
-            pyc_admin_1: pycountry.db.Country = pycountry.countries.lookup(admin_1)  # type: ignore
+            pyc_admin_1: pycountry.db.Country = pycountry.countries.lookup(region)  # type: ignore
         except LookupError:
-            pyc_admin_1_matches: list = pycountry.countries.search_fuzzy(admin_1)
-            if len(pyc_admin_1_matches) > 1:
+            pyc_region_matches: list = pycountry.countries.search_fuzzy(region)
+            if len(pyc_region_matches) > 1:
                 raise LookupError(
-                    f'{admin_1} too ambiguous, {len(pyc_admin_1_matches)}'
+                    f'{region} too ambiguous, {len(pyc_region_matches)}'
                     f'matches. Please use a more specific region name, or use'
                     f'the ISO country code. Available matches are:'
-                    f'\n{[c.name for c in pyc_admin_1_matches]}'
+                    f'\n{[c.name for c in pyc_region_matches]}'
                 )
-            pyc_admin_1: pycountry.db.Country = pyc_admin_1_matches[0]  # type: ignore
+            pyc_admin_1: pycountry.db.Country = pyc_region_matches[0]  # type: ignore
 
-        self.country = pyc_admin_1.name
-        self.admin_1 = pyc_admin_1.alpha_3
-        self.admin_2 = None
-        self.admin_3 = None
+        return pyc_admin_1
 
+    @property
+    def country(self) -> str:
+        return self._country
+
+    @country.setter
+    def country(self, country: str):
+        self._admin_1 = self._top_level_region_parser(country).alpha_3
+        self._country = self._top_level_region_parser(country).name
+
+    @property
+    def admin_1(self) -> str:
+        return self._admin_1
+
+    @admin_1.setter
+    def admin_1(self, admin_1: str):
+        self._admin_1 = self._top_level_region_parser(admin_1).alpha_3
+        self._country = self._top_level_region_parser(admin_1).name
+
+    @property
+    def level(self) -> int:
+        return self._level
+
+    @level.setter
+    def level(self, level: Optional[int]):
+        print((self.admin_1, self._admin_2, self._admin_3))
         #  If the level has been manually specified that (probably) means the
         #  user wants data for all of the administrative regions at that level
         if not level is None:
@@ -117,7 +165,7 @@ class Region:
 
             #  Specifying a level and an administrative region at or below that
             #  level doesn't make sense, so throw an exception for that here
-            if (admin_2 and level <= 2) or (admin_3):
+            if (self._admin_2 and level <= 2) or (self._admin_3):
                 raise ValueError(
                     '`level` argument is used to return data for all '
                     'administrative regions at that level, so passing a '
@@ -129,50 +177,58 @@ class Region:
             level = max(
                 [
                     i + 1
-                    for (i, v) in enumerate((admin_1, admin_2, admin_3))
+                    for (i, v) in enumerate(
+                        (self.admin_1, self._admin_2, self._admin_3)
+                    )
                     if not v is None
                 ]
             )
 
-        self.level = level
+        self._level = level
 
-        data = covid19dh.get(self.admin_1, level=self.level)  # type: ignore
+    @property
+    def admin_2(self) -> str:
+        return self._admin_2  # type: ignore
 
+    @admin_2.setter
+    def admin_2(self, admin_2):
         if self.level >= 2:
             if admin_2:
                 if admin_2 != '*':
                     self._check_admin_level(self.country, admin_2, 2)
-                self.admin_2 = admin_2
+                self._admin_2 = admin_2
 
-                data = data[data['administrative_area_level_2'] == self.admin_2]
+                self.data = self.data[
+                    self.data['administrative_area_level_2'] == self._admin_2
+                ]
             else:
-                self.admin_2 = '*'
+                self._admin_2 = '*'
+        else:
+            self._admin_2 = None
 
+    @property
+    def admin_3(self) -> str:
+        return self._admin_3  # type: ignore
+
+    @admin_3.setter
+    def admin_3(self, admin_3):
         if self.level == 3:
             if admin_3:
                 if admin_3 != '*':
                     self._check_admin_level(self.country, admin_3, 3)
-                self.admin_3 = admin_3
+                self._admin_3 = admin_3
 
-                data = data[data['administrative_area_level_3'] == self.admin_3]
+                self.data = self.data[
+                    self.data['administrative_area_level_3'] == self.admin_3
+                ]
             else:
-                self.admin_3 = '*'
-
-        self.data = data
+                self._admin_3 = '*'
+        else:
+            self._admin = None
 
     @property
     def cite(self) -> List[str]:
-        return covid19dh.cite(self.data)
-
-    @staticmethod
-    def _check_admin_level(admin_1: str, admin_target: str, level: int):
-        data = covid19dh.get(admin_1, level)
-        admin_names = data[f'administrative_area_level_{level}'].unique()
-        if not admin_target in admin_names:
-            raise LookupError(
-                f'{admin_target} not found in data for {admin_1}, availabe '
-                f'regions are: {admin_names.tolist()}'
-            )
+        return covid19dh.cite(self.data)  # type: ignore
 
     def __str__(self) -> str:
         a = f"{self.country} ({self.admin_1})"
