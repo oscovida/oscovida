@@ -21,12 +21,27 @@ class Cache:
         if not os.path.isdir(self.cache_dir):
             os.mkdir(self.cache_dir)
 
-        for f in os.listdir(self.cache_dir):
+        files_in_cache = os.listdir(self.cache_dir)
+
+        for f in files_in_cache:
             cached_data_file = os.path.join(self.cache_dir, f)
             mtime = os.path.getmtime(cached_data_file)
-            age = datetime.datetime.now() - datetime.datetime.fromtimestamp(mtime)
+
+            now = datetime.datetime.now()
+
+            file_age = now - datetime.datetime.fromtimestamp(mtime)
+            try:
+                name_age = now - datetime.datetime.strptime(f[:8], "%Y%m%d")
+            except ValueError:
+                #  Happens if the filename is not formatted like a date
+                continue
+
             #  If a csv file in the cache is over 1 day old then remove it
-            if age.days > 1 and os.path.splitext(cached_data_file)[1] == '.csv':
+            if (
+                file_age.days > 1
+                and name_age.days > 1
+                and os.path.splitext(cached_data_file)[1] == '.csv'
+            ):
                 os.remove(cached_data_file)
 
     @staticmethod
