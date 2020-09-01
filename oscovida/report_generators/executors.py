@@ -160,9 +160,7 @@ class ReportExecutor:
 
         return None
 
-    def create_html_reports(
-        self, regions: Union[List[str], List[List[str]]]
-    ) -> None:
+    def create_html_reports(self, regions: Union[List[str], List[List[str]]]) -> None:
         if self.workers:
             #  Works with both ThreadPoolExecutor and ProcessPoolExecutor
             #  for this task multithreading and multiprocessing perform

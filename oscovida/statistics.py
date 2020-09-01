@@ -3,21 +3,41 @@ from functools import singledispatch
 from typing import Tuple, Union
 
 import numpy as np
-
 import pandas as pd
 
 SMOOTHING_METHODS = {
     'weak': (
-        {'window': 9, 'center': True, 'win_type': 'gaussian', 'min_periods': 1,},
-        {'mean_std': 3,},
+        {
+            'window': 9,
+            'center': True,
+            'win_type': 'gaussian',
+            'min_periods': 1,
+        },
+        {
+            'mean_std': 3,
+        },
     ),
     'strong': (
-        {'window': 4, 'center': True, 'win_type': 'gaussian', 'min_periods': 1,},
-        {'mean_std': 2,},
+        {
+            'window': 4,
+            'center': True,
+            'win_type': 'gaussian',
+            'min_periods': 1,
+        },
+        {
+            'mean_std': 2,
+        },
     ),
     '7dayrolling': (
-        {'window': 7, 'center': True, 'win_type': 'gaussian', 'min_periods': 7,},
-        {'mean_std': 3,},
+        {
+            'window': 7,
+            'center': True,
+            'win_type': 'gaussian',
+            'min_periods': 7,
+        },
+        {
+            'mean_std': 3,
+        },
     ),
 }
 

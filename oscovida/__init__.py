@@ -4,4 +4,3 @@ from pandas.plotting import register_matplotlib_converters
 register_matplotlib_converters()
 
 __version__ = "0.2.0"
-

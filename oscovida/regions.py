@@ -7,7 +7,6 @@ from pandas import DataFrame
 
 from . import covid19dh
 
-
 # TODO: Use world bank data (world-bank-data pypi)
 
 

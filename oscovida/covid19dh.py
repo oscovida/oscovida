@@ -4,14 +4,13 @@ import os
 import re
 import warnings
 import zipfile
+from functools import lru_cache
 from io import BytesIO, StringIO
-from typing import Optional, Union, Tuple, List
+from typing import List, Optional, Tuple, Union
 
 import appdirs
 import pandas as pd
 import requests
-
-from functools import lru_cache
 
 
 class Cache:

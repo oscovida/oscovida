@@ -7,6 +7,7 @@ from matplotlib import rcParams
 from matplotlib.axes._subplots import Axes
 from matplotlib.ticker import ScalarFormatter
 from multipledispatch.dispatcher import Dispatcher
+
 from oscovida.regions import Region
 
 from . import statistics
@@ -119,7 +120,10 @@ def _(
         color = COLOR_MAPPING[label]['totals']
 
     ax.step(
-        series.index, series, label=" ".join([label_prepend, label]), color=color,
+        series.index,
+        series,
+        label=" ".join([label_prepend, label]),
+        color=color,
     )
 
     if logscale:
@@ -551,9 +555,8 @@ def _(
     if color is None:
         color = COLOR_MAPPING[label]['growth_factor']
 
-    growth_factor = (series
-        .pipe(statistics.smooth, kind=smoothing)
-        .pipe(statistics.growth_factor)
+    growth_factor = series.pipe(statistics.smooth, kind=smoothing).pipe(
+        statistics.growth_factor
     )
 
     ax.plot(
@@ -789,4 +792,3 @@ def _(
         )
 
     return ax
-
