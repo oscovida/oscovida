@@ -743,19 +743,9 @@ def plot_daily_change(ax, series, color, labels=None):
     ax.legend()
     ax.set_ylabel('daily change')
 
-    # create another Y-axis on the right hand side
-    ax2 = ax.twinx()    # create the independent y-axis
-    population = get_population(region).loc[region].population
-    ax2.plot(smooth2.index, smooth2.values * 1E5 / population, color='green')
-    ax2.set_ylabel('daily change\nnormalised per 100K')
-
     # labels on the right y-axis as well
-    # ax.tick_params(left=True, right=False, labelleft=True, labelright=False)
-    # ax2.tick_params(left=False, right=True, labelleft=False, labelright=True)
-    # ax.yaxis.set_ticks_position('none')
-    # ax2.yaxis.set_ticks_position('none')
-    ax.set_ylim((0, max(change)))
-    ax2.set_ylim((0, max(change) * 1E5 / population))
+    ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
+    ax.yaxis.set_ticks_position('both')
 
 
     # data cleaning: For France, there was a huge spike on 12 April with 26849
@@ -1583,8 +1573,8 @@ def overview(country: str, region: str = None, subregion: str = None,
     for i in range(1, axes.shape[0]):
         axes[i].set_xlim(axes[0].get_xlim())
     for i in range(0, axes.shape[0]):
-        # axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
-        # axes[i].yaxis.set_ticks_position('both')
+        axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
+        axes[i].yaxis.set_ticks_position('both')
         if weeks > 0:
             axes[i].get_xaxis().set_major_locator(WeekdayLocator(byweekday=MONDAY))     # put ticks every Monday
             axes[i].get_xaxis().set_major_formatter(DateFormatter('%d %b'))             # date format: `15 Jun`
