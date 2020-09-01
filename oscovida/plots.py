@@ -4,7 +4,7 @@ from typing import Optional, Sequence
 import matplotlib.pyplot as plt
 import pandas as pd
 from matplotlib import rcParams
-from matplotlib.axes._subplots import Axes
+from matplotlib.axes._axes import Axes
 from matplotlib.ticker import ScalarFormatter
 from multipledispatch.dispatcher import Dispatcher
 
@@ -73,8 +73,8 @@ def _(
     series: pd.Series,
     ax: Optional[Axes] = None,
     color: Optional[str] = None,
+    label: str = '',
     logscale: bool = True,
-    label_prepend: str = "",
 ) -> Axes:
     """Plots the total numbers for a given series.
 
@@ -112,17 +112,13 @@ def _(
     if ax is None:
         ax = plt.gca()
 
-    label = series.name
-    if label == 'confirmed':
-        label = 'cases'
-
     if color is None:
         color = COLOR_MAPPING[label]['totals']
 
     ax.step(
         series.index,
         series,
-        label=" ".join([label_prepend, label]),
+        label=label,
         color=color,
     )
 
@@ -176,7 +172,7 @@ def _(
         Axes with plotted lines
     """
     if label_prepend is None:
-        label_prepend = region.admin_1
+        label_prepend: str = region.admin_1
 
     #  colnames should be a list or tuple of strings, if it is just a string then
     #  put it into a list here
@@ -184,8 +180,12 @@ def _(
         colnames = [colnames]
 
     for colname in colnames:
+        label: str = 'cases' if colname == 'confirmed' else colname
         ax = plot_totals(
-            region.data[colname], ax=ax, logscale=logscale, label_prepend=label_prepend
+            region.data[colname],
+            ax=ax,
+            logscale=logscale,
+            label="".join([label_prepend, label]),
         )
 
     return ax
@@ -243,7 +243,7 @@ def _(
     if ax is None:
         ax = plt.gca()
 
-    label = series.name
+    label: str = series.name
     if label == 'confirmed':
         label = 'cases'
 
@@ -390,7 +390,7 @@ def _(
     if ax is None:
         ax = plt.gca()
 
-    label = series.name
+    label: str = series.name
     if label == 'confirmed':
         label = 'cases'
 
@@ -548,7 +548,7 @@ def _(
     if ax is None:
         ax = plt.gca()
 
-    label = series.name
+    label: str = series.name
     if label == 'confirmed':
         label = 'cases'
 
@@ -698,7 +698,7 @@ def _(
     if ax is None:
         ax = plt.gca()
 
-    label = series.name
+    label: str = series.name
     if label == 'confirmed':
         label = 'cases'
 
