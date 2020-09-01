@@ -44,10 +44,15 @@ def test_level_error(level):
     with pytest.raises(ValueError):
         regions.Region('GBR', level=level)
 
+
 def test_repr():
     region = regions.Region('United Kingdom', 'England', 'Westminster')
 
-    assert region.__repr__() == "Region(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3='Westminster', level=3)"
+    assert (
+        region.__repr__()
+        == "Region(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3='Westminster', level=3)"
+    )
+
 
 def test_str():
     region = regions.Region('United Kingdom', 'England', 'Westminster')
