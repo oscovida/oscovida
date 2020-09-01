@@ -11,16 +11,6 @@ from . import covid19dh
 # TODO: Use world bank data (world-bank-data pypi)
 
 
-def _check_admin_level_(admin_1: str, admin_target: str, level: int):
-    data = covid19dh.get(admin_1, level)
-    admin_names = data[f'administrative_area_level_{level}'].unique()
-    if not admin_target in admin_names:
-        raise LookupError(
-            f'{admin_target} not found in data for {admin_1}, availabe '
-            f'regions are: {admin_names.tolist()}'
-        )
-
-
 class Region:
     def __init__(
         self,
@@ -152,7 +142,7 @@ class Region:
         if self.level >= 2:
             if admin_2:
                 if admin_2 != '*':
-                    _check_admin_level_(self.country, admin_2, 2)
+                    self._check_admin_level(self.country, admin_2, 2)
                 self.admin_2 = admin_2
 
                 data = data[data['administrative_area_level_2'] == self.admin_2]
@@ -162,7 +152,7 @@ class Region:
         if self.level == 3:
             if admin_3:
                 if admin_3 != '*':
-                    _check_admin_level_(self.country, admin_3, 3)
+                    self._check_admin_level(self.country, admin_3, 3)
                 self.admin_3 = admin_3
 
                 data = data[data['administrative_area_level_3'] == self.admin_3]
@@ -174,6 +164,16 @@ class Region:
     @property
     def cite(self) -> List[str]:
         return covid19dh.cite(self.data)
+
+    @staticmethod
+    def _check_admin_level(admin_1: str, admin_target: str, level: int):
+        data = covid19dh.get(admin_1, level)
+        admin_names = data[f'administrative_area_level_{level}'].unique()
+        if not admin_target in admin_names:
+            raise LookupError(
+                f'{admin_target} not found in data for {admin_1}, availabe '
+                f'regions are: {admin_names.tolist()}'
+            )
 
     def __str__(self) -> str:
         a = f"{self.country} ({self.admin_1})"
