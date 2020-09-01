@@ -1,3 +1,4 @@
+# Template files have odd formatting so we exclude them a few times throughout
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v2.3.0
@@ -6,6 +7,7 @@ repos:
     - id: end-of-file-fixer
     - id: trailing-whitespace
     - id: check-docstring-first
+      exclude: .*/template-.*\.py
     - id: check-merge-conflict
     - id: mixed-line-ending
       args: [--fix=lf]
@@ -13,7 +15,9 @@ repos:
     rev: 5.3.0
     hooks:
       - id: isort
+        exclude: .*/template-.*\.py
   - repo: https://github.com/ambv/black
     rev: stable
     hooks:
     - id: black
+      exclude: .*/template-.*\.py

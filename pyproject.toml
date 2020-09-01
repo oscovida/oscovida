@@ -4,6 +4,32 @@ to = {format = "setuppy", path = "setup.py"}
 
 [tool.black]
 skip-string-normalization = true
+target-version = ['py38']  # Specify your Python version
+include = '\.pyi?$'
+exclude = '''  # Specify the files/dirs that should be ignored by the black formatter
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+  | template-.*\.py
+)/
+'''
+
+[tool.isort]
+skip = "template-*.py"
+multi_line_output = 3
+include_trailing_comma = "True"
+force_grid_wrap = 0
+use_parentheses = "True"
+ensure_newline_before_comments = "True"
+line_length = 88
 
 [tool.poetry]
 name = "oscovida"
