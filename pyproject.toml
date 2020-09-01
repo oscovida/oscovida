@@ -48,8 +48,9 @@ black = "^19.10b0"
 ipython = "^7.16.1"
 jupyterlab = "^2.2.0"
 isort = "^5.4.2"
+pre-commit = "^2.7.1"
 
 [tool.poetry.extras]
 test = ["pytest", "pytest-cov", "coverage", "nbval", "testpath"]
-formatting = ["pycodestyle", "mypy", "black", "isort"]
-dev = ["pytest", "pytest-cov", "coverage", "nbval", "testpath", "pycodestyle", "mypy", "black", "isort"]
+formatting = ["pycodestyle", "mypy", "black", "isort", "pre-commit"]
+dev = ["pytest", "pytest-cov", "coverage", "nbval", "testpath", "pycodestyle", "mypy", "black", "isort", "pre-commit"]
