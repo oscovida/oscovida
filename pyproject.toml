@@ -39,7 +39,7 @@ license = "BSD-3-Clause"
 classifiers = ["Intended Audience :: Developers", "Intended Audience :: Science/Research", "License :: OSI Approved :: BSD License", "Operating System :: POSIX :: Linux", "Programming Language :: Python :: 3", "Topic :: Scientific/Engineering :: Information Analysis"]
 homepage = "https://github.com/oscovida/oscovida"
 authors = ["Hans Fangohr <da-support@xfel.eu>", "Robert Rosca", "Yury Kirienko"]
-readme = "README.md"
+readme = "README.rst"
 
 [tool.poetry.dependencies]
 python = "^3.6.7"
@@ -75,8 +75,9 @@ ipython = "^7.16.1"
 jupyterlab = "^2.2.0"
 isort = "^5.4.2"
 pre-commit = "^2.7.1"
+dephell = "^0.8.3"
 
 [tool.poetry.extras]
 test = ["pytest", "pytest-cov", "coverage", "nbval", "testpath"]
 formatting = ["pycodestyle", "mypy", "black", "isort", "pre-commit"]
-dev = ["pytest", "pytest-cov", "coverage", "nbval", "testpath", "pycodestyle", "mypy", "black", "isort", "pre-commit"]
+dev = ["pytest", "pytest-cov", "coverage", "nbval", "testpath", "pycodestyle", "mypy", "black", "isort", "pre-commit", "dephell"]

@@ -9,14 +9,16 @@ try:
 except ImportError:
     from distutils.core import setup
 
+
 import os.path
 
 readme = ''
 here = os.path.abspath(os.path.dirname(__file__))
-readme_path = os.path.join(here, 'README.md')
+readme_path = os.path.join(here, 'README.rst')
 if os.path.exists(readme_path):
     with open(readme_path, 'rb') as stream:
         readme = stream.read().decode('utf8')
+
 
 setup(
     long_description=readme,
@@ -39,7 +41,7 @@ setup(
     ],
     packages=['oscovida', 'oscovida.report_generators'],
     package_dir={"": "."},
-    package_data={"oscovida": ["*.md"]},
+    package_data={},
     install_requires=[
         'click==7.*,>=7.1.2',
         'ipynb-py-convert==0.*,>=0.4.5',
@@ -47,11 +49,13 @@ setup(
         'joblib==0.*,>=0.16.0',
         'markdown==3.*,>=3.2.2',
         'matplotlib<3.3',
+        'multipledispatch==0.*,>=0.6.0',
         'numpy==1.*,>=1.19.0',
-        'pandas==1.*,>=1.0.5',
+        'pandas==1.*,>=1.1.0.rc0',
         'pelican==4.*,>=4.2.0',
         'pelican-jupyter==0.*,>=0.10.0',
         'pycountry==20.*,>=20.7.3',
+        'requests==2.*,>=2.24.0',
         'scipy==1.*,>=1.5.1',
         'seaborn==0.*,>=0.10.1',
         'tabulate==0.*,>=0.8.7',
@@ -62,8 +66,13 @@ setup(
         "dev": [
             "black==19.*,>=19.10.0.b0",
             "coverage==5.*,>=5.2.0",
+            "dephell==0.*,>=0.8.3",
+            "ipython==7.*,>=7.16.1",
+            "isort==5.*,>=5.4.2",
+            "jupyterlab==2.*,>=2.2.0",
             "mypy==0.*,>=0.782.0",
             "nbval==0.*,>=0.9.5",
+            "pre-commit==2.*,>=2.7.1",
             "pycodestyle==2.*,>=2.6.0",
             "pytest==5.*,>=5.4.3",
             "pytest-cov==2.*,>=2.10.0",
@@ -71,7 +80,9 @@ setup(
         ],
         "formatting": [
             "black==19.*,>=19.10.0.b0",
+            "isort==5.*,>=5.4.2",
             "mypy==0.*,>=0.782.0",
+            "pre-commit==2.*,>=2.7.1",
             "pycodestyle==2.*,>=2.6.0",
         ],
         "test": [

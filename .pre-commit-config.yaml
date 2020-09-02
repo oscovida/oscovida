@@ -1,16 +1,21 @@
-# Template files have odd formatting so we exclude them a few times throughout
+# Template files have odd formatting so we exclude them
 exclude: .*/template-.*\.py
 repos:
-  - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v2.3.0
+  #  Odd custom hook. dephell generates non-black formatted setup.py each time,
+  #  which means black would then 'edit' it every time the hooks run, and cause
+  #  the hook stage to fail. Here we run dephell and black in the same command
+  #  so that, if there is actually no change to the file, it can pass
+  - repo: local
     hooks:
-    - id: check-yaml
-    - id: end-of-file-fixer
-    - id: trailing-whitespace
-    - id: check-docstring-first
-    - id: check-merge-conflict
-    - id: mixed-line-ending
-      args: [--fix=lf]
+    - id: dephell
+      name: dephell && black setup.py
+      description: Generate default output based on configuration in pyproject.toml and format setup.py with black afterwards.
+      entry: bash -c 'dephell deps convert && black setup.py'
+      pass_filenames: false
+      files: "^pyproject.toml$"
+      require_serial: true
+      language: system
+      types: [python]
   - repo: https://github.com/pycqa/isort
     rev: 5.3.0
     hooks:
@@ -19,3 +24,14 @@ repos:
     rev: stable
     hooks:
     - id: black
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v2.3.0
+    hooks:
+    - id: check-yaml
+    - id: check-toml
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+    - id: check-docstring-first
+    - id: check-merge-conflict
+    - id: mixed-line-ending
+      args: [--fix=lf]
