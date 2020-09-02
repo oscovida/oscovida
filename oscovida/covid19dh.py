@@ -2,7 +2,6 @@ import datetime
 import math
 import os
 import re
-import warnings
 import zipfile
 from functools import lru_cache
 from io import BytesIO, StringIO
@@ -13,8 +12,22 @@ import pandas as pd
 import requests
 
 
+class NoDataAvailable(Exception):
+    pass
+
+
 class Cache:
     def __init__(self, cache_dir=appdirs.user_cache_dir('covid19dh')) -> None:
+        """Class used to manage covid19dh data caching
+
+        Note: the cache automatically cleans itself, data older than one day
+        will be deleted unless it is explicitly vintage data
+
+        Parameters
+        ----------
+        cache_dir : [type], optional Directory to store cache, by default
+            appdirs.user_cache_dir('covid19dh')
+        """
         self.cache_dir = cache_dir
 
         if not os.path.isdir(self.cache_dir):
@@ -40,6 +53,7 @@ class Cache:
                 file_age.days > 1
                 and name_age.days > 1
                 and os.path.splitext(cached_data_file)[1] == '.csv'
+                and 'vintage' not in f
             ):
                 os.remove(cached_data_file)
 
@@ -50,6 +64,8 @@ class Cache:
 
         if raw:
             cache_id += "_raw"
+        if vintage:
+            cache_id += "_vintage"
 
         return cache_id
 
@@ -60,7 +76,7 @@ class Cache:
             self.cache_dir, self._cache_id(level, dt, raw, vintage) + '.csv'
         )
 
-    def cached(
+    def _cached(
         self, level: int, dt: datetime.datetime, raw: bool, vintage: bool
     ) -> bool:
         return os.path.isfile(self._cache_path(level, dt, raw, vintage))
@@ -69,6 +85,21 @@ class Cache:
     def read(
         self, level: int, dt: datetime.datetime, raw: bool, vintage: bool
     ) -> pd.DataFrame:
+        """Read data from the cache for some given parameters
+
+        Parameters
+        ----------
+        level : int
+            Administrative level
+        dt : datetime.datetime
+            A dataset containing **all** data up to this date will be fetched
+        raw : bool
+        vintage : bool
+
+        Returns
+        -------
+        pd.DataFrame
+        """
         return pd.read_csv(
             self._cache_path(level, dt, raw, vintage),
             index_col='date',
@@ -89,22 +120,20 @@ class Cache:
 def _get_url(
     level: int, dt: datetime.datetime, raw: bool, vintage: bool
 ) -> Tuple[str, str]:
-    # dataname
     rawprefix = "raw" if raw else ""
     dataname = f"{rawprefix}data-{level}"
 
-    # vintage
     if vintage:
-        # too new
-        if dt >= datetime.datetime.now() - datetime.timedelta(days=2):
-            raise Exception("vintage data not available yet")
-
         dt_str = dt.strftime("%Y-%m-%d")
+        two_days_ago = datetime.datetime.now() - datetime.timedelta(days=2)
+        first_vintage_data = datetime.datetime(2020, 4, 14)
+        if (dt >= two_days_ago) or (dt < first_vintage_data):
+            raise NoDataAvailable(f"vintage data not available for {dt_str}")
+
         filename = f"{ dt_str }.zip"
-    # current data
     else:
         filename = f"{dataname}.zip"
-    # url, filename
+
     return f"https://storage.covid19datahub.io/{filename}", f"{dataname}.csv"
 
 
@@ -129,8 +158,10 @@ def _download(
         with zz.open(filename) as fd:
             df: pd.DataFrame = pd.read_csv(fd, low_memory=False)  # type: ignore
 
+    #  Convert date column from string to datetime object
     df['date'] = df['date'].apply(lambda x: datetime.datetime.strptime(x, "%Y-%m-%d"))
-    df['iso_numeric'] = df['iso_numeric'].apply(lambda x: float(x))
+    if 'iso_numeric' in df.columns:  # Some vintage data does not have this column
+        df['iso_numeric'] = df['iso_numeric'].apply(lambda x: float(x))
 
     df = df.set_index('date')  # type: ignore
 
@@ -138,7 +169,7 @@ def _download(
 
 
 def get(
-    country: Union[Optional[str], Optional[list]] = None,
+    country: Optional[str] = None,
     level: int = 1,
     start: datetime.date = datetime.date(2019, 1, 1),
     end: Optional[datetime.datetime] = None,
@@ -146,38 +177,48 @@ def get(
     raw: bool = False,
     vintage: bool = False,
 ) -> pd.DataFrame:
-    """Main function for module. Fetches data from hub.
+    """Fetches data from [covid19datahub.io](covid19datahub.io) for the specified
+    level, and filters by country if one is given.
 
-    Args:
-        country (str, optional): ISO country code, default all countries
-        level (int, optional): level of data, default 1
-            * country-level (1)
-            * state-level (2)
-            * city-level (3)
-        start (datetime | date | str, optional): start date of data (as str in format [%Y-%m-%d]),
-                                                default 2019-01-01
-        end (datetime | date | str, optional): end date of data (as str in format [%Y-%m-%d]),
-                                            default today (sysdate)
-        cache (bool, optional): use cached data if available, default yes
-        verbose (bool, optional): prints sources, default true
-        raw (bool, optional): download not cleansed data, default using cleansed
-        vintage (bool, optional): use hub data (True) or original source, not available in Python covid19dh (only hub)
+    Parameters
+    ----------
+    country : Optional[str], optional
+        Country to filter by, returns full table if `None`, by default None
+    level : int, optional
+        Administrative level of the table, 1 is at the country level, 2 sub-
+        country (typically states/regions),and 2 is sub-state level (typically
+        individual cities or districts). Only accepts values of 1, 2, or 3, by
+        default 1
+    start : Optional[datetime.date], optional
+        Start of data, by default `datetime.date(2019, 1, 1)`
+    end : Optional[datetime.datetime], optional
+        End of data, if `None` it is set to the current time, by default `None`
+    cache : Optional[Cache], optional
+        Cache option to use, by default `oscovida.covid19dh.Cache()`
+    raw : bool, optional
+        Warning: Experimental. If `True`, downloads the saw data tables, by
+        default `False`
+    vintage : bool, optional
+        Warning: Experimental. If `True`, downloads vintage data, by default `False`
+
+    Returns
+    -------
+    pd.DataFrame
+        DataFrame containing the covid data for a specified level, filtered by
+        the specified country. The index is set to `date`, and each row contains
+        the cumulative numbers for a region up to the specified date.
     """
-    if country is not None:
-        country = [country] if isinstance(country, str) else country
-        country = [c.upper() if isinstance(c, str) else c for c in country]
-
     end = datetime.datetime.now() if end is None else end
     end = _parse_date(end)
     start = _parse_date(start)
 
     if level not in {1, 2, 3}:
-        raise Exception("Invalid level, level should be 1, 2, or 3.")
+        raise IndexError("invalid level, level should be 1, 2, or 3.")
 
     if start > end:
-        raise Exception("Start is later than end")
+        raise ValueError(f"start date {start} is later than {end}")
 
-    if cache and cache.cached(level, end, raw, vintage):
+    if cache and cache._cached(level, end, raw, vintage):
         df = cache.read(level, end, raw, vintage)
     else:
         df = _download(level, end, raw, vintage)
@@ -185,22 +226,28 @@ def get(
             cache.write(df, level, end, raw, vintage)
 
     if country is not None:
-        # elementwise comparison works, but throws warning that it will be
-        # working better in the future no idea why, but I found solution to mute
-        # it as follows
-        with warnings.catch_warnings():
-            warnings.simplefilter(action='ignore', category=FutureWarning)
+        #  We get all of the columns that give a region its name, check if the
+        #  given country argument matches any of the values in those columns
+        #  (with the country as given, or all upper case, or all lower case),
+        #  then create a mask by finding any columns that match the country
+        cols = [
+            'iso_alpha_2',
+            'iso_alpha_3',
+            'iso_numeric',
+            'administrative_area_level_1',
+        ]
+        # Some columns are missing for vintage data so we check they exist here
+        cols = list(filter(lambda x: x in df.columns, cols))
 
-            df = df[
-                (df['iso_alpha_3'].isin(country))
-                | (df['iso_alpha_2'].isin(country))
-                | (df['iso_numeric'].isin(country))
-                | (
-                    df['administrative_area_level_1']
-                    .map(lambda s: s.upper())
-                    .isin(country)
-                )
-            ]
+        df_mask = df[cols].isin([country, country.upper(), country.lower()]).any(axis=1)
+
+        df = df[df_mask]
+
+        if len(df) == 0:
+            raise NoDataAvailable(
+                f"No data found for '{country}' in {cols}. Is '{country}' "
+                f"a valid country name or ISO country code?"
+            )
 
     if start is not None:
         df = df[df.index >= start]  # type: ignore
@@ -210,10 +257,24 @@ def get(
 
     df = df.sort_values(by=["id", "date"])  # type: ignore
 
-    return df
+    return df  # type: ignore
 
 
 def cite(x: pd.DataFrame, raw: bool = False) -> List[str]:
+    """Get a list of sources for a given covid19dh DataFrame
+
+    Parameters
+    ----------
+    x : pd.DataFrame
+        Input covid19dh DataFrame
+    raw : bool, optional
+        Set to `True` if the data is raw data, by default `False`
+
+    Returns
+    -------
+    List[str]
+        List of sources, each element is a string
+    """
     # get sources
     url = 'https://storage.covid19datahub.io/src.csv'
     response = requests.get(url)
@@ -234,7 +295,7 @@ def cite(x: pd.DataFrame, raw: bool = False) -> List[str]:
     )
 
     if raw:
-        return unique_sources.count().reset_index()
+        return unique_sources.count().reset_index().tolist()
 
     # turn references into citations
     citations = []
@@ -270,7 +331,8 @@ def cite(x: pd.DataFrame, raw: bool = False) -> List[str]:
         citations.append(citation)
 
     citations.append(
-        "Guidotti, E., Ardia, D., (2020), \"COVID-19 Data Hub\", Working paper, doi: 10.13140/RG.2.2.11649.81763."
+        "Guidotti, E., Ardia, D., (2020), 'COVID-19 Data Hub', "
+        "Working paper, doi: 10.13140/RG.2.2.11649.81763."
     )
 
     return citations
