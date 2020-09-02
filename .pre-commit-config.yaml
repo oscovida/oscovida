@@ -10,12 +10,11 @@ repos:
     - id: dephell
       name: dephell && black setup.py
       description: Generate default output based on configuration in pyproject.toml and format setup.py with black afterwards.
+      language: python
       entry: bash -c 'dephell deps convert && black setup.py'
       pass_filenames: false
       files: "^pyproject.toml$"
       require_serial: true
-      language: system
-      types: [python]
   - repo: https://github.com/pycqa/isort
     rev: 5.3.0
     hooks:
