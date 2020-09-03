@@ -310,3 +310,40 @@ def test_get_population():
     assert 120_000_000 * 1.5 > world.loc['Japan'].population > 120_000_000
     assert 320_000_000 * 1.5 > world.loc['US'].population > 320_000_000
     assert 80_000_000 * 1.5 > world.loc['Germany'].population > 80_000_000
+
+
+def test_get_region_label():
+    countries = ["China", "Germany", "Hungary", "Russia", "US", "Zimbabwe"]
+    for country in countries:
+        assert c.get_region_label(country) == country
+    assert c.get_region_label(country="US", region="New Jersey") == "United States: New Jersey"
+    assert c.get_region_label(country="Germany", region="Hamburg") == "Germany-Hamburg"
+    assert c.get_region_label(country="Germany", region="LK Pinneberg") == "Germany-LK Pinneberg"
+    assert c.get_region_label(country="Hungary", region="Baranya") == "Hungary-Baranya"
+
+
+def test_population():
+    germany = c.population('Germany')
+    assert isinstance(germany, int)
+    assert germany > 8E7
+
+    bayern = c.population("Germany", "Bayern")
+    assert isinstance(bayern, int)
+    assert bayern > 1E7
+
+    pinneberg = c.population("Germany", "LK Pinneberg")
+    assert isinstance(pinneberg, int)
+    assert pinneberg > 1E4
+
+    russia = c.population("Russia")
+    assert isinstance(russia, int)
+    assert russia > 1.4E8
+
+    kyoto = c.population("Japan")
+    assert isinstance(kyoto, int)
+    assert kyoto > 2500000
+
+    # new_jersey = c.population("US", "New Jersey")
+    # assert isinstance(new_jersey, int)
+    # assert new_jersey > 250000000
+
