@@ -8,3 +8,4 @@ cd $scriptDir
 jupyter-nbconvert ../generate-individiual-plots.ipynb --execute
 jupyter nbconvert --ExecutePreprocessor.timeout=600 --inplace --to notebook --execute ../pelican/content/ipynb/14-day-incidence-germany.ipynb
 jupyter nbconvert --ExecutePreprocessor.timeout=600 --inplace --to notebook --execute ../pelican/content/ipynb/14-day-incidence.ipynb
+jupyter nbconvert --ExecutePreprocessor.timeout=600 --inplace --to notebook --execute ../pelican/content/ipynb/2020-are-summer-holidays-triggering-rising-cases.ipynb
