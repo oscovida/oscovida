@@ -1,5 +1,6 @@
 import datetime as dt
 import os
+from unittest import mock
 
 import pandas as pd
 import pytest
@@ -7,18 +8,6 @@ import pytest
 import oscovida.covid19dh as covid19dh
 
 TEST_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
-@pytest.fixture()
-def fresh_cache(tmp_path):
-    cache_dir = os.path.join(tmp_path, "cache_dir")
-    return covid19dh.Cache(cache_dir=cache_dir)
-
-
-@pytest.fixture(scope="module")
-def reused_cache(tmp_path_factory):
-    cache_dir = tmp_path_factory.mktemp("cache_dir")
-    return covid19dh.Cache(cache_dir=cache_dir)
 
 
 def test_cache(fresh_cache):
@@ -45,32 +34,34 @@ def test_cache(fresh_cache):
 
 def test_cache_clean(tmp_path):
     cache_dir = os.path.join(tmp_path, "cache_dir")
-    os.mkdir(cache_dir)
+    with mock.patch('oscovida.covid19dh.CACHE_DIR', cache_dir):
+        os.mkdir(cache_dir)
 
-    old = os.path.join(
-        cache_dir,
-        covid19dh.Cache._cache_id(1, dt.datetime(2020, 1, 1), False, False) + ".csv",
-    )
-    os.system(f'touch -d "2 weeks ago" {old}')
+        old = os.path.join(
+            cache_dir,
+            covid19dh.Cache._cache_id(1, dt.datetime(2020, 1, 1), False, False)
+            + ".csv",
+        )
+        os.system(f'touch -d "2 weeks ago" {old}')
 
-    new = os.path.join(
-        cache_dir,
-        covid19dh.Cache._cache_id(1, dt.datetime.now(), False, False) + ".csv",
-    )
-    os.system(f'touch -d "2 weeks ago" {new}')
+        new = os.path.join(
+            cache_dir,
+            covid19dh.Cache._cache_id(1, dt.datetime.now(), False, False) + ".csv",
+        )
+        os.system(f'touch -d "2 weeks ago" {new}')
 
-    keep = os.path.join(cache_dir, "keep.doc")
-    os.system(f'touch -d "2 weeks ago" {keep}')
+        keep = os.path.join(cache_dir, "keep.doc")
+        os.system(f'touch -d "2 weeks ago" {keep}')
 
-    #  Initialising `Cache` runs the old file cleaning at the start
-    covid19dh.Cache(cache_dir=cache_dir)
+        #  Initialising `Cache` runs the old file cleaning at the start
+        covid19dh.Cache()
 
-    #  Should have deleted the old cache file
-    assert os.path.exists(old) == False
+        #  Should have deleted the old cache file
+        assert os.path.exists(old) == False
 
-    #  And kept the new one and the non-csv
-    assert os.path.exists(new)
-    assert os.path.exists(keep)
+        #  And kept the new one and the non-csv
+        assert os.path.exists(new)
+        assert os.path.exists(keep)
 
 
 def test_get_cache(reused_cache):

@@ -11,13 +11,15 @@ import appdirs
 import pandas as pd
 import requests
 
+CACHE_DIR = appdirs.user_cache_dir('covid19dh')
+
 
 class NoDataAvailable(Exception):
     pass
 
 
 class Cache:
-    def __init__(self, cache_dir=appdirs.user_cache_dir('covid19dh')) -> None:
+    def __init__(self) -> None:
         """Class used to manage covid19dh data caching
 
         Note: the cache automatically cleans itself, data older than one day
@@ -28,7 +30,7 @@ class Cache:
         cache_dir : [type], optional Directory to store cache, by default
             appdirs.user_cache_dir('covid19dh')
         """
-        self.cache_dir = cache_dir
+        self.cache_dir = CACHE_DIR
 
         if not os.path.isdir(self.cache_dir):
             os.mkdir(self.cache_dir)
