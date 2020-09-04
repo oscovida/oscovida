@@ -402,7 +402,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
             deaths = pad_cumulative_series_to_yesterday(deaths)
             cases = pad_cumulative_series_to_yesterday(cases)
 
-        return cases, deaths, region_label
+        return cases, deaths
 
     if landkreis:
         assert landkreis in germany['Landkreis'].values, \
@@ -424,7 +424,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
             deaths = pad_cumulative_series_to_yesterday(deaths)
             cases = pad_cumulative_series_to_yesterday(cases)
 
-        return cases, deaths, region_label
+        return cases, deaths
 
     raise NotImplemented("Should never get to this point.")
 
@@ -671,7 +671,7 @@ def get_region_hungary(county):
     region_label = f'Hungary-{county}'
     cases.name = region_label + " cases"
 
-    return cases, None, region_label
+    return cases, None
 
 
 def plot_time_step(ax, series, style="-", labels=None, logscale=True):
@@ -776,12 +776,12 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
     habitants = population(region_label)
     if region_label is not "" and habitants:
         ax2 = ax.twinx()  # create an independent y-axis
+        ax2.grid(color='gray', linewidth=0.5, alpha=0.5)
+        # this is just to be sure that we plot the same graph (please leave it commented in the production):
         # ax2.plot(smooth2.index, smooth2.values * 1E5 / habitants, color='green')
         ax2.set_ylabel('daily change\nnormalised per 100K')
 
         # labels on the right y-axis as well
-        # ax2.tick_params(left=False, right=True, labelleft=False, labelright=True)
-        # ax2.yaxis.set_ticks_position('none')
         ax.set_ylim((0, max(change)))
         ax2.set_ylim((0, max(change) * 1E5 / habitants))
     else:
@@ -1144,7 +1144,7 @@ def get_region_label(country: str, region: str = None, subregion: str = None) ->
         # county -> megye
 
         if region is not None:
-            c, d, region_label = get_region_hungary(county=region)
+            region_label = f"Hungary-{region}"
 
     # finally:
     if not region_label:
@@ -1154,7 +1154,7 @@ def get_region_label(country: str, region: str = None, subregion: str = None) ->
 
 
 def get_country_data(country: str, region: str = None, subregion: str = None, verbose: bool = False,
-                     pad_RKI_data_to_yesterday: bool = True) -> Tuple[pd.Series, pd.Series, str]:
+                     pad_RKI_data_to_yesterday: bool = True) -> Tuple[pd.Series, pd.Series]:
     """Given the name of a country, get the Johns Hopkins data for cases and deaths,
     and return them as a tuple of pandas.Series objects and a string describing the region:
     (cases, deaths, region_label)
@@ -1187,35 +1187,18 @@ def get_country_data(country: str, region: str = None, subregion: str = None, ve
     or two days (or even later in extreme cases).
 
     """
+    special_countries = {
+        'germany': (germany_get_region, {'state': region, 'landkreis': subregion,
+                                         'pad2yesterday': pad_RKI_data_to_yesterday}),
+        'us': (get_region_US, {'state': region}),
+        'hungary': (get_region_hungary, {'county': region})
+    }
 
-    if country.lower() == 'germany':
-        if region == None and subregion == None:
-            c, d = get_country_data_johns_hopkins(country)  # use johns hopkins data
-            country_region = country
-        else:
-            # use German data
-            c, d, country_region = germany_get_region(state=region, landkreis=subregion,
-                                                      pad2yesterday=pad_RKI_data_to_yesterday)
-    elif country.lower() == 'us' and region != None:
-        # load US data
-        c, d = get_region_US(region)
-        country_region = f"United States: {region}"
-
-    elif country.lower() == 'hungary':
-        # region -> térség
-        # subregion -> kistérség
-        # county -> megye
-
-        if region is not None:
-            c, d, country_region = get_region_hungary(county=region)
-
-        else:
-            c, d = get_country_data_johns_hopkins(country)
-            country_region = country
-
+    if country.casefold() in special_countries and (region is not None or subregion is not None):
+        func, kwargs = special_countries[country.casefold()]
+        c, d = func(**kwargs)
     else:
-        c, d = get_country_data_johns_hopkins(country)
-        country_region = country
+        c, d = get_country_data_johns_hopkins(country)  # use johns hopkins data
 
     len_cases1 = len(c)
     # hungarian county data doesn't contain number of deaths
@@ -1230,7 +1213,7 @@ def get_country_data(country: str, region: str = None, subregion: str = None, ve
     if verbose:
         print(f"get_country_data: cases [{len_cases1}] -> [{len_cases2}]")
         print(f"get_country_data: deaths[{len_deaths1}] -> [{len_deaths2}]")
-    return c, d, country_region
+    return c, d
 
 #######################
 
@@ -1467,7 +1450,7 @@ def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
     for reg_subreg in [region_subregion] + compare_with_local:
 
         region, subregion = unpack_region_subregion(reg_subreg)
-        c, d, country_subregion = germany_get_region(state=region, landkreis=subregion)
+        c, d = germany_get_region(state=region, landkreis=subregion)
 
         label = label_from_region_subregion((region, subregion))
         df_c[label] = c.diff().rolling(rolling, center=True).mean()  # cases
@@ -1489,7 +1472,7 @@ def get_compare_data_hungary(region, compare_with_local: list, rolling=7):
     df_c = pd.DataFrame()
     # df_d = pd.DataFrame()
     for reg in [region] + compare_with_local:
-        c, d, country_subregion = get_region_hungary(county=reg)
+        c, d = get_region_hungary(county=reg)
         label = str(reg)
         df_c[label] = c.diff().rolling(rolling, center=True).mean()  # cases
         # df_d[label] = d.diff().rolling(rolling, center=True).mean()  # deaths
@@ -1615,7 +1598,8 @@ def plot_no_data_available(ax, mimic_subplot, text):
 
 def overview(country: str, region: str = None, subregion: str = None,
              savefig: bool = False, weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
-    c, d, region_label = get_country_data(country, region=region, subregion=subregion)
+    c, d = get_country_data(country, region=region, subregion=subregion)
+    region_label = get_region_label(country, region=region, subregion=subregion)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     c = c[- weeks * 7:]
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
@@ -1671,7 +1655,8 @@ def compare_plot(country: str, region: str = None, subregion: str = None,
                  savefig: bool = False, normalise: bool = False) -> Tuple[plt.axes, pd.Series, pd.Series]:
     """ Create a pair of plots which show comparison of the region with other most suffering countries
     """
-    c, d, region_label = get_country_data(country, region=region, subregion=subregion)
+    c, d = get_country_data(country, region=region, subregion=subregion)
+    region_label = get_region_label(country, region=region, subregion=subregion)
     if normalise:
         assert subregion is None, f"Normalization does not support subregions"
         _population = population(country=country, region=region)

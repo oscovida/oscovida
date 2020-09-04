@@ -102,19 +102,19 @@ def test_label_from_region_subregion():
 
 def test_get_country_data():
     # Germany
-    cases, deaths, region_label = c.get_country_data(country="Germany",
-                                                     subregion="SK Hamburg")
-    print(f"region_label = {region_label}")
-    print(f"deaths = {type(deaths)}")
-    print(f"empty")
+    cases, deaths = c.get_country_data(country="Germany", region="Bayern")
+    assert isinstance(deaths, pd.Series)
+    assert cases.name == 'Germany-Bayern cases'
+    assert deaths.name == 'Germany-Bayern deaths'
+
+    cases, deaths = c.get_country_data(country="Germany", subregion="SK Hamburg")
+    assert isinstance(deaths, pd.Series)
     assert cases.name == 'Germany-SK Hamburg cases'
     assert deaths.name == 'Germany-SK Hamburg deaths'
-    assert region_label == 'Germany-SK Hamburg'
 
-    c2, d2, region_label = c.get_country_data(country="United Kingdom")
+    c2, d2 = c.get_country_data(country="United Kingdom")
     assert c2.name == "United Kingdom cases"
     assert d2.name == "United Kingdom deaths"
-    assert region_label == "United Kingdom"
 
 
 def test_compute_daily_change():
