@@ -144,7 +144,7 @@ def _parse_date(dt: Union[str, datetime.datetime, datetime.date]) -> datetime.da
     if isinstance(dt, str):
         return datetime.datetime.strptime(dt, "%Y-%m-%d")
 
-    return dt
+    raise NotImplementedError(f"{type(dt)} is not `str` or `datetime.date`")
 
 
 def _download(
