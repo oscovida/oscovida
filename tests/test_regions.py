@@ -3,15 +3,22 @@ import pytest
 from oscovida import regions
 
 
+def test_region_check_admin_level(mock_cache_dir):
+    pass
+
+
+def test_region_top_level_parser(mock_cache_dir):
+    pass
+
+
 @pytest.mark.parametrize(
     'test_input,expected_output',
     [
-        (('GB',), ('United Kingdom', 'GBR', None, None, 1)),
-        (('GBR', 'England'), ('United Kingdom', 'GBR', 'England', None, 2)),
-        (('GB', None, None, 3), ('United Kingdom', 'GBR', '*', '*', 3)),
+        (('USA',), ('United States', 'USA', None, None, 1)),
+        (('USA', 'California'), ('United States', 'USA', 'California', None, 2)),
         (
-            ('United Kingdom', 'England', 'Westminster'),
-            ('United Kingdom', 'GBR', 'England', 'Westminster', 3),
+            ('USA', 'California', 'San Francisco'),
+            ('United States', 'USA', 'California', 'San Francisco', 3),
         ),
     ],
 )
@@ -34,27 +41,28 @@ def test_region_data_levels(test_input, expected_output):
         assert region.data['administrative_area_level_3'].unique() == [admin_3]
 
 
-def test_region_ambiguity_error():
+def test_region_raises():
+    #  Invalid admin 1
     with pytest.raises(LookupError):
         regions.Region('UK')
 
+    #  Invalid admin 2
+    with pytest.raises(LookupError):
+        regions.Region('GBR', 'Hamburg')
 
-@pytest.mark.parametrize('level', [0, 4])
-def test_level_error(level):
+    # Invalid level
     with pytest.raises(ValueError):
-        regions.Region('GBR', level=level)
+        regions.Region('GBR', level=0)
+    with pytest.raises(ValueError):
+        regions.Region('GBR', level=4)
 
 
-def test_repr():
-    region = regions.Region('United Kingdom', 'England', 'Westminster')
+def test_display():
+    region = regions.Region('USA', 'California', 'San Francisco')
 
     assert (
         region.__repr__()
-        == "Region(country='United Kingdom', admin_1='GBR', admin_2='England', admin_3='Westminster', level=3)"
+        == "Region(country='United States', admin_1='USA', admin_2='California', admin_3='San Francisco', level=3)"
     )
 
-
-def test_str():
-    region = regions.Region('United Kingdom', 'England', 'Westminster')
-
-    assert region.__str__() == "United Kingdom (GBR): England, Westminster"
+    assert region.__str__() == "United States (USA): California, San Francisco"
