@@ -1,14 +1,74 @@
 import pytest
 
 from oscovida import regions
+from tests.conftest import mock_cache_dir
 
 
-def test_region_check_admin_level(mock_cache_dir):
-    pass
+def test_top_level_parser(mock_cache_dir):
+    region_parser = regions.Region._top_level_region_parser
+
+    assert region_parser('Germany').alpha_3 == 'DEU'
+    assert region_parser('DEU').name == 'Germany'
+
+    assert region_parser('United Kingdom').alpha_3 == 'GBR'
+    assert region_parser('GBR').name == 'United Kingdom'
+
+    assert region_parser('great britain').alpha_3 == 'GBR'
 
 
-def test_region_top_level_parser(mock_cache_dir):
-    pass
+def test_top_level_parser_raises():
+    with pytest.raises(LookupError):
+        regions.Region._top_level_region_parser('UK')
+
+
+def test_check_admin_level_2(mock_cache_dir):
+    assert regions.Region('DEU', level=2)._check_admin_level('Hamburg', level=2)
+    assert regions.Region('USA', level=2)._check_admin_level('California', level=2)
+
+
+def test_check_admin_level_3(mock_cache_dir):
+    assert regions.Region('USA', 'California', level=3)._check_admin_level(
+        'San Francisco', level=3
+    )
+
+
+def test_cite(mock_cache_dir):
+    cite = regions.Region('DEU').cite
+
+    assert all([isinstance(line, str) for line in cite])
+
+
+def test_display_level_1():
+    region = regions.Region('USA')
+
+    assert (
+        region.__repr__()
+        == "Region(country='United States', admin_1='USA', admin_2=None, admin_3=None, level=1)"
+    )
+
+    assert region.__str__() == "United States (USA)"
+
+
+def test_display_level_2():
+    region = regions.Region('USA', 'California')
+
+    assert (
+        region.__repr__()
+        == "Region(country='United States', admin_1='USA', admin_2='California', admin_3=None, level=2)"
+    )
+
+    assert region.__str__() == "United States (USA): California"
+
+
+def test_display_level_3():
+    region = regions.Region('USA', 'California', 'San Francisco')
+
+    assert (
+        region.__repr__()
+        == "Region(country='United States', admin_1='USA', admin_2='California', admin_3='San Francisco', level=3)"
+    )
+
+    assert region.__str__() == "United States (USA): California, San Francisco"
 
 
 @pytest.mark.parametrize(
@@ -22,7 +82,7 @@ def test_region_top_level_parser(mock_cache_dir):
         ),
     ],
 )
-def test_region_data_levels(test_input, expected_output):
+def test_data_levels(test_input, expected_output):
     country, admin_1, admin_2, admin_3, level = expected_output
 
     region = regions.Region(*test_input)
@@ -41,28 +101,23 @@ def test_region_data_levels(test_input, expected_output):
         assert region.data['administrative_area_level_3'].unique() == [admin_3]
 
 
-def test_region_raises():
-    #  Invalid admin 1
+def test_raises_invalid_admin_name(mock_cache_dir):
     with pytest.raises(LookupError):
         regions.Region('UK')
 
-    #  Invalid admin 2
     with pytest.raises(LookupError):
         regions.Region('GBR', 'Hamburg')
 
-    # Invalid level
+
+def test_raises_invalid_level(mock_cache_dir):
     with pytest.raises(ValueError):
         regions.Region('GBR', level=0)
+
     with pytest.raises(ValueError):
         regions.Region('GBR', level=4)
 
+    with pytest.raises(ValueError):
+        regions.Region('DEU', 'Hamburg', level=2)
 
-def test_display():
-    region = regions.Region('USA', 'California', 'San Francisco')
-
-    assert (
-        region.__repr__()
-        == "Region(country='United States', admin_1='USA', admin_2='California', admin_3='San Francisco', level=3)"
-    )
-
-    assert region.__str__() == "United States (USA): California, San Francisco"
+    with pytest.raises(ValueError):
+        regions.Region('DEU', 'Hamburg', 'SK Hamburg', level=3)
