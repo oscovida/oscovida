@@ -92,28 +92,67 @@ class Region:
         >>> Region('USA', 'California', level=3)
         Region(country='United States', admin_1='USA', admin_2='California', admin_3='*', level=3)
         """
-        self._admin_1 = admin_1
-        self._admin_2 = admin_2
-        self._admin_3 = admin_3
-
-        self.admin_1 = admin_1  # WARNING: Implicitly also sets _country through setter
-
-        self.level = level
-
-        #  The full data is always stored even if you end up filtering it down
-        self._data = covid19dh.get(self.admin_1, level=self.level)  # type: ignore
-        self.data = self._data.copy()
+        self.admin_1 = self._top_level_region_parser(admin_1).alpha_3
+        self.country = self._top_level_region_parser(admin_1).name
 
         self.admin_2 = admin_2
         self.admin_3 = admin_3
 
-    def _check_admin_level(self, admin_1: str, admin_target: str, level: int):
-        admin_names = self.data[f'administrative_area_level_{level}'].unique()
-        if not admin_target in admin_names:
-            raise LookupError(
-                f'{admin_target} not found in data for {admin_1}, availabe '
-                f'regions are: {admin_names.tolist()}'
+        if not level is None:
+            if not (1 <= level <= 3):
+                raise ValueError('Level must be between 1 and 3 (inclusive).')
+
+            #  Specifying a level and an administrative region at or below that
+            #  level doesn't make sense, so throw an exception for that here
+            if (self.admin_2 and level <= 2) or (self.admin_3):
+                raise ValueError(
+                    '`level` argument is used to return data for all '
+                    'administrative regions at that level, so passing a '
+                    '`level <= 2` and `admin_2` is not supported, neither is '
+                    'passing any level and an `admin_3`.'
+                )
+        else:
+            #  Sets level to the highest specified administrative region
+            level = max(
+                [
+                    i + 1
+                    for (i, v) in enumerate((self.admin_1, self.admin_2, self.admin_3))
+                    if not v is None
+                ]
             )
+
+        self.level = level
+
+        #  The full data is always stored even if you end up filtering it down
+        self.data = covid19dh.get(self.admin_1, level=self.level)  # type: ignore
+
+        if self.level >= 2:
+            if admin_2:
+                if admin_2 != '*':
+                    self._check_admin_level(admin_2, level=2)
+                self._admin_2 = admin_2
+
+                self.data = self.data[
+                    self.data['administrative_area_level_2'] == self._admin_2
+                ]
+            else:
+                self._admin_2 = '*'
+        else:
+            self._admin_2 = None
+
+        if self.level == 3:
+            if admin_3:
+                if admin_3 != '*':
+                    self._check_admin_level(admin_3, level=3)
+                self._admin_3 = admin_3
+
+                self.data = self.data[
+                    self.data['administrative_area_level_3'] == self.admin_3
+                ]
+            else:
+                self._admin_3 = '*'
+        else:
+            self._admin = None
 
     @staticmethod
     def _top_level_region_parser(region: str):
@@ -132,99 +171,15 @@ class Region:
 
         return pyc_admin_1
 
-    @property
-    def country(self) -> str:
-        return self._country
-
-    @country.setter
-    def country(self, country: str):
-        self._admin_1 = self._top_level_region_parser(country).alpha_3
-        self._country = self._top_level_region_parser(country).name
-
-    @property
-    def admin_1(self) -> str:
-        return self._admin_1
-
-    @admin_1.setter
-    def admin_1(self, admin_1: str):
-        self._admin_1 = self._top_level_region_parser(admin_1).alpha_3
-        self._country = self._top_level_region_parser(admin_1).name
-
-    @property
-    def level(self) -> int:
-        return self._level
-
-    @level.setter
-    def level(self, level: Optional[int]):
-        print((self.admin_1, self._admin_2, self._admin_3))
-        #  If the level has been manually specified that (probably) means the
-        #  user wants data for all of the administrative regions at that level
-        if not level is None:
-            if not (1 <= level <= 3):
-                raise ValueError('Level must be between 1 and 3 (inclusive).')
-
-            #  Specifying a level and an administrative region at or below that
-            #  level doesn't make sense, so throw an exception for that here
-            if (self._admin_2 and level <= 2) or (self._admin_3):
-                raise ValueError(
-                    '`level` argument is used to return data for all '
-                    'administrative regions at that level, so passing a '
-                    '`level <= 2` and `admin_2` is not supported, neither is '
-                    'passing any level and an `admin_3`.'
-                )
-        else:
-            #  Sets level to the highest specified administrative region
-            level = max(
-                [
-                    i + 1
-                    for (i, v) in enumerate(
-                        (self.admin_1, self._admin_2, self._admin_3)
-                    )
-                    if not v is None
-                ]
+    def _check_admin_level(self, admin_target: str, level: int):
+        admin_names = self.data[f'administrative_area_level_{level}'].unique()
+        if not admin_target in admin_names:
+            raise LookupError(
+                f'{admin_target} not found in data for {self.admin_1}, availabe '
+                f'regions are: {admin_names.tolist()}'
             )
 
-        self._level = level
-
-    @property
-    def admin_2(self) -> str:
-        return self._admin_2  # type: ignore
-
-    @admin_2.setter
-    def admin_2(self, admin_2):
-        if self.level >= 2:
-            if admin_2:
-                if admin_2 != '*':
-                    self._check_admin_level(self.country, admin_2, 2)
-                self._admin_2 = admin_2
-
-                self.data = self.data[
-                    self.data['administrative_area_level_2'] == self._admin_2
-                ]
-            else:
-                self._admin_2 = '*'
-        else:
-            self._admin_2 = None
-
-    @property
-    def admin_3(self) -> str:
-        return self._admin_3  # type: ignore
-
-    @admin_3.setter
-    def admin_3(self, admin_3):
-        if self.level == 3:
-            if admin_3:
-                if admin_3 != '*':
-                    self._check_admin_level(self.country, admin_3, 3)
-                self._admin_3 = admin_3
-
-                self.data = self.data[
-                    self.data['administrative_area_level_3'] == self.admin_3
-                ]
-            else:
-                self._admin_3 = '*'
-        else:
-            self._admin = None
+        return True
 
     @property
     def cite(self) -> List[str]:
