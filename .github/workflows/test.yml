@@ -40,6 +40,6 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest --cov=. --cov-report xml:cov.xml --verbose
+        pytest --cov=oscovida --cov-report xml:cov.xml --verbose
 
     - uses: codecov/codecov-action@v1
