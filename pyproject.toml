@@ -79,5 +79,5 @@ dephell = "^0.8.3"
 
 [tool.poetry.extras]
 test = ["pytest", "pytest-cov", "coverage", "nbval", "testpath"]
-formatting = ["pycodestyle", "mypy", "black", "isort", "pre-commit"]
+formatting = ["pycodestyle", "mypy", "black", "isort", "pre-commit", "dephell"]
 dev = ["pytest", "pytest-cov", "coverage", "nbval", "testpath", "pycodestyle", "mypy", "black", "isort", "pre-commit", "dephell"]

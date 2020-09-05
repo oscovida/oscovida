@@ -15,6 +15,7 @@ repos:
       pass_filenames: false
       files: "^pyproject.toml$"
       require_serial: true
+      additional_dependencies: [dephell, black]
   - repo: https://github.com/pycqa/isort
     rev: 5.3.0
     hooks:
