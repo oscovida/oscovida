@@ -15,7 +15,7 @@ oscovida-metadata
 tools/binder
 tools/status
 oscovida.egg-info
-
+tests/test_data/.cache
 venv/
 .idea/
 replication/
