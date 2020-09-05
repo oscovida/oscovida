@@ -83,7 +83,7 @@ class Cache:
     ) -> bool:
         return os.path.isfile(self._cache_path(level, dt, raw, vintage))
 
-    @lru_cache
+    @lru_cache()
     def read(
         self, level: int, dt: datetime.datetime, raw: bool, vintage: bool
     ) -> pd.DataFrame:
