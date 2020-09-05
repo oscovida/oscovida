@@ -41,7 +41,7 @@ setup(
     ],
     packages=['oscovida', 'oscovida.report_generators'],
     package_dir={"": "."},
-    package_data={},
+    package_data={"oscovida": ["reports/*.pyt"]},
     install_requires=[
         'click==7.*,>=7.1.2',
         'ipynb-py-convert==0.*,>=0.4.5',
@@ -60,7 +60,6 @@ setup(
         'seaborn==0.*,>=0.10.1',
         'tabulate==0.*,>=0.8.7',
         'tqdm==4.*,>=4.48.0',
-        'voila==0.*,>=0.1.21',
     ],
     extras_require={
         "dev": [
@@ -70,10 +69,9 @@ setup(
             "ipython==7.*,>=7.16.1",
             "isort==5.*,>=5.4.2",
             "jupyterlab==2.*,>=2.2.0",
-            "mypy==0.*,>=0.782.0",
+            "mutmut==2.*,>=2.1.0",
             "nbval==0.*,>=0.9.5",
             "pre-commit==2.*,>=2.7.1",
-            "pycodestyle==2.*,>=2.6.0",
             "pytest==5.*,>=5.4.3",
             "pytest-cov==2.*,>=2.10.0",
             "testpath==0.*,>=0.4.4",
@@ -82,12 +80,11 @@ setup(
             "black==19.*,>=19.10.0.b0",
             "dephell==0.*,>=0.8.3",
             "isort==5.*,>=5.4.2",
-            "mypy==0.*,>=0.782.0",
             "pre-commit==2.*,>=2.7.1",
-            "pycodestyle==2.*,>=2.6.0",
         ],
         "test": [
             "coverage==5.*,>=5.2.0",
+            "mutmut==2.*,>=2.1.0",
             "nbval==0.*,>=0.9.5",
             "pytest==5.*,>=5.4.3",
             "pytest-cov==2.*,>=2.10.0",
