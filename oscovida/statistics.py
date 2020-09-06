@@ -48,7 +48,7 @@ def daily(obj: pd.Series) -> pd.Series:
     Parameters
     ----------
     obj : pd.Series
-        Input column
+        Input series of cumulative numbers
 
     Returns
     -------
@@ -68,7 +68,7 @@ def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Seri
     Parameters
     ----------
     obj : Union[pd.Series, np.ndarray]
-        Input column (pandas `Series` or numpy `ndarray`)
+        Input series of cumulative or daily numbers
     kind : str, optional
         Smoothing approach, either `'weak'`, `'strong'`, or `'7dayrolling`', by
         default 'weak'. The names correspond to:
@@ -122,7 +122,7 @@ def doubling_time(obj: pd.Series, minchange: float = 20) -> pd.Series:
     Parameters
     ----------
     obj : pd.Series
-        Source series
+        Input series of daily numbers
     minchange : float
         Values in the series under the minchange are set to 0 before computing
         the doubling time, by default 20
@@ -146,7 +146,7 @@ def doubling_time(obj: pd.Series, minchange: float = 20) -> pd.Series:
     return dt
 
 
-def r_number(obj: pd.Series, tau=4) -> pd.Series:
+def r_number(obj: pd.Series, tau: int = 4) -> pd.Series:
     """Calculate the R-number using a method similar to RKI[1]. Assumes that the
     input series has rows per-day.
 
@@ -156,7 +156,7 @@ def r_number(obj: pd.Series, tau=4) -> pd.Series:
     Parameters
     ----------
     obj : pd.Series
-        Source series
+        Input series of daily numbers
     tau : int, optional
         Day averages, by default 4
 
@@ -191,7 +191,7 @@ def growth_factor(obj: pd.Series) -> pd.Series:
     Parameters
     ----------
     obj : pd.Series
-        Source series
+        Input series of daily numbers
 
     Returns
     -------
@@ -212,7 +212,7 @@ def min_max(obj: pd.Series, n: int, at_least=(0.75, 1.25), alert=(0.1, 100)) -> 
     Parameters
     ----------
     obj : pd.Series
-        Source series
+        Input series
     n : int
         Past number of days looked at
     at_least : tuple, optional
