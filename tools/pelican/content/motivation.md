@@ -6,6 +6,8 @@ slug: motivation
 
 ## Motivation
 
+Here we explain our motivation for putting together the Open Science COVID Analysis (OSCOVIDA) framework.
+
 ### 1. Understanding the pandemic
 
 The reporting in the media on the COVID19 situation is not always providing
@@ -38,7 +40,7 @@ dynamics of new, hopefully fewer and more localised, COVID19 outbreaks. We want
 to enable the interested citizen to inspect and understand the data to a level
 that as barely possible with the reports in the media.
 
-### 3. Enable citizen science
+### 3. Enable citizen science and reproducible analysis
 
 Headlines that attract attention may not deliver useful information. We would
 like to offer complementary information and tools with OSCOVIDA:
