@@ -42,7 +42,7 @@ authors = ["Hans Fangohr <da-support@xfel.eu>", "Robert Rosca", "Yury Kirienko"]
 readme = "README.rst"
 
 [tool.poetry.dependencies]
-python = "^3.6.7"
+python = "^3.7"
 joblib = "^0.16.0"
 seaborn = "^0.10.1"
 matplotlib = "<3.3"
@@ -58,13 +58,14 @@ ipynb_py_convert = "^0.4.5"
 click = "^7.1.2"
 pycountry = "^20.7.3"
 requests = "^2.24.0"
-pandas = {version = "^1.1.0-rc.0", allow-prereleases = true}
+pandas = "^1.1.0"
 multipledispatch = "^0.6.0"
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
 coverage = "^5.2"
 dephell = "^0.8.3"
+hypothesis = "^5.32.0"
 ipython = "^7.16.1"
 isort = "^5.4.2"
 jupyterlab = "^2.2.0"
@@ -77,5 +78,5 @@ testpath = "^0.4.4"
 
 [tool.poetry.extras]
 formatting = ["black", "dephell", "isort", "pre-commit"]
-test = ["coverage", "mutmut", "nbval", "pytest", "pytest-cov", "testpath"]
-dev = ["black", "dephell", "isort", "pre-commit", "coverage", "mutmut", "nbval", "pytest", "pytest-cov", "testpath", "ipython", "jupyterlab"]
+test = ["coverage", "hypothesis", "mutmut", "nbval", "pytest", "pytest-cov", "testpath"]
+dev = ["black", "dephell", "isort", "pre-commit", "coverage", "hypothesis", "mutmut", "nbval", "pytest", "pytest-cov", "testpath", "ipython", "jupyterlab"]
