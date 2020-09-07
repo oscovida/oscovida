@@ -1130,7 +1130,7 @@ name = "plotly"
 version = "4.9.0"
 description = "An open-source, interactive data visualization library for Python"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -1398,7 +1398,7 @@ name = "retrying"
 version = "1.3.3"
 description = "Retrying"
 category = "main"
-optional = false
+optional = true
 python-versions = "*"
 
 [package.dependencies]
@@ -1704,7 +1704,7 @@ dev = ["plotly", "psutil", "kaleido"]
 [metadata]
 lock-version = "1.0"
 python-versions = "^3.7"
-content-hash = "87d9816677a630136b49ff0df96daa76ea0bdc211b93554a3290b0d326cf08bf"
+content-hash = "3b055e18c06ce9c3f422575428854ed6b9ca80b91c1458089e76ea9fefe10688"
 
 [metadata.files]
 aiohttp = [
