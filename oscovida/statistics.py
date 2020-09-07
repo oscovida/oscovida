@@ -42,13 +42,13 @@ SMOOTHING_METHODS = {
 }
 
 
-def daily(obj: pd.Series) -> pd.Series:
+def daily(cumulative: pd.Series) -> pd.Series:
     """Computes the daily change for the series
 
     Parameters
     ----------
-    obj : pd.Series
-        Input series of cumulative numbers
+    cumulative : pd.Series
+        Input series of sorted cumulative daily numbers
 
     Returns
     -------
@@ -59,7 +59,7 @@ def daily(obj: pd.Series) -> pd.Series:
     --------
     TODO
     """
-    return obj.diff().dropna()
+    return cumulative.diff().dropna()
 
 
 def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Series:
@@ -67,7 +67,7 @@ def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Seri
 
     Parameters
     ----------
-    obj : Union[pd.Series, np.ndarray]
+    obj : pd.Series
         Input series of cumulative or daily numbers
     kind : str, optional
         Smoothing approach, either `'weak'`, `'strong'`, or `'7dayrolling`', by
@@ -83,7 +83,7 @@ def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Seri
 
     Returns
     -------
-    Union[pd.Series, np.ndarray]
+    pd.Series
         Smoothed series
 
     Examples
@@ -103,7 +103,7 @@ def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Seri
     return res
 
 
-def doubling_time(obj: pd.Series, minchange: float = 20) -> pd.Series:
+def doubling_time(cumulative: pd.Series) -> pd.Series:
     """Compute the doubling time for a given series by shifting the rows by one.
 
     The doubling time equation is:
@@ -121,11 +121,10 @@ def doubling_time(obj: pd.Series, minchange: float = 20) -> pd.Series:
 
     Parameters
     ----------
-    obj : pd.Series
-        Input series of daily numbers
-    minchange : float
-        Values in the series under the minchange are set to 0 before computing
-        the doubling time, by default 20
+    cumulative : pd.Series
+        Input series of (usually) sorted cumulative daily numbers, as you want
+        to find the doubling time of the cumulative number of cases not daily
+        number
 
     Returns
     -------
@@ -136,27 +135,24 @@ def doubling_time(obj: pd.Series, minchange: float = 20) -> pd.Series:
     --------
     TODO
     """
-    exclude = obj < minchange
-    obj = obj.drop(exclude[exclude].index)
+    cumulative_shifted = cumulative.shift(1)  # Previous day
 
-    obj_shifted = obj.shift(1)  # previous
-
-    dt = np.log(2) / np.log(obj / obj_shifted)
+    dt = np.log(2) / np.log(cumulative / cumulative_shifted)
 
     return dt
 
 
-def r_number(obj: pd.Series, tau: int = 4) -> pd.Series:
+def r_number(cumulative: pd.Series, tau: int = 4) -> pd.Series:
     """Calculate the R-number using a method similar to RKI[1]. Assumes that the
-    input series has rows per-day.
+    input series is sorted cumulative daily numbers.
 
     [1] Robert Koch Institute: Epidemiologisches Bulletin 17 | 23 April 2020
     https://www.rki.de/DE/Content/Infekt/EpidBull/Archiv/2020/Ausgaben/17_20.html
 
     Parameters
     ----------
-    obj : pd.Series
-        Input series of daily numbers
+    cumulative : pd.Series
+        Input series of sorted cumulative daily numbers
     tau : int, optional
         Day averages, by default 4
 
@@ -165,14 +161,13 @@ def r_number(obj: pd.Series, tau: int = 4) -> pd.Series:
     pd.Series
         R number per-day
     """
-
     # TODO: Look at using method from:
     # https://www.medrxiv.org/content/10.1101/2020.04.19.20071886v2.full.pdf
     # http://trackingr-env.eba-9muars8y.us-east-2.elasticbeanstalk.com/
     # and
     # https://valeriupredoi.github.io/
 
-    rolling_avg = obj.rolling(tau).mean()
+    rolling_avg = cumulative.rolling(tau).mean()
     R = rolling_avg / rolling_avg.shift(tau)
     R2 = R.shift(-tau)
 
