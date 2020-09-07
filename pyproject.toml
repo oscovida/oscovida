@@ -60,7 +60,9 @@ pycountry = "^20.7.3"
 requests = "^2.24.0"
 pandas = "^1.1.0"
 multipledispatch = "^0.6.0"
-plotly ={ version =  "^4.9.0", optional = true }
+plotly = { version = "^4.9.0", optional = true }
+psutil = { version = "^5.7.2", optional = true }
+kaleido ={ version =  "^0.0.3", optional = true }
 
 [tool.poetry.dev-dependencies]
 black = "^19.10b0"
@@ -79,7 +81,7 @@ pytest-cov = "^2.10.0"
 testpath = "^0.4.4"
 
 [tool.poetry.extras]
-plotly=["plotly"]
+plotly=["plotly", "psutil", "kaleido"]
 formatting = ["black", "dephell", "isort", "pre-commit"]
 test = ["coverage", "hypothesis", "mutmut", "nbval", "pytest", "pytest-cov", "testpath"]
-dev = ["plotly", "black", "dephell", "isort", "pre-commit", "coverage", "hypothesis", "mutmut", "nbval", "pytest", "pytest-cov", "testpath", "ipython", "jupyterlab"]
+dev = ["plotly", "psutil", "kaleido", "black", "dephell", "isort", "pre-commit", "coverage", "hypothesis", "mutmut", "nbval", "pytest", "pytest-cov", "testpath", "ipython", "jupyterlab"]

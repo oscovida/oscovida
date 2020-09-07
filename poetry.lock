@@ -787,6 +787,14 @@ notebook = ">=4.2.0"
 requests = "*"
 
 [[package]]
+name = "kaleido"
+version = "0.0.3.post1"
+description = "Static image export for web-based visualization libraries with zero dependencies"
+category = "main"
+optional = true
+python-versions = "*"
+
+[[package]]
 name = "kiwisolver"
 version = "1.2.0"
 description = "A fast implementation of the Cassowary constraint solver"
@@ -1194,6 +1202,17 @@ python-versions = ">=3.6.1"
 
 [package.dependencies]
 wcwidth = "*"
+
+[[package]]
+name = "psutil"
+version = "5.7.2"
+description = "Cross-platform lib for process and system monitoring in Python."
+category = "main"
+optional = true
+python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
+
+[package.extras]
+test = ["ipaddress", "mock", "unittest2", "enum34", "pywin32", "wmi"]
 
 [[package]]
 name = "ptyprocess"
@@ -1677,15 +1696,15 @@ docs = ["sphinx", "jaraco.packaging (>=3.2)", "rst.linker (>=1.9)"]
 testing = ["jaraco.itertools", "func-timeout"]
 
 [extras]
-plotly = ["plotly"]
+plotly = ["plotly", "psutil", "kaleido"]
 formatting = []
 test = []
-dev = ["plotly"]
+dev = ["plotly", "psutil", "kaleido"]
 
 [metadata]
 lock-version = "1.0"
 python-versions = "^3.7"
-content-hash = "a25e85f945b2757e3fe550aca4a2d46aae2d0f165a74436c7f21795e0bb50986"
+content-hash = "87d9816677a630136b49ff0df96daa76ea0bdc211b93554a3290b0d326cf08bf"
 
 [metadata.files]
 aiohttp = [
@@ -2013,6 +2032,13 @@ jupyterlab-server = [
     {file = "jupyterlab_server-1.2.0-py3-none-any.whl", hash = "sha256:55d256077bf13e5bc9e8fbd5aac51bef82f6315111cec6b712b9a5ededbba924"},
     {file = "jupyterlab_server-1.2.0.tar.gz", hash = "sha256:5431d9dde96659364b7cc877693d5d21e7b80cea7ae3959ecc2b87518e5f5d8c"},
 ]
+kaleido = [
+    {file = "kaleido-0.0.3.post1-py2.py3-none-macosx_10_10_x86_64.whl", hash = "sha256:013454cda65ed96c70d6b9338f23f921599292069aed7aacd534b563b145bd7f"},
+    {file = "kaleido-0.0.3.post1-py2.py3-none-manylinux1_x86_64.whl", hash = "sha256:a71e40f16e9f6d64782211b4af3f98b585e93dfc999466ecf186bdf8f8dd9d2c"},
+    {file = "kaleido-0.0.3.post1-py2.py3-none-manylinux2014_aarch64.whl", hash = "sha256:3f29367f2fa86ef099b3b78211355d04abaedec9aaddc9d5ee263988fccd5641"},
+    {file = "kaleido-0.0.3.post1-py2.py3-none-win32.whl", hash = "sha256:71d65ad8ba412fc7044b856c7a49546ae29536a6ac4c05795c75bf24bd9470f7"},
+    {file = "kaleido-0.0.3.post1-py2.py3-none-win_amd64.whl", hash = "sha256:03978623a7360e22fecce14823f1aaab6818c9ea4f2ae400c2f9929fe59ecce5"},
+]
 kiwisolver = [
     {file = "kiwisolver-1.2.0-cp36-cp36m-macosx_10_9_x86_64.whl", hash = "sha256:443c2320520eda0a5b930b2725b26f6175ca4453c61f739fef7a5847bd262f74"},
     {file = "kiwisolver-1.2.0-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:efcf3397ae1e3c3a4a0a0636542bcad5adad3b1dd3e8e629d0b6e201347176c8"},
@@ -2248,6 +2274,19 @@ prometheus-client = [
 prompt-toolkit = [
     {file = "prompt_toolkit-3.0.7-py3-none-any.whl", hash = "sha256:83074ee28ad4ba6af190593d4d4c607ff525272a504eb159199b6dd9f950c950"},
     {file = "prompt_toolkit-3.0.7.tar.gz", hash = "sha256:822f4605f28f7d2ba6b0b09a31e25e140871e96364d1d377667b547bb3bf4489"},
+]
+psutil = [
+    {file = "psutil-5.7.2-cp27-none-win32.whl", hash = "sha256:f2018461733b23f308c298653c8903d32aaad7873d25e1d228765e91ae42c3f2"},
+    {file = "psutil-5.7.2-cp27-none-win_amd64.whl", hash = "sha256:66c18ca7680a31bf16ee22b1d21b6397869dda8059dbdb57d9f27efa6615f195"},
+    {file = "psutil-5.7.2-cp35-cp35m-win32.whl", hash = "sha256:5e9d0f26d4194479a13d5f4b3798260c20cecf9ac9a461e718eb59ea520a360c"},
+    {file = "psutil-5.7.2-cp35-cp35m-win_amd64.whl", hash = "sha256:4080869ed93cce662905b029a1770fe89c98787e543fa7347f075ade761b19d6"},
+    {file = "psutil-5.7.2-cp36-cp36m-win32.whl", hash = "sha256:d8a82162f23c53b8525cf5f14a355f5d1eea86fa8edde27287dd3a98399e4fdf"},
+    {file = "psutil-5.7.2-cp36-cp36m-win_amd64.whl", hash = "sha256:0ee3c36428f160d2d8fce3c583a0353e848abb7de9732c50cf3356dd49ad63f8"},
+    {file = "psutil-5.7.2-cp37-cp37m-win32.whl", hash = "sha256:ff1977ba1a5f71f89166d5145c3da1cea89a0fdb044075a12c720ee9123ec818"},
+    {file = "psutil-5.7.2-cp37-cp37m-win_amd64.whl", hash = "sha256:a5b120bb3c0c71dfe27551f9da2f3209a8257a178ed6c628a819037a8df487f1"},
+    {file = "psutil-5.7.2-cp38-cp38-win32.whl", hash = "sha256:10512b46c95b02842c225f58fa00385c08fa00c68bac7da2d9a58ebe2c517498"},
+    {file = "psutil-5.7.2-cp38-cp38-win_amd64.whl", hash = "sha256:68d36986ded5dac7c2dcd42f2682af1db80d4bce3faa126a6145c1637e1b559f"},
+    {file = "psutil-5.7.2.tar.gz", hash = "sha256:90990af1c3c67195c44c9a889184f84f5b2320dce3ee3acbd054e3ba0b4a7beb"},
 ]
 ptyprocess = [
     {file = "ptyprocess-0.6.0-py2.py3-none-any.whl", hash = "sha256:d7cc528d76e76342423ca640335bd3633420dc1366f258cb31d05e865ef5ca1f"},
