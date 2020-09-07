@@ -51,7 +51,3 @@ def mock_cache_dir(tmp_path_factory, request):
         defaults = tuple(defaults)
         with mock.patch.object(oscovida.covid19dh.get, '__defaults__', defaults):
             yield
-
-
-def pytest_collectstart(collector):
-    collector.skip_compare += ('stderr',)
