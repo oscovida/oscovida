@@ -7,9 +7,6 @@ from matplotlib.axes._axes import Axes
 from ..regions import Region
 from . import _matplotlib
 
-if importlib.find_loader('plotly') is not None:
-    from . import _plotly
-
 
 class Backend:
     def __init__(self):
@@ -20,7 +17,9 @@ class Backend:
             '__test__': None,
         }
 
-        if importlib.find_loader('_plotly') is not None:
+        if importlib.find_loader('plotly') is not None:
+            from . import _plotly
+
             self._backends['plotly'] = _plotly
 
     @property

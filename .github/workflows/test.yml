@@ -36,10 +36,14 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install ".[dev]"
+        pip install -e ".[dev]"
 
     - name: Test with pytest
       run: |
-        pytest --nbval --cov=oscovida --cov-report xml:cov.xml --verbose
+        pytest --verbose --cov-report xml:cov.xml --cov=.
+
+    - name: Test witn nbval
+      run: |
+        pytest --verbose --cov-report xml:cov.xml --cov=. --cov-append --nbval ./tests/plots/
 
     - uses: codecov/codecov-action@v1
