@@ -40,10 +40,10 @@ jobs:
 
     - name: Test with pytest
       run: |
-        pytest --verbose --cov-report xml:cov.xml --cov=.
+        pytest --verbose --cov-report xml:cov.xml --cov=oscovida
 
     - name: Test witn nbval
       run: |
-        pytest --verbose --cov-report xml:cov.xml --cov=. --cov-append --nbval ./tests/plots/
+        pytest --verbose --cov-report xml:cov.xml --cov=oscovida --cov-append --nbval ./tests/plots/
 
     - uses: codecov/codecov-action@v1
