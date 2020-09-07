@@ -1,9 +1,14 @@
+import importlib
+import warnings
 from typing import Optional, Sequence
 
 from matplotlib.axes._axes import Axes
 
 from ..regions import Region
-from . import _matplotlib, _plotly
+from . import _matplotlib
+
+if importlib.find_loader('plotly') is not None:
+    from . import _plotly
 
 
 class Backend:
@@ -12,9 +17,11 @@ class Backend:
 
         self._backends = {
             'matplotlib': _matplotlib,
-            'plotly': _plotly,
             '__test__': None,
         }
+
+        if importlib.find_loader('_plotly') is not None:
+            self._backends['plotly'] = _plotly
 
     @property
     def backend(self):
@@ -25,8 +32,13 @@ class Backend:
         if backend in self._backends.keys():
             self._backend = backend
         else:
+            if importlib.find_loader('plotly') is None:
+                warnings.warn(
+                    "Plotly module not loaded so plotly is not availale as a"
+                    "backend. Is plotly installed?"
+                )
             raise ValueError(
-                f"Invalid backend, backend mus be one of {list(self._backends.keys())}"
+                f"Invalid backend, backend must be one of {list(self._backends.keys())}"
             )
 
     @property

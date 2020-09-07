@@ -57,7 +57,7 @@ def plot_totals(
     series: pd.Series,
     ax: Optional[Axes] = None,
     color: Optional[str] = None,
-    label: Optional[str] = None,
+    label_prepend: str = "",
     logscale: bool = True,
 ) -> Axes:
     """Plots the total numbers for a given series.
@@ -98,7 +98,7 @@ def plot_totals(
     ax.step(
         series.index,
         series,
-        label=label,
+        label=" ".join([label_prepend, f'total {series.name}']),
         color=color,
     )
 

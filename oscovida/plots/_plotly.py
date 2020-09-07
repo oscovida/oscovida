@@ -1,9 +1,11 @@
 from functools import wraps
+from html.entities import name2codepoint
 from typing import Optional, Sequence
 
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
+import plotly.offline
 from plotly.graph_objects import Figure
 
 from .. import statistics
