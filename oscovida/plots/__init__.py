@@ -74,8 +74,9 @@ def plot_totals(
     colnames : Sequence[str], optional
         List or tuple of column names to be plotted
         By default ["confirmed", "deaths"]
-    ax : Optional[Axes], optional
-        Axes to plot onto, if `None` then defaults to `plt.gca()`
+    plot_object : Optional[Axes], optional
+        Axes to plot onto, if `None` then defaults to `plt.gca()`. If the plotly
+        backend is being used, this can be a `plotly.graph_objects.Figure` instead
         By default `None`
     logscale : bool, optional
         [description], by default True
@@ -131,8 +132,9 @@ def plot_daily(
     colnames : Sequence[str], optional
         List or tuple of column names to be plotted
         By default ["confirmed", "deaths"]
-    ax : Optional[Axes], optional
-        Axes to plot onto, if `None` then defaults to `plt.gca()`
+    plot_object : Optional[Axes], optional
+        Axes to plot onto, if `None` then defaults to `plt.gca()`. If the plotly
+        backend is being used, this can be a `plotly.graph_objects.Figure` instead
         By default `None`
     label_prepend : Optional[str], optional
         String to prepend to the label, e.g. "GB" would make the labels "GB cases"
@@ -190,8 +192,9 @@ def plot_r_number(
     colnames : Sequence[str], optional
         List or tuple of column names to be plotted
         By default ["confirmed", "deaths"]
-    ax : Optional[Axes], optional
-        Axes to plot onto, if `None` then defaults to `plt.gca()`
+    plot_object : Optional[Axes], optional
+        Axes to plot onto, if `None` then defaults to `plt.gca()`. If the plotly
+        backend is being used, this can be a `plotly.graph_objects.Figure` instead
         By default `None`
     color : Optional[str], optional
         Color for the plot line, if `None` then the color is based on the series
@@ -255,8 +258,9 @@ def plot_growth_factor(
     colnames : Sequence[str], optional
         List or tuple of column names to be plotted
         By default ["confirmed", "deaths"]
-    ax : Optional[Axes], optional
-        Axes to plot onto, if `None` then defaults to `plt.gca()`
+    plot_object : Optional[Axes], optional
+        Axes to plot onto, if `None` then defaults to `plt.gca()`. If the plotly
+        backend is being used, this can be a `plotly.graph_objects.Figure` instead
         By default `None`
     color : Optional[str], optional
         Color for the plot line, if `None` then the color is based on the series
@@ -323,8 +327,9 @@ def plot_doubling_time(
     colnames : Sequence[str], optional
         List or tuple of column names to be plotted
         By default ["confirmed", "deaths"]
-    ax : Optional[Axes], optional
-        Axes to plot onto, if `None` then defaults to `plt.gca()`
+    plot_object : Optional[Axes], optional
+        Axes to plot onto, if `None` then defaults to `plt.gca()`. If the plotly
+        backend is being used, this can be a `plotly.graph_objects.Figure` instead
         By default `None`
     color : Optional[str], optional
         Color for the plot line, if `None` then the color is based on the series

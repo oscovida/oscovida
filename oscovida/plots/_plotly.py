@@ -69,8 +69,8 @@ def plot_totals(
     series : pd.Series
         Input data to plot, assumes it is a cumulative sum of `cases`, `deaths`,
         or `recovered`
-    ax : Optional[Figure], optional
-        Axes to plot onto, if `None` then defaults to `plt.gca()`
+    fig : Optional[Figure], optional
+        Figure to plot onto, if `None` then defaults to `plotly.graph_objects.Figure`
         By default `None`
     color : Optional[str], optional
         Color for the plot line, if `None` then the color is based on the series
@@ -130,8 +130,8 @@ def plot_daily(
     series : pd.Series
         Input data to plot, assumes it is a cumulative sum of `cases`, `deaths`,
         or `recovered`
-    ax : Optional[Figure], optional
-        Axes to plot onto, if `None` then defaults to `plt.gca()`
+    fig : Optional[Figure], optional
+        Figure to plot onto, if `None` then defaults to `plotly.graph_objects.Figure`
         By default `None`
     color : Optional[str], optional
         Color for the plot line, if `None` then the color is based on the series
@@ -207,8 +207,8 @@ def plot_r_number(
     series : pd.Series
         Input data to plot, assumes it is a cumulative sum of `cases`, `deaths`,
         or `recovered`
-    ax : Optional[Figure], optional
-        Axes to plot onto, if `None` then defaults to `plt.gca()`
+    fig : Optional[Figure], optional
+        Figure to plot onto, if `None` then defaults to `plotly.graph_objects.Figure`
         By default `None`
     color : Optional[str], optional
         Color for the plot line, if `None` then the color is based on the series
@@ -301,8 +301,8 @@ def plot_growth_factor(
     series : pd.Series
         Input data to plot, assumes it is a cumulative sum of `cases`, `deaths`,
         or `recovered`
-    ax : Optional[Figure], optional
-        Axes to plot onto, if `None` then defaults to `plt.gca()`
+    fig : Optional[Figure], optional
+        Figure to plot onto, if `None` then defaults to `plotly.graph_objects.Figure`
         By default `None`
     color : Optional[str], optional
         Color for the plot line, if `None` then the color is based on the series
@@ -391,8 +391,8 @@ def plot_doubling_time(
     series : pd.Series
         Input data to plot, assumes it is a cumulative sum of `cases`, `deaths`,
         or `recovered`
-    ax : Optional[Figure], optional
-        Axes to plot onto, if `None` then defaults to `plt.gca()`
+    fig : Optional[Figure], optional
+        Figure to plot onto, if `None` then defaults to `plotly.graph_objects.Figure`
         By default `None`
     color : Optional[str], optional
         Color for the plot line, if `None` then the color is based on the series
