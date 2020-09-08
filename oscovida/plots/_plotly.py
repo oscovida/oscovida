@@ -445,6 +445,10 @@ def plot_doubling_time(
             y=doubling_time,
             name=" ".join([label_prepend, f'{str(series.name)} doubling time']),
             mode='markers',
+            opacity=0.2,
+            marker=dict(
+                color=color,
+            ),
         )
     )
 
