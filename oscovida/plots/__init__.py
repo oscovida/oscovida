@@ -2,6 +2,7 @@ import importlib
 import warnings
 from typing import Optional, Sequence
 
+import matplotlib.pyplot as plt
 from matplotlib.axes._axes import Axes
 
 from ..regions import Region
@@ -14,7 +15,6 @@ class Backend:
 
         self._backends = {
             'matplotlib': _matplotlib,
-            '__test__': None,
         }
 
         if importlib.find_loader('plotly') is not None:
@@ -53,10 +53,14 @@ def set_backend(backend):
     return None
 
 
+def get_backend():
+    return BACKEND.module
+
+
 def plot_totals(
     region: Region,
-    colnames: Sequence[str] = ["confirmed", "deaths"],
     plot_object: Optional[Axes] = None,
+    colnames: Sequence[str] = ["confirmed", "deaths"],
     logscale: bool = True,
     label_prepend: Optional[str] = None,
 ) -> Axes:
@@ -101,11 +105,11 @@ def plot_totals(
         colnames = [colnames]
 
     for colname in colnames:
-        plot_object = BACKEND.module.plot_totals(
+        plot_object = get_backend().plot_totals(
             region.data[colname],
             plot_object,
             logscale=logscale,
-            label_prepend=" ".join([label_prepend, colname]),
+            label_prepend=label_prepend,
         )
 
     return plot_object
@@ -113,8 +117,8 @@ def plot_totals(
 
 def plot_daily(
     region: Region,
-    colnames: Sequence[str] = ["confirmed", "deaths"],
     plot_object: Optional[Axes] = None,
+    colnames: Sequence[str] = ["confirmed", "deaths"],
     label_prepend: Optional[str] = None,
     smoothing: str = 'weak',
 ) -> Axes:
@@ -159,7 +163,7 @@ def plot_daily(
         colnames = [colnames]
 
     for colname in colnames:
-        plot_object = BACKEND.module.plot_daily(
+        plot_object = get_backend().plot_daily(
             region.data[colname],
             plot_object,
             label_prepend=label_prepend,
@@ -171,8 +175,8 @@ def plot_daily(
 
 def plot_r_number(
     region: Region,
-    colnames: Sequence[str] = ["confirmed", "deaths"],
     plot_object: Optional[Axes] = None,
+    colnames: Sequence[str] = ["confirmed", "deaths"],
     color: Optional[str] = None,
     label_prepend: Optional[str] = None,
     smoothing: str = '7dayrolling',
@@ -227,7 +231,7 @@ def plot_r_number(
         colnames = [colnames]
 
     for colname in colnames:
-        plot_object = BACKEND.module.plot_r_number(
+        plot_object = get_backend().plot_r_number(
             region.data[colname],
             plot_object,
             color=color,
@@ -241,8 +245,8 @@ def plot_r_number(
 
 def plot_growth_factor(
     region: Region,
-    colnames: Sequence[str] = ["confirmed", "deaths"],
     plot_object: Optional[Axes] = None,
+    colnames: Sequence[str] = ["confirmed", "deaths"],
     color: Optional[str] = None,
     label_prepend: Optional[str] = None,
     smoothing: str = '7dayrolling',
@@ -293,7 +297,7 @@ def plot_growth_factor(
         colnames = [colnames]
 
     for colname in colnames:
-        plot_object = BACKEND.module.plot_growth_factor(
+        plot_object = get_backend().plot_growth_factor(
             region.data[colname],
             plot_object,
             color=color,
@@ -307,8 +311,8 @@ def plot_growth_factor(
 
 def plot_doubling_time(
     region: Region,
-    colnames: Sequence[str] = ["confirmed", "deaths"],
     plot_object: Optional[Axes] = None,
+    colnames: Sequence[str] = ["confirmed", "deaths"],
     color: Optional[str] = None,
     label_prepend: Optional[str] = None,
     smoothing: str = 'strong',
@@ -358,8 +362,11 @@ def plot_doubling_time(
     if label_prepend is None:
         label_prepend = region.admin_1
 
+    if isinstance(colnames, str):
+        colnames = [colnames]
+
     for colname in colnames:
-        plot_object = BACKEND.module.plot_doubling_time(
+        plot_object = get_backend().plot_doubling_time(
             region.data[colname],
             plot_object,
             color=color,
@@ -369,3 +376,113 @@ def plot_doubling_time(
         )
 
     return plot_object
+
+
+def _plot_summary_matplotlib(region: Region, label_prepend: Optional[str] = None):
+    fig, ax = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
+
+    plot_totals(region, ax[0], label_prepend=label_prepend)
+
+    plot_daily(region, ax[1], colnames=['confirmed'], label_prepend=label_prepend)
+    ax[1].set_ylabel("daily change\n(confirmed)")
+    plot_daily(region, ax[2], colnames=['deaths'], label_prepend=label_prepend)
+    ax[2].set_ylabel("daily change\n(deaths)")
+
+    plot_r_number(region, ax[3], colnames=['confirmed'], label_prepend=label_prepend)
+    plot_growth_factor(
+        region, ax[3], colnames=['confirmed'], label_prepend=label_prepend
+    )
+    ax[3].set_ylabel("r & growth factor\n(confirmed)")
+
+    plot_r_number(region, ax[4], colnames=['deaths'], label_prepend=label_prepend)
+    plot_growth_factor(region, ax[4], colnames=['deaths'], label_prepend=label_prepend)
+    ax[4].set_ylabel("r & growth factor\n(deaths)")
+
+    plot_doubling_time(region, ax[5], label_prepend=label_prepend)
+    ax[5].set_ylabel("doubling time")
+
+    return ax
+
+
+def _plotly_subplot_insert(main_figure, subplot, row, col):
+    #  Subplots in plotly are far more awkward than in matplotlib... far as
+    #  I could find, there's no way to add a figure to a subplot, so you
+    #  have to add in the data the figure contains, which then loses stuff
+    #  like axis limits that you have to add back in... hopefully I'm an
+    #  idiot and there's a better way to do this
+    #  https://github.com/plotly/plotly.py/issues/2647
+    #  Also there are no per-plot legends so everything is squished at the top
+    #  https://github.com/plotly/plotly.js/issues/1668
+
+    main_figure.add_traces(subplot.data, row, col)
+
+    main_figure.update_yaxes(subplot.layout['yaxis'], row=row, col=col)
+
+
+def _plot_summary_plotly(region: Region, label_prepend: Optional[str] = None):
+    from plotly.subplots import make_subplots
+
+    fig = make_subplots(rows=6, cols=1)
+
+    totals = plot_totals(region, label_prepend=label_prepend)
+    _plotly_subplot_insert(fig, totals, 1, 1)
+
+    daily_confirmed = plot_daily(
+        region, colnames=['confirmed'], label_prepend=label_prepend
+    )
+    _plotly_subplot_insert(fig, daily_confirmed, 2, 1)
+    fig.update_yaxes(title="daily change<br>(confirmed)", row=2, col=1)
+
+    daily_deaths = plot_daily(region, colnames=['deaths'], label_prepend=label_prepend)
+    _plotly_subplot_insert(fig, daily_deaths, 3, 1)
+    fig.update_yaxes(title="daily change<br>(deaths)", row=3, col=1)
+
+    r_number_confirmed = plot_r_number(
+        region, colnames=['confirmed'], label_prepend=label_prepend
+    )
+    _plotly_subplot_insert(fig, r_number_confirmed, 4, 1)
+
+    growth_factor_confirmed = plot_growth_factor(
+        region, colnames=['confirmed'], label_prepend=label_prepend
+    )
+    _plotly_subplot_insert(fig, growth_factor_confirmed, 4, 1)
+    fig.update_yaxes(title="r & growth factor<br>(confirmed)", row=4, col=1)
+
+    r_number_deaths = plot_r_number(
+        region, colnames=['deaths'], label_prepend=label_prepend
+    )
+    _plotly_subplot_insert(fig, r_number_deaths, 5, 1)
+    growth_factor_deaths = plot_growth_factor(
+        region, colnames=['deaths'], label_prepend=label_prepend
+    )
+    _plotly_subplot_insert(fig, growth_factor_deaths, 5, 1)
+    fig.update_yaxes(title="r & growth factor<br>(deaths)", row=5, col=1)
+
+    doubling_time = plot_doubling_time(region, label_prepend=label_prepend)
+    _plotly_subplot_insert(fig, doubling_time, 6, 1)
+
+    fig.update_layout(
+        font=dict(family="Inconsolata"),
+        #  Plotly doesn't have auto legend position like matplotlib so we
+        #  set it to outside the plot to avoid covering the plot lines
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        height=1160,
+        width=880,
+    )
+
+    return fig
+
+
+def plot_summary(
+    region: Region,
+    label_prepend: Optional[str] = None,
+):
+    if label_prepend is None:
+        label_prepend = region.admin_1
+
+    summary_functions = {
+        'matplotlib': _plot_summary_matplotlib,
+        'plotly': _plot_summary_plotly,
+    }
+
+    return summary_functions[BACKEND._backend](region, label_prepend)
