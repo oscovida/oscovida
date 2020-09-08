@@ -1,3 +1,4 @@
+import datetime
 from functools import lru_cache
 from typing import List, Optional
 
@@ -17,6 +18,10 @@ class Region:
         admin_2: Optional[str] = None,
         admin_3: Optional[str] = None,
         level: Optional[int] = None,
+        start: datetime.date = datetime.date(2019, 1, 1),
+        end: Optional[datetime.datetime] = None,
+        raw: bool = False,
+        vintage: bool = False,
     ) -> None:
         """
         Parameters
@@ -124,7 +129,14 @@ class Region:
         self.level = level
 
         #  The full data is always stored even if you end up filtering it down
-        self.data = covid19dh.get(self.admin_1, level=self.level)  # type: ignore
+        self.data = covid19dh.get(
+            self.admin_1,
+            level=self.level,
+            start=start,
+            end=end,
+            raw=raw,
+            vintage=vintage,
+        )
 
         if self.level >= 2:
             if admin_2:
