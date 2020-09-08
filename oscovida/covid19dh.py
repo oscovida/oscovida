@@ -50,7 +50,8 @@ class Cache:
                 #  Happens if the filename is not formatted like a date
                 continue
 
-            #  If a csv file in the cache is over 1 day old then remove it
+            #  If a csv file in the cache is over 1 day old, and it is not a
+            #  vintage file, then remove it
             if (
                 file_age.days > 1
                 and name_age.days > 1
