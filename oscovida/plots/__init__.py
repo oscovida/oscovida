@@ -48,6 +48,11 @@ class Backend:
 BACKEND = Backend()
 
 
+def set_backend(backend):
+    BACKEND.backend = backend
+    return None
+
+
 def plot_totals(
     region: Region,
     colnames: Sequence[str] = ["confirmed", "deaths"],
@@ -99,7 +104,7 @@ def plot_totals(
             region.data[colname],
             plot_object,
             logscale=logscale,
-            label=" ".join([label_prepend, colname]),
+            label_prepend=" ".join([label_prepend, colname]),
         )
 
     return plot_object
