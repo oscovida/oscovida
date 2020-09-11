@@ -1,5 +1,5 @@
 import datetime
-from functools import lru_cache
+from collections import namedtuple
 from typing import List, Optional
 
 import pandas as pd
@@ -14,7 +14,7 @@ from . import covid19dh
 class Region:
     def __init__(
         self,
-        admin_1: str,
+        admin_1: Optional[str],
         admin_2: Optional[str] = None,
         admin_3: Optional[str] = None,
         level: Optional[int] = None,
@@ -117,14 +117,19 @@ class Region:
                     'passing any level and an `admin_3`.'
                 )
         else:
-            #  Sets level to the highest specified administrative region
-            level = max(
-                [
-                    i + 1
-                    for (i, v) in enumerate((self.admin_1, self.admin_2, self.admin_3))
-                    if not v is None
-                ]
-            )
+            if self.admin_1 is None:
+                level = 1
+            else:
+                #  Sets level to the highest specified administrative region
+                level = max(
+                    [
+                        i + 1
+                        for (i, v) in enumerate(
+                            (self.admin_1, self.admin_2, self.admin_3)
+                        )
+                        if not v is None
+                    ]
+                )
 
         self.level = level
 
@@ -167,7 +172,12 @@ class Region:
             self._admin = None
 
     @staticmethod
-    def _top_level_region_parser(region: str):
+    def _top_level_region_parser(region: Optional[str]):
+        if region is None:
+            #  If `admin_1` was set to `None`, then we return the entire unfiltered
+            #  dataset, so no checks need to be performed
+            return namedtuple('Country', ['alpha_3', 'name'])(None, None)
+
         try:
             pyc_admin_1: pycountry.db.Country = pycountry.countries.lookup(region)  # type: ignore
         except LookupError:
@@ -198,6 +208,9 @@ class Region:
         return covid19dh.cite(self.data)  # type: ignore
 
     def __str__(self) -> str:
+        if self.country is None:
+            return f"All level {self.level} regions"
+
         a = f"{self.country} ({self.admin_1})"
 
         b = ", ".join([r for r in [self.admin_2, self.admin_3] if not r is None])
