@@ -286,8 +286,6 @@ def cite(x: pd.DataFrame, raw: bool = False) -> List[str]:
     # transform data
     isos = set(x["iso_alpha_3"])
     params = set(x.columns)
-    # add universal
-    isos.add(math.nan)
 
     # collect used references
     sources = sources[
