@@ -199,7 +199,7 @@ def get(
     cache : Optional[Cache], optional
         Cache option to use, by default `oscovida.covid19dh.Cache()`
     raw : bool, optional
-        Warning: Experimental. If `True`, downloads the saw data tables, by
+        Warning: Experimental. If `True`, downloads the raw data tables, by
         default `False`
     vintage : bool, optional
         Warning: Experimental. If `True`, downloads vintage data, by default `False`
