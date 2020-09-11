@@ -419,10 +419,12 @@ def _plotly_subplot_insert(main_figure, subplot, row, col):
     main_figure.update_yaxes(subplot.layout['yaxis'], row=row, col=col)
 
 
-def _plot_summary_plotly(region: Region, label_prepend: Optional[str] = None):
+def _plot_summary_plotly(
+    region: Region, label_prepend: Optional[str] = None, shared_xaxes=False
+):
     from plotly.subplots import make_subplots
 
-    fig = make_subplots(rows=6, cols=1)
+    fig = make_subplots(rows=6, cols=1, shared_xaxes=shared_xaxes)
 
     totals = plot_totals(region, label_prepend=label_prepend)
     _plotly_subplot_insert(fig, totals, 1, 1)
