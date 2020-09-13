@@ -691,16 +691,18 @@ def compute_daily_change(series):
     # smoothed curve, technical description
     smooth_label = f"Gaussian window (stddev=3 days)"
     # shorter description
-    smooth_label = f"(rolling mean)"
-    rolling_series = diff.rolling(9, center=True,
-                                  win_type='gaussian',
-                                  min_periods=1).mean(std=3)
+    smooth_label = f"(rolling 7d mean)"
+
+    # Smoothing step 1: get rid of weekly cycles
+    rolling_series = diff.rolling(7, center=True,
+                                  win_type=None,
+                                  min_periods=1).mean()
     smooth = rolling_series, smooth_label
 
     # extra smoothing for better visual effects
-    rolling_series2 = rolling_series.rolling(4, center=True,
+    rolling_series2 = rolling_series.rolling(9, center=True,
                                              win_type='gaussian',
-                                             min_periods=1).mean(std=2)
+                                             min_periods=1).mean(std=3)
     # extra smooth curve
     smooth2_label = "Smoothed " + smooth_label
     # shorter description
@@ -1046,11 +1048,13 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
             alpha=0.7)
 
 
-    # data for computation or R
-    smooth_diff = series.diff().rolling(7,
-                                        center=True,
-                                        win_type='gaussian').mean(std=4)
+    # # data for computation or R
+    # start from smooth diffs as used in plot 1
+    (change, change_label) , (smooth, smooth_label), \
+        (smooth2, smooth2_label) = compute_daily_change(series)
 
+    # we only use one return value:
+    smooth_diff = smooth2
     R = compute_R(smooth_diff)
     ax.plot(R.index, R, "-", color=color_R,
             label=region + f" estimated R (using {label})",
