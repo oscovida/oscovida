@@ -8,8 +8,13 @@ def create_index(
     level: int,
     start: Optional[datetime.datetime] = None,
     end: Optional[datetime.datetime] = None,
+    groupby: Optional[str] = None,
 ):
-    columns = ['confirmed', 'deaths', 'population']
+    #  This excludes the current administrative area as that one becomes the index
+    #  later on
+    available_aa = [f'administrative_area_level_{level}' for level in range(1, level)]
+
+    columns = ['confirmed', 'deaths', 'population'] + available_aa
     columns_delta = ['confirmed', 'deaths']
 
     if end is None:
@@ -28,13 +33,18 @@ def create_index(
     data_delta = data_end[columns_delta] - data_start[columns_delta]
     data_delta = data_delta.rename(
         columns={
-            'confirmed': f'confirmed-past-{(end-start).days + 1}-days',
-            'deaths': f'deaths-past-{(end-start).days + 1}-days',
+            'confirmed': 'confirmed-delta',
+            'deaths': 'deaths-delta',
         }
-        # {
-        #     'confirmed': f'New cases last {(end-start).days + 1} days',
-        #     'deaths': f'New deaths last {(end-start).days + 1} days',
-        # }
     )
 
-    return data_end.join(data_delta)
+    data_index = data_end.join(data_delta)
+
+    if groupby:
+        data_index_groups = data_index.groupby(groupby)
+        return {
+            group: data_index_groups.get_group(group)
+            for group in data_index_groups.groups
+        }
+
+    return data_index
