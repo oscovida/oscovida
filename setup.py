@@ -39,7 +39,12 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Scientific/Engineering :: Information Analysis',
     ],
-    packages=['oscovida', 'oscovida.plots', 'oscovida.report_generators'],
+    packages=[
+        'oscovida',
+        'oscovida.plots',
+        'oscovida.report_generators',
+        'oscovida.reports',
+    ],
     package_dir={"": "."},
     package_data={},
     install_requires=[
@@ -71,6 +76,9 @@ setup(
             "isort==5.*,>=5.4.2",
             "jupyterlab==2.*,>=2.2.0",
             "kaleido==0.*,>=0.0.3",
+            "mkdocs==1.*,>=1.1.2",
+            "mkdocs-material==5.*,>=5.5.12",
+            "mkdocstrings==0.*,>=0.13.2",
             "mutmut==2.*,>=2.1.0",
             "nbval==0.*,>=0.9.5",
             "plotly==4.*,>=4.9.0",
@@ -79,6 +87,11 @@ setup(
             "pytest==5.*,>=5.4.3",
             "pytest-cov==2.*,>=2.10.0",
             "testpath==0.*,>=0.4.4",
+        ],
+        "docs": [
+            "mkdocs==1.*,>=1.1.2",
+            "mkdocs-material==5.*,>=5.5.12",
+            "mkdocstrings==0.*,>=0.13.2",
         ],
         "formatting": [
             "black==19.*,>=19.10.0.b0",

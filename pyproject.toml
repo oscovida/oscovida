@@ -72,6 +72,9 @@ hypothesis = "^5.32.0"
 ipython = "^7.16.1"
 isort = "^5.4.2"
 jupyterlab = "^2.2.0"
+mkdocs = "^1.1.2"
+mkdocs-material = "^5.5.12"
+mkdocstrings = "^0.13.2"
 mutmut = "^2.1.0"
 nbval = "^0.9.5"
 pre-commit = "^2.7.1"
@@ -80,7 +83,8 @@ pytest-cov = "^2.10.0"
 testpath = "^0.4.4"
 
 [tool.poetry.extras]
+docs = ["mkdocs", "mkdocs-material", "mkdocstrings"]
 plotly = ["plotly", "psutil", "kaleido"]
 formatting = ["black", "dephell", "isort", "pre-commit"]
 test = ["coverage", "hypothesis", "mutmut", "nbval", "pytest", "pytest-cov", "testpath"]
-dev = ["plotly", "psutil", "kaleido", "black", "dephell", "isort", "pre-commit", "coverage", "hypothesis", "mutmut", "nbval", "pytest", "pytest-cov", "testpath", "ipython", "jupyterlab"]
+dev = ["plotly", "psutil", "kaleido", "black", "dephell", "isort", "pre-commit", "coverage", "hypothesis", "mutmut", "nbval", "pytest", "pytest-cov", "testpath", "ipython", "jupyterlab", "mkdocs", "mkdocs-material", "mkdocstrings"]

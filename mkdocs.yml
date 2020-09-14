@@ -1,0 +1,22 @@
+site_name: Oscovida Documentation
+site_description: TODO
+site_url: https://oscovida.github.io
+
+theme:
+  name: material
+  palette:
+    language: en
+
+repo_name: oscovida/oscovida
+repo_url: https://github.com/oscovida/oscovida
+edit_uri: ""
+
+nav:
+  - API Documentation: 'api.md'
+
+plugins:
+  - search
+  - mkdocstrings
+
+extra_css:
+  - css/mkdocstrings.css
