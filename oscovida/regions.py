@@ -14,9 +14,10 @@ from . import covid19dh
 class Region:
     def __init__(
         self,
-        admin_1: Optional[str],
+        country: Optional[str],
         admin_2: Optional[str] = None,
         admin_3: Optional[str] = None,
+        admin_1: Optional[str] = None,
         level: Optional[int] = None,
         start: datetime.date = datetime.date(2019, 1, 1),
         end: Optional[datetime.datetime] = None,
@@ -97,8 +98,10 @@ class Region:
         >>> Region('USA', 'California', level=3)
         Region(country='United States', admin_1='USA', admin_2='California', admin_3='*', level=3)
         """
-        self.admin_1 = self._top_level_region_parser(admin_1).alpha_3
-        self.country = self._top_level_region_parser(admin_1).name
+        country = admin_1 if admin_1 is not None else country
+
+        self.admin_1 = self._top_level_region_parser(country).alpha_3
+        self.country = self._top_level_region_parser(country).name
 
         self.admin_2 = admin_2
         self.admin_3 = admin_3
@@ -107,9 +110,9 @@ class Region:
             if not (1 <= level <= 3):
                 raise ValueError('Level must be between 1 and 3 (inclusive).')
 
-            #  Specifying a level and an administrative region at or below that
-            #  level doesn't make sense, so throw an exception for that here
-            if (self.admin_2 and level <= 2) or (self.admin_3):
+            #  Specifying a level and an administrative below that level doesn't
+            #  make sense, so throw an exception for that here
+            if (self.admin_2 and level < 2) or (self.admin_3):
                 raise ValueError(
                     '`level` argument is used to return data for all '
                     'administrative regions at that level, so passing a '

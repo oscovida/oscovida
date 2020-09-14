@@ -42,8 +42,7 @@ def test_display_level_1():
     region = regions.Region('USA')
 
     assert (
-        region.__repr__()
-        == "Region(country='United States', admin_1='USA', admin_2=None, admin_3=None, level=1)"
+        region.__repr__() == "Region(country='United States', admin_1='USA', level=1)"
     )
 
     assert region.__str__() == "United States (USA)"
@@ -54,7 +53,7 @@ def test_display_level_2():
 
     assert (
         region.__repr__()
-        == "Region(country='United States', admin_1='USA', admin_2='California', admin_3=None, level=2)"
+        == "Region(country='United States', admin_1='USA', admin_2='California', level=2)"
     )
 
     assert region.__str__() == "United States (USA): California"
@@ -109,15 +108,17 @@ def test_raises_invalid_admin_name(mock_cache_dir):
         regions.Region('GBR', 'Hamburg')
 
 
-def test_raises_invalid_level(mock_cache_dir):
+def test_raises_invalid_level_range(mock_cache_dir):
     with pytest.raises(ValueError):
         regions.Region('GBR', level=0)
 
     with pytest.raises(ValueError):
         regions.Region('GBR', level=4)
 
+
+def test_raises_invalid_level_logic(mock_cache_dir):
     with pytest.raises(ValueError):
-        regions.Region('DEU', 'Hamburg', level=2)
+        regions.Region('DEU', 'Hamburg', level=1)
 
     with pytest.raises(ValueError):
-        regions.Region('DEU', 'Hamburg', 'SK Hamburg', level=3)
+        regions.Region('DEU', 'Hamburg', 'SK Hamburg', level=2)
