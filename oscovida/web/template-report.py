@@ -20,7 +20,7 @@ import oscovida.plots as plots
 plots.set_backend('plotly')
 
 # %%
-region = Region({{REGION_ARGS}})
+region = {REGION_REPR}
 region
 
 # %%
