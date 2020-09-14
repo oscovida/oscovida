@@ -43,7 +43,7 @@ setup(
         'oscovida',
         'oscovida.plots',
         'oscovida.report_generators',
-        'oscovida.reports',
+        'oscovida.web',
     ],
     package_dir={"": "."},
     package_data={},
