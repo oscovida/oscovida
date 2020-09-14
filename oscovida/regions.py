@@ -25,78 +25,74 @@ class Region:
         vintage: bool = False,
     ) -> None:
         """
-        Parameters
-        ----------
-        admin_1: str
-            Country name string (e.g. 'United States') or alpha_3 string,
-            administrative area of top level
-            (e.g. 'USA')
-        admin_2: Optional[str] = None
-            Second-level administrative area, usually states, regions or cantons
-            (e.g. 'California')
-        admin_3: Optional[str] = None
-            Third-level administrative area, usually cities or municipalities
-            (e.g. 'San Francisco')
-        level: Optional[int] = None
-            Level is automatically detected from the number of administrative
-            levels passed. Optionally you can specify the level to return a
-            dataframe containing the information for all administrative regions
-            up to and including the specified level
-            (e.g. `Region('USA', level=2)` returns all USA states)
+        Parameters:
+            country: str
+                Country name string (e.g. 'United States') or alpha_3 string,
+                administrative area of top level
+                (e.g. 'USA')
+            admin_2: Optional[str] = None
+                Second-level administrative area, usually states, regions or cantons
+                (e.g. 'California')
+            admin_3: Optional[str] = None
+                Third-level administrative area, usually cities or municipalities
+                (e.g. 'San Francisco')
+            level: Optional[int] = None
+                Level is automatically detected from the number of administrative
+                levels passed. Optionally you can specify the level to return a
+                dataframe containing the information for all administrative regions
+                up to and including the specified level
+                (e.g. `Region('USA', level=2)` returns all USA states)
 
-        Attributes
-        -------
-        data: DataFrame
-            Pandas dataframe containing the data for the specified region
-        cite: list[str]
-            Returns a list of sources for the data
-        country: str
-            Country name string (e.g. 'United States')
-        admin_1: str
-            Country alpha_3 string, administrative area of top level (e.g. 'USA')
-        admin_2: Optional[str]
-            Second-level administrative area, usually states, regions or cantons
-        admin_3: Optional[str]
-            Third-level administrative area, usually cities or municipalities
-        level: int
-            Level of administrative areas specified
+        Attributes:
+            data: DataFrame
+                Pandas dataframe containing the data for the specified region
+            cite: list[str]
+                Returns a list of sources for the data
+            country: str
+                Country name string (e.g. 'United States')
+            admin_1: str
+                Country alpha_3 string, administrative area of top level (e.g. 'USA')
+            admin_2: Optional[str]
+                Second-level administrative area, usually states, regions or cantons
+            admin_3: Optional[str]
+                Third-level administrative area, usually cities or municipalities
+            level: int
+                Level of administrative areas specified
 
-        Raises
-        ------
-        LookupError
-            Raised if an administrative level string is too ambiguous. For example,
-            `Region('UK')` will not work as the country code is GB or GBR, and UK
-            matches too many possible places.
+        Raises:
+            LookupError
+                Raised if an administrative level string is too ambiguous. For example,
+                `Region('UK')` will not work as the country code is GB or GBR, and UK
+                matches too many possible places.
 
-        Examples
-        --------
-        You can create a `Region` object by calling it with specific levels, which
-        will return a filtered DataTable:
+        Examples:
+            You can create a `Region` object by calling it with specific levels, which
+            will return a filtered DataTable:
 
-        >>> Region('USA')
-        Region(country='United States', admin_1='USA', admin_2=None, admin_3=None, level=1)
+            >>> Region('USA')
+            Region(country='United States', admin_1='USA', admin_2=None, admin_3=None, level=1)
 
-        >>> Region('USA', 'California')
-        Region(country='United States', admin_1='USA', admin_2='California', admin_3=None, level=2)
+            >>> Region('USA', 'California')
+            Region(country='United States', admin_1='USA', admin_2='California', admin_3=None, level=2)
 
-        >>> Region('USA', 'California', 'San Francisco')
-        Region(country='United States', admin_1='USA', admin_2='California', admin_3='San Francisco', level=3)
+            >>> Region('USA', 'California', 'San Francisco')
+            Region(country='United States', admin_1='USA', admin_2='California', admin_3='San Francisco', level=3)
 
-        Alternatively you can specify a `level` directly, which will not filter
-        the administrative regions. For example, getting all level 2 regions for
-        the United Kingdom would be:
+            Alternatively you can specify a `level` directly, which will not filter
+            the administrative regions. For example, getting all level 2 regions for
+            the United Kingdom would be:
 
-        >>> Region('USA', level=2)
-        Region(country='United States', admin_1='USA', admin_2='*', admin_3=None, level=2)
+            >>> Region('USA', level=2)
+            Region(country='United States', admin_1='USA', admin_2='*', admin_3=None, level=2)
 
-        Or all level 3:
+            Or all level 3:
 
-        >>> Region('USA', level=3)
-        Region(country='United States', admin_1='USA', admin_2='*', admin_3='*', level=3)
+            >>> Region('USA', level=3)
+            Region(country='United States', admin_1='USA', admin_2='*', admin_3='*', level=3)
 
-        Or an administrative level 2, requesting all level 3 regions in it:
-        >>> Region('USA', 'California', level=3)
-        Region(country='United States', admin_1='USA', admin_2='California', admin_3='*', level=3)
+            Or an administrative level 2, requesting all level 3 regions in it:
+            >>> Region('USA', 'California', level=3)
+            Region(country='United States', admin_1='USA', admin_2='California', admin_3='*', level=3)
         """
         country = admin_1 if admin_1 is not None else country
 
@@ -227,6 +223,7 @@ class Region:
         fields = {
             f: getattr(self, f)
             for f in ['country', 'admin_1', 'admin_2', 'admin_3', 'level']
+            if not getattr(self, f) is None
         }
         fields = ', '.join('%s=%r' % i for i in fields.items())
         return f'{self.__class__.__name__}({fields})'
