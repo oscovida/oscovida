@@ -199,7 +199,7 @@ def get(
     cache : Optional[Cache], optional
         Cache option to use, by default `oscovida.covid19dh.Cache()`
     raw : bool, optional
-        Warning: Experimental. If `True`, downloads the saw data tables, by
+        Warning: Experimental. If `True`, downloads the raw data tables, by
         default `False`
     vintage : bool, optional
         Warning: Experimental. If `True`, downloads vintage data, by default `False`
@@ -284,10 +284,8 @@ def cite(x: pd.DataFrame, raw: bool = False) -> List[str]:
     sources: pd.DataFrame = pd.read_csv(StringIO(response.text))  # type: ignore
 
     # transform data
-    isos = set(x["iso_alpha_3"].unique())
+    isos = set(x["iso_alpha_3"])
     params = set(x.columns)
-    # add universal
-    isos.add(math.nan)
 
     # collect used references
     sources = sources[

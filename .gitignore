@@ -9,3 +9,4 @@ __pycache__
 coverage.xml
 oscovida.egg-info
 tests/test_data/.cache
+.idea/
