@@ -23,6 +23,7 @@ class Region:
         end: Optional[datetime.datetime] = None,
         raw: bool = False,
         vintage: bool = False,
+        lazy: bool = False,
     ) -> None:
         """
         Parameters:
@@ -94,6 +95,8 @@ class Region:
             >>> Region('USA', 'California', level=3)
             Region(country='United States', admin_1='USA', admin_2='California', admin_3='*', level=3)
         """
+        self.lazy = lazy
+
         country = admin_1 if admin_1 is not None else country
 
         self.admin_1 = self._top_level_region_parser(country).alpha_3
@@ -101,6 +104,13 @@ class Region:
 
         self.admin_2 = admin_2
         self.admin_3 = admin_3
+
+        self.start = start
+        self.end = end
+        self.raw = raw
+        self.vintage = vintage
+
+        self._query = []
 
         if not level is None:
             if not (1 <= level <= 3):
@@ -132,43 +142,43 @@ class Region:
 
         self.level = level
 
-        #  The full data is always stored even if you end up filtering it down
-        self.data = covid19dh.get(
-            self.admin_1,
-            level=self.level,
-            start=start,
-            end=end,
-            raw=raw,
-            vintage=vintage,
-        )
-
         if self.level >= 2:
-            if admin_2:
-                if admin_2 != '*':
-                    self._check_admin_level(admin_2, level=2)
-                self._admin_2 = admin_2
+            if self.admin_2:
+                if self.admin_2 != '*':
+                    self._check_admin_level(self.admin_2, level=2)
 
-                self.data = self.data[
-                    self.data['administrative_area_level_2'] == self._admin_2
-                ]
+                self._query.append(f'administrative_area_level_2 == "{self.admin_2}"')
             else:
-                self._admin_2 = '*'
+                self.admin_2 = '*'
         else:
-            self._admin_2 = None
+            self.admin_2 = None
 
         if self.level == 3:
-            if admin_3:
-                if admin_3 != '*':
-                    self._check_admin_level(admin_3, level=3)
-                self._admin_3 = admin_3
+            if self.admin_3:
+                if self.admin_3 != '*':
+                    self._check_admin_level(self.admin_3, level=3)
 
-                self.data = self.data[
-                    self.data['administrative_area_level_3'] == self.admin_3
-                ]
+                self._query.append(f'administrative_area_level_3 == "{self.admin_3}"')
             else:
-                self._admin_3 = '*'
+                self.admin_3 = '*'
         else:
-            self._admin = None
+            self.admin_3 = None
+
+    @property
+    def data(self):
+        data = covid19dh.get(
+            self.admin_1,
+            level=self.level,
+            start=self.start,
+            end=self.end,
+            raw=self.raw,
+            vintage=self.vintage,
+        )
+
+        if self._query:
+            return data.query(" & ".join(self._query))
+        else:
+            return data
 
     @staticmethod
     def _top_level_region_parser(region: Optional[str]):
@@ -193,6 +203,9 @@ class Region:
         return pyc_admin_1
 
     def _check_admin_level(self, admin_target: str, level: int):
+        if self.lazy:
+            return True
+
         admin_names = self.data[f'administrative_area_level_{level}'].unique()
         if not admin_target in admin_names:
             raise LookupError(
