@@ -10,6 +10,7 @@ env:
 
 install:
   - pip install -U pytest
+  - pip install pytest-tornasync
   - make dev-install
 
 script:
