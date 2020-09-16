@@ -49,6 +49,7 @@ setup(name="oscovida",
           'ipywidgets',
           'ipynb_py_convert',
           'click',
+          'nbconvert==5.*,<6',
       ],
       extras_require={
           'test': [
