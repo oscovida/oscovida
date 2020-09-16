@@ -3,6 +3,7 @@
 # {TITLE}
 
 * Homepage of project: https://oscovida.github.io
+* Plots are explained at http://oscovida.github.io/plots.html
 * [Execute this Jupyter Notebook using myBinder]({BINDER_URL})
 """
 
