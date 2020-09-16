@@ -14,7 +14,7 @@ test:
 	python3 -m pytest -v --cov=oscovida
 
 test-pelican:
-	cd tools && jupyter-nbconvert --execute generate-individiual-plots.ipynb
+	cd tools && python -m nbconvert --execute --inplace generate-individiual-plots.ipynb
 	cd tools/pelican && make html
 
 test-html-creation:
