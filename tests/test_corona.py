@@ -310,3 +310,29 @@ def test_get_population():
     assert 120_000_000 * 1.5 > world.loc['Japan'].population > 120_000_000
     assert 320_000_000 * 1.5 > world.loc['US'].population > 320_000_000
     assert 80_000_000 * 1.5 > world.loc['Germany'].population > 80_000_000
+
+
+def test_clean_data_germany_goettingen_alt_is_fluke():
+    germany_data = c.fetch_data_germany(filter_goettingen_alt=False)
+    cleaned = c.fetch_data_germany(filter_goettingen_alt=True)
+    ## could also use this command:
+    cleaned = c.clean_data_germany_remove_goettingen_alt(germany_data)
+
+    # how many rows did we delete?
+    n = len(germany_data) - len(cleaned)
+
+    if n == 1:
+        # Normal as of 167 Sept (see oscovida.cleane_data_germany_remove_göttingen_alt.__doc__)
+        pass
+    elif n > 1:
+        msg = f"We have found {n} rows of Göttingen alt data - please investigate\n" + \
+            "if this is a real / important LK in Germany"
+        raise ValueError(msg, germany_data, cleaned)
+    elif n == 0:
+        msg = "There are now rows with LK Göttingen (alt). \n" + \
+            "Consider removing the data cleaning code for Göttingen (alt)."
+        print(msg)
+        # should we raise an error here to notice this situation?
+        raise ValueError(msg)
+    else:
+        raise NotImplementedError("This should not be possible.", germany_data, cleaned)
