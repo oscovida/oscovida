@@ -5,7 +5,7 @@ scriptDir=$(dirname -- "$(readlink -f -- "$BASH_SOURCE")")
 cd $scriptDir
 
 # Paths should be relative to where this script is
-jupyter-nbconvert ../generate-individiual-plots.ipynb --execute
-jupyter nbconvert --ExecutePreprocessor.timeout=600 --inplace --to notebook --execute ../pelican/content/ipynb/14-day-incidence-germany.ipynb
-jupyter nbconvert --ExecutePreprocessor.timeout=600 --inplace --to notebook --execute ../pelican/content/ipynb/14-day-incidence.ipynb
-jupyter nbconvert --ExecutePreprocessor.timeout=600 --inplace --to notebook --execute ../pelican/content/ipynb/2020-are-summer-holidays-triggering-rising-cases.ipynb
+python -m nbconvert --execute --inplace ../generate-individiual-plots.ipynb
+python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pelican/content/ipynb/14-day-incidence-germany.ipynb
+python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pelican/content/ipynb/14-day-incidence.ipynb
+python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pelican/content/ipynb/2020-are-summer-holidays-triggering-rising-cases.ipynb
