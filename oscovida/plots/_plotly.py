@@ -2,6 +2,7 @@ from functools import wraps
 from html.entities import name2codepoint
 from typing import Optional, Sequence
 
+import numpy as np
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
@@ -380,6 +381,7 @@ def plot_doubling_time(
     label_prepend: str = "",
     smoothing: str = 'strong',
     yaxis_auto_lim: bool = True,
+    logscale: bool = True,
 ) -> Figure:
     """Plots the doubling time for a given series.
 
@@ -454,8 +456,20 @@ def plot_doubling_time(
 
     if yaxis_auto_lim:
         y_auto_min, y_auto_max = doubling_time.pipe(statistics.min_max, n=28)
+
+        #  Doubling time is in days, if it's over 20 years then clip it for
+        #  aesthetics
+        y_auto_max = min([y_auto_max, 365 * 20])
+
+        if logscale:
+            #  Plotly man...
+            y_auto_min, y_auto_max = np.log10(y_auto_min), np.log10(y_auto_max)
+
         fig.update_layout(yaxis=dict(range=[y_auto_min, y_auto_max]))
 
-    fig.update_layout(yaxis_title="doubling time")
+    if logscale:
+        fig.update_layout(yaxis_type="log")
+
+    fig.update_layout(yaxis_title="doubling time (days)")
 
     return fig

@@ -317,6 +317,7 @@ def plot_doubling_time(
     label_prepend: Optional[str] = None,
     smoothing: str = 'strong',
     yaxis_auto_lim: bool = True,
+    logscale: bool = True,
 ) -> Axes:
     """Plots the doubling time for an oscovida `Region`, by default plots only
     the `confirmed` and `deaths` columns.
@@ -373,6 +374,7 @@ def plot_doubling_time(
             label_prepend=label_prepend,
             smoothing=smoothing,
             yaxis_auto_lim=yaxis_auto_lim,
+            logscale=logscale,
         )
 
     return plot_object

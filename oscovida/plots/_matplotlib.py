@@ -348,6 +348,7 @@ def plot_doubling_time(
     label_prepend: str = "",
     smoothing: str = 'strong',
     yaxis_auto_lim: bool = True,
+    logscale: bool = True,
 ) -> Axes:
     """Plots the doubling time for a given series.
 
@@ -411,5 +412,8 @@ def plot_doubling_time(
     if yaxis_auto_lim:
         y_auto_min, y_auto_max = doubling_time.pipe(statistics.min_max, n=28)
         ax.set_ylim(y_auto_min, y_auto_max)
+
+    if logscale:
+        ax.set_yscale('log')
 
     return ax
