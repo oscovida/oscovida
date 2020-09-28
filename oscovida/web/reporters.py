@@ -2,7 +2,6 @@ import json
 import logging
 import os
 import threading
-from collections import namedtuple
 from typing import List
 
 import ipynb_py_convert
@@ -12,54 +11,70 @@ from nbconvert.preprocessors import ExecutePreprocessor
 from nbconvert.writers import FilesWriter
 from tqdm.auto import tqdm
 
+from ..covid19dh import get
+from ..regions import Region
+
 __STOP__ = threading.Event()
 
 
-RegionREPR = namedtuple(
-    'Region', ['admin_1', 'admin_2', 'admin_3', 'level'], defaults=[None, None, None]
-)
+def all_countries():
+    countries = []
+
+    for country in Region(country=None).data['iso_alpha_3'].unique():
+        try:
+            countries.append(Region(country, level=1, lazy=True))
+        except LookupError:
+            logging.warn(f"Skipped {country}")
+            pass
+
+    return countries
+
+
+ALL_COUNTRIES = all_countries()
 
 
 def generate_notebook(
     mapping: dict,
-    output_file: str,
-    template_file="./template-report.py",
+    output_file_path: str,
+    template_file_path="./template-report.py",
 ) -> str:
-    with open(template_file, "r") as f:
+    with open(template_file_path, "r") as f:
         template_str = f.read()
 
     template_str = template_str.format_map(mapping)
 
     notebook = ipynb_py_convert.py2nb(template_str)
 
-    logging.info(f"Written templated notebook to {output_file}")
-    with open(output_file, "tw") as f:
+    logging.info(f"Written templated notebook to {output_file_path}")
+    with open(output_file_path, "tw") as f:
         json.dump(notebook, f, indent=2)
 
-    return output_file
+    return output_file_path
 
 
-def execute_notebook(output_file: str, input_file: str, kernel_name: str = ""):
+def execute_notebook(
+    output_file_path: str, input_file_path: str, kernel_name: str = ""
+):
     nb_executor = ExecutePreprocessor(kernel_name=kernel_name)
     nb_executor.allow_errors = True
 
     html_exporter = HTMLExporter()
     html_writer = FilesWriter()
 
-    logging.info(f"Written templated notebook to {output_file}")
-    with open(input_file) as f:
+    logging.info(f"Written templated notebook to {output_file_path}")
+    with open(input_file_path) as f:
         nb = nbformat.read(f, as_version=4)
         nb = nb_executor.preprocess(nb)[0]
         body, resources = html_exporter.from_notebook_node(nb)
         #  HTML writer automatically adds .html to the end, so get rid of it
         #  from the output file name if it is specified
-        html_writer.write(body, resources, output_file.replace(".html", ""))
+        html_writer.write(body, resources, output_file_path.replace(".html", ""))
 
 
 def create_html_report(
-    region: RegionREPR,
-    output_file: str,
-    template_file: str = "./template-report.py",
+    region: Region,
+    output_file_path: str,
+    template_file_path: str = "./template-report.py",
     attempts: int = 3,
     force: bool = False,
     kernel_name: str = "",
@@ -70,7 +85,12 @@ def create_html_report(
         'REGION_REPR': region.__repr__(),
     }
 
-    if os.path.exists(output_file) and not force:
+    output_file_path_html = output_file_path + ".html"
+    output_file_path_ipynb = output_file_path + ".ipynb"
+
+    if (
+        os.path.exists(output_file_path_html) or os.path.exists(output_file_path_ipynb)
+    ) and not force:
         raise FileExistsError
 
     for attempt in range(attempts):
@@ -79,8 +99,10 @@ def create_html_report(
 
         logging.info(f"Processing {region} attempt {attempt}")
         try:
-            nb_file = generate_notebook(mapping, output_file, template_file)
-            execute_notebook(output_file, nb_file, kernel_name)
+            nb_file = generate_notebook(
+                mapping, output_file_path_ipynb, template_file_path
+            )
+            execute_notebook(output_file_path_html, nb_file, kernel_name)
             break  #  Without this break if force is on it will keep attempting
         except Exception as e:
             if e == KeyboardInterrupt:
@@ -96,15 +118,15 @@ def create_html_report(
 
 
 def create_html_reports_serial(
-    regions: List[RegionREPR],
-    template_file: str,
-    output_file: str,
+    regions: List[Region],
+    output_file_dir: str,
+    template_file_path: str = "./template-report.py",
     attempts: int = 3,
     force: bool = False,
     kernel_name: str = "",
     disable_pbar: bool = False,
 ) -> None:
-    if logging.getLogger(__name__).level <= logging.WARNING:
+    if logging.getLogger().level < logging.WARNING:
         logging.info("Disabled pbar due to logging level")
         disable_pbar = True
 
@@ -125,7 +147,16 @@ def create_html_reports_serial(
             else:
                 pbar.set_description(f"Processing {str(region)}")
 
-            create_html_report(region)
+            html_path = region._path(output_file_dir)
+
+            create_html_report(
+                region,
+                html_path,
+                template_file_path,
+                attempts,
+                force,
+                kernel_name,
+            )
 
     except KeyboardInterrupt:
         logging.warning(f"stopped {KeyboardInterrupt}")
