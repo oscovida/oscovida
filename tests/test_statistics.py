@@ -17,7 +17,10 @@ daily_cases = series(
 def test_daily_hypothesis(daily_cases: pd.Series):
     cumulative_cases = daily_cases.cumsum()
 
-    assert all(daily_cases[1:] == statistics.daily(cumulative_cases).to_numpy())
+    assert all(
+        daily_cases[1:]
+        == statistics.daily(cumulative_cases, drop_negative=False).to_numpy()
+    )
 
 
 @given(daily_cases=daily_cases)

@@ -60,7 +60,10 @@ def daily(cumulative: pd.Series, drop_negative=True) -> pd.Series:
     TODO
     """
     daily = cumulative.diff()
-    daily[daily < 0] = np.nan
+
+    if drop_negative:
+        daily[daily < 0] = np.nan
+
     return daily.dropna()
 
 
