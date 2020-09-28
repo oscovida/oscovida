@@ -42,7 +42,7 @@ SMOOTHING_METHODS = {
 }
 
 
-def daily(cumulative: pd.Series) -> pd.Series:
+def daily(cumulative: pd.Series, drop_negative=True) -> pd.Series:
     """Computes the daily change for the series
 
     Parameters
@@ -59,7 +59,9 @@ def daily(cumulative: pd.Series) -> pd.Series:
     --------
     TODO
     """
-    return cumulative.diff().dropna()
+    daily = cumulative.diff()
+    daily[daily < 0] = np.nan
+    return daily.dropna()
 
 
 def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Series:
