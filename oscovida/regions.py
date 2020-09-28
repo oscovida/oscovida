@@ -1,4 +1,5 @@
 import datetime
+import os
 from collections import namedtuple
 from typing import List, Optional
 
@@ -95,6 +96,8 @@ class Region:
             >>> Region('USA', 'California', level=3)
             Region(country='United States', admin_1='USA', admin_2='California', admin_3='*', level=3)
         """
+        #  Implemented so that the data does not have to be loaded if a Region
+        #  object is only being created to be used for report generation
         self.lazy = lazy
 
         country = admin_1 if admin_1 is not None else country
@@ -166,6 +169,7 @@ class Region:
 
     @property
     def data(self):
+        #  Uses LRU cache so repeated calls to get are fine
         data = covid19dh.get(
             self.admin_1,
             level=self.level,
@@ -204,7 +208,7 @@ class Region:
 
     def _check_admin_level(self, admin_target: str, level: int):
         if self.lazy:
-            return True
+            return None
 
         admin_names = self.data[f'administrative_area_level_{level}'].unique()
         if not admin_target in admin_names:
@@ -218,6 +222,16 @@ class Region:
     @property
     def cite(self) -> List[str]:
         return covid19dh.cite(self.data)  # type: ignore
+
+    def _path(self, base_path: str = "") -> str:
+        if self.level == 1:
+            path = os.path.join('countries', self.country)
+        elif self.level == 2:
+            path = os.path.join(self.country, self.admin_2)
+        elif self.level == 3:
+            path = os.path.join(self.country, self.admin_2, self.admin_3)
+
+        return os.path.join(base_path, path.replace(' ', '-').casefold())
 
     def __str__(self) -> str:
         if self.country is None:
