@@ -105,8 +105,8 @@ def create_markdown_incidence_page(
 
     index_path = os.path.join(pelican_file_path)
 
-    intro_text = f"""The searchable table below shows {period}-day incidence rate per
-100,000 for all countries. ([An explanation of the calculation is
+    intro_text = f"""The searchable table below shows {period}-day incidence
+rate per 100,000. ([An explanation of the calculation is
 available](./14-day-incidence-rate.html)), entries with this incidence rate
 greater than {threshold} are highlighted.
 

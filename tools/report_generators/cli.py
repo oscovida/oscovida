@@ -51,7 +51,15 @@ def get_country_list():
 
 
 def generate_reports_countries(
-    *, workers, kernel_name, wwwroot, force, disable_pbar, debug
+    *,
+    workers,
+    kernel_name,
+    wwwroot,
+    force,
+    disable_pbar,
+    debug,
+    incidence_period=7,
+    incidence_threshold=50,
 ):
     d = oscovida.fetch_deaths()
     c = oscovida.fetch_cases()
@@ -82,7 +90,10 @@ def generate_reports_countries(
 
     cre.create_markdown_index_page()
 
-    cre.create_markdown_incidence_page()
+    cre.create_markdown_incidence_page(
+        period=incidence_period, threshold=incidence_threshold
+    )
+
 
 def get_germany_regions_list():
     data_germany = oscovida.fetch_data_germany()
@@ -92,7 +103,15 @@ def get_germany_regions_list():
 
 
 def generate_reports_germany(
-    *, workers, kernel_name, wwwroot, force, disable_pbar, debug
+    *,
+    workers,
+    kernel_name,
+    wwwroot,
+    force,
+    disable_pbar,
+    debug,
+    incidence_period=7,
+    incidence_threshold=50,
 ):
     _ = oscovida.fetch_data_germany()
 
@@ -140,11 +159,12 @@ def generate_reports_germany(
 
     gre.create_markdown_index_page()
 
-    gre.create_markdown_incidence_page()
+    gre.create_markdown_incidence_page(
+        period=incidence_period, threshold=incidence_threshold
+    )
 
-def generate_reports_usa(
-    *, workers, kernel_name, wwwroot, force, disable_pbar, debug
-):
+
+def generate_reports_usa(*, workers, kernel_name, wwwroot, force, disable_pbar, debug):
     _ = oscovida.fetch_cases_US()
     _ = oscovida.fetch_deaths_US()
 
@@ -171,7 +191,9 @@ def generate_reports_usa(
     usre.create_markdown_index_page()
 
 
-def generate_reports_hungary(*, workers, kernel_name, wwwroot, force, disable_pbar, debug):
+def generate_reports_hungary(
+    *, workers, kernel_name, wwwroot, force, disable_pbar, debug
+):
     _ = oscovida.fetch_data_hungary()
 
     #  TODO: The get_x_list methods should be part of Reporter class
@@ -195,6 +217,7 @@ def generate_reports_hungary(*, workers, kernel_name, wwwroot, force, disable_pb
     hre.create_html_reports(counties)
 
     hre.create_markdown_index_page()
+
 
 def generate_markdown_all_regions(
     *, workers, kernel_name, wwwroot, force, disable_pbar, debug
@@ -227,10 +250,7 @@ def generate(*, region, workers, kernel_name, wwwroot, force, disable_pbar, debu
 @click.option(
     "--regions",
     "-r",
-    type=click.Choice(
-        ALL_REGIONS,
-        case_sensitive=False
-    ),
+    type=click.Choice(ALL_REGIONS, case_sensitive=False),
     multiple=True,
     help="Region(s) to generate reports for.",
 )
@@ -238,13 +258,9 @@ def generate(*, region, workers, kernel_name, wwwroot, force, disable_pbar, debu
     "--workers",
     default="auto",
     help="Number of workers to use, `auto` uses nproc-2, set to 1 or False to "
-         "use a single process.",
+    "use a single process.",
 )
-@click.option(
-    "--wwwroot",
-    default="./wwwroot",
-    help="Root directory for www content."
-)
+@click.option("--wwwroot", default="./wwwroot", help="Root directory for www content.")
 @click.option(
     "--create-wwwroot",
     default=False,
@@ -280,7 +296,7 @@ def generate(*, region, workers, kernel_name, wwwroot, force, disable_pbar, debu
     default=False,
     is_flag=True,
     help="Enable debug mode, only generates reports for the first 10 regions "
-         "and sets the log level to `INFO`.",
+    "and sets the log level to `INFO`.",
 )
 def cli(
     *,
