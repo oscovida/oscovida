@@ -12,6 +12,11 @@ and most `other countries <countries.html>`__ in the world.
 Use OSCOVIDA to monitor the pandemic, second waves, local outbreaks and motivate
 social distancing and support for other containment measures.
 
+European XFEL follows the RKI recommendations for access restrictions to the
+campus after travel abroad or in Germany, we provide tables showing these
+incidence rates for `Germany here <germany-incidence-rate.html>`__, and for
+`countries worldwide here. <countries-incidence-rate.html>`__.
+
 Read more about our `motivation <motivation.html>`__, `data sources
 <data-sources.html>`__, `team <team.html>`__, watch a
 `video interview <https://youtu.be/1_oDc_vptBQ>`__, or join our
