@@ -4,7 +4,7 @@ Home
 :URL: index.html
 :save_as: index.html
 
-OCOVIDA provides an `open science <open-science.html>`__ portal to see and
+OSCOVIDA provides an `open science <open-science.html>`__ portal to see and
 investigate the COVID19 infections and deaths as a function of time for the
 `US states <us.html>`__, the `districts in Germany <germany.html>`__,
 and most `other countries <countries.html>`__ in the world.
@@ -15,7 +15,7 @@ social distancing and support for other containment measures.
 European XFEL follows the RKI recommendations for access restrictions to the
 campus after travel abroad or in Germany, we provide tables showing these
 incidence rates for `Germany here <germany-incidence-rate.html>`__, and for
-`countries worldwide here. <countries-incidence-rate.html>`__.
+`countries worldwide here <countries-incidence-rate.html>`__.
 
 Read more about our `motivation <motivation.html>`__, `data sources
 <data-sources.html>`__, `team <team.html>`__, watch a
