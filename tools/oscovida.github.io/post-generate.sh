@@ -14,6 +14,8 @@ python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pel
 # a generic link available to these pages, so here we make a symlink to allow
 # for a generic url:
 cd ..
+rm -f ./germany-incidence-rate.html
 ln -s ./germany-incidence-rate-7day-50cases.html ./germany-incidence-rate.html || true
+rm -f ./countries-incidence-rate.html
 ln -s ./countries-incidence-rate-7day-50cases.html ./countries-incidence-rate.html|| true
 cd $scriptDir
