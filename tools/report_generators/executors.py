@@ -200,7 +200,7 @@ class ReportExecutor:
         save_as: str = None,
         slug: str = None,
         pelican_file_path: str = None,
-        title_prefix: str = "14 Day Incidence Rates: ",
+        title_prefix: str = "7 Day Incidence Rates: ",
         period=14,
         threshold=20
     ) -> None:
