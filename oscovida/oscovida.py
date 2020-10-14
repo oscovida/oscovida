@@ -1561,9 +1561,7 @@ def overview(country: str, region: str = None, subregion: str = None,
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
     plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"))
     # data cleaning
-    if country == "China":
-        axes[1].set_ylim(0, 5000)
-    elif country == "Spain":   # https://github.com/oscovida/oscovida/issues/44
+    if country == "Spain":   # https://github.com/oscovida/oscovida/issues/44
         axes[1].set_ylim(bottom=0)
     plot_reproduction_number(axes[3], series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
     plot_doubling_time(axes[5], series=c, color="C1", labels=(region_label, "cases"))
