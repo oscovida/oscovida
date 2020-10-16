@@ -58,7 +58,7 @@ def create_markdown_incidence_list(regions: DataFrame, threshold):
     #  to check "If the 3rd column is >= 20 AND it is called 'incidence rate'",
     #  instead we add a flag column and check if this flag column is True, and
     #  if it is the row is coloured red...
-    regions5['FLAG'] = regions5[[f"{period} Day Incidence Rate"]].astype(float) >= threshold
+    regions5['FLAG'] = regions5[f"{period} Day Incidence Rate"].str.replace(',', '').astype(float) >= threshold
 
     logging.info(f"{len(regions5)} regions in markdown index list")
 
