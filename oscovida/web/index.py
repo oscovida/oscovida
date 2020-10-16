@@ -6,6 +6,7 @@ from .. import covid19dh, statistics
 
 def create_index(
     level: int,
+    delta: Optional[int] = 7,
     start: Optional[datetime.datetime] = None,
     end: Optional[datetime.datetime] = None,
     groupby: Optional[str] = None,
@@ -21,7 +22,7 @@ def create_index(
         end = datetime.datetime.now()
 
     if start is None:
-        start = datetime.datetime.today() - datetime.timedelta(7)
+        start = datetime.datetime.today() - datetime.timedelta(delta)
 
     data = covid19dh.get(level=level)
 
@@ -46,5 +47,12 @@ def create_index(
             group: data_index_groups.get_group(group)
             for group in data_index_groups.groups
         }
+
+    data_index = data_index.rename(
+        columns={
+            'confirmed': 'confirmed-total',
+            'deaths': 'deaths-total',
+        }
+    )
 
     return data_index
