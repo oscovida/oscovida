@@ -555,17 +555,21 @@ def get_incidence_rates_germany(period=14):
     periods = (fortnight_ago < germany.index) & (germany.index < yesterday)
     germany = germany.iloc[periods]
 
-    cases = germany[["Landkreis", "cases"]]
-    deaths = germany[["Landkreis", "deaths"]]
+    index = germany[['Bundesland', 'Landkreis']]
+
+    index['Landkreis'] = 'Germany: ' + index['Landkreis']
+    index['Bundesland'] = '(' + index['Bundesland'] + ')'
+
+    germany['metadata-index'] = index['Landkreis'] + ' ' + index['Bundesland']
 
     cases_sum = (
-        cases.groupby("Landkreis")
-        .sum().astype(int)
+        germany.groupby("Landkreis")
+        .agg({'cases': 'sum', 'Bundesland': 'first', 'metadata-index': 'first'})
         .rename(columns={"cases": f"{period}-day-sum"})
     )
     deaths_sum = (
-        deaths.groupby("Landkreis")
-        .sum().astype(int)
+        germany.groupby("Landkreis")
+        .agg({'deaths': 'sum', 'Bundesland': 'first', 'metadata-index': 'first'})
         .rename(columns={"deaths": f"{period}-day-sum"})
     )
 
@@ -578,20 +582,28 @@ def get_incidence_rates_germany(period=14):
     # [406 rows x 1 columns]
     # Where the values are the total cases/deaths in the past `period` days
 
-    population = (
-        germany_get_population()
-        .population.astype(int)
-        .to_frame()
-    )
+    population = germany_get_population().population.astype(int).to_frame()
 
     cases_incidence = cases_sum.join(population)
     cases_incidence[f"{period}-day-incidence-rate"] = (
         cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
     ).round(decimals=1)
+    # one-line-summary is used for the index entry on the table
+    cases_incidence['one-line-summary'] = (cases_incidence.index
+        .map(lambda x:  x[3:] + " (LK)" if x.startswith("LK ") else x)
+        .map(lambda x:  x[3:] + " (SK)" if x.startswith("SK ") else x)
+        + ' (' + cases_incidence['Bundesland'] + ')'
+    )
+
     deaths_incidence = deaths_sum.join(population)
     deaths_incidence[f"{period}-day-incidence-rate"] = (
         deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
     ).round(decimals=1)
+    deaths_incidence['one-line-summary'] = (deaths_incidence.index
+        .map(lambda x:  x[3:] + " (LK)" if x.startswith("LK ") else x)
+        .map(lambda x:  x[3:] + " (SK)" if x.startswith("SK ") else x)
+        + ' (' + deaths_incidence['Bundesland'] + ')'
+    )
 
     # We could join the tables, but it's easier to join them than to split so
     # we'll just return two instead
@@ -1664,7 +1676,7 @@ def clean_data_germany_remove_goettingen_alt(germany_data, debug=False):
 
     Some diagnostic output is printed, if `debug=True` is used.
 
-    
+
     Context:
 
     Some tests failed because we have a new Landkreis in the data from the RKI,
