@@ -588,16 +588,21 @@ def get_incidence_rates_germany(period=14):
     cases_incidence[f"{period}-day-incidence-rate"] = (
         cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
     ).round(decimals=1)
-    cases_incidence['one-line-summary'] = cases_incidence['Bundesland'].str.cat(
-        cases_incidence.index, ': '
-    )  # one-line-summary is used for the index entry on the table
+    # one-line-summary is used for the index entry on the table
+    cases_incidence['one-line-summary'] = (cases_incidence.index
+        .map(lambda x:  x[3:] + " (LK)" if x.startswith("LK ") else x)
+        .map(lambda x:  x[3:] + " (SK)" if x.startswith("SK ") else x)
+        + ' (' + cases_incidence['Bundesland'] + ')'
+    )
 
     deaths_incidence = deaths_sum.join(population)
     deaths_incidence[f"{period}-day-incidence-rate"] = (
         deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
     ).round(decimals=1)
-    deaths_incidence['one-line-summary'] = deaths_incidence['Bundesland'].str.cat(
-        cases_incidence.index, ': '
+    deaths_incidence['one-line-summary'] = (deaths_incidence.index
+        .map(lambda x:  x[3:] + " (LK)" if x.startswith("LK ") else x)
+        .map(lambda x:  x[3:] + " (SK)" if x.startswith("SK ") else x)
+        + ' (' + deaths_incidence['Bundesland'] + ')'
     )
 
     # We could join the tables, but it's easier to join them than to split so
