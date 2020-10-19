@@ -207,15 +207,17 @@ class ReportExecutor:
         #  1st element of incidence_rates is the cases, second is deaths
         if self.Reporter.category == 'germany':
             incidence_rates = get_incidence_rates_germany(period)[0]
+            incidence_rates = incidence_rates.merge(
+                self.metadata_regions,
+                how='left',
+                left_on='metadata-index',
+                right_index=True
+            )
         elif self.Reporter.category == 'countries':
             incidence_rates = get_incidence_rates_countries(period)[0]
+            incidence_rates = incidence_rates.join(self.metadata_regions)
         else:
             raise NotImplementedError
-
-        incidence_rates = incidence_rates.join(self.metadata_regions)
-        #  This way even if the entry is missing from the metadata (because the
-        #  data was not downloaded to create a notebook) it'll still have a name
-        incidence_rates['one-line-summary'] = incidence_rates.index
 
         create_markdown_incidence_page(
             incidence_rates,
