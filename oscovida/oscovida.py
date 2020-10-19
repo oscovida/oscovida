@@ -555,17 +555,29 @@ def get_incidence_rates_germany(period=14):
     periods = (fortnight_ago < germany.index) & (germany.index < yesterday)
     germany = germany.iloc[periods]
 
+    index = germany[['Bundesland', 'Landkreis']]
+    index['Landkreis'] = (index['Landkreis']
+        .map(lambda x: x[3:] + " (LK)" if x.startswith("LK ") else x)
+        .map(lambda x: x[3:] + " (SK)" if x.startswith("SK ") else x)
+    )
+
+    index['Landkreis'] = index['Bundesland'].str.cat(index['Landkreis'], ', ')
+
+    germany['Landkreis'] = index['Landkreis']
+
     cases = germany[["Landkreis", "cases"]]
     deaths = germany[["Landkreis", "deaths"]]
 
     cases_sum = (
         cases.groupby("Landkreis")
-        .sum().astype(int)
+        .sum()
+        .astype(int)
         .rename(columns={"cases": f"{period}-day-sum"})
     )
     deaths_sum = (
         deaths.groupby("Landkreis")
-        .sum().astype(int)
+        .sum()
+        .astype(int)
         .rename(columns={"deaths": f"{period}-day-sum"})
     )
 
@@ -578,11 +590,7 @@ def get_incidence_rates_germany(period=14):
     # [406 rows x 1 columns]
     # Where the values are the total cases/deaths in the past `period` days
 
-    population = (
-        germany_get_population()
-        .population.astype(int)
-        .to_frame()
-    )
+    population = germany_get_population().population.astype(int).to_frame()
 
     cases_incidence = cases_sum.join(population)
     cases_incidence[f"{period}-day-incidence-rate"] = (
