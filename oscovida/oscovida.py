@@ -556,28 +556,20 @@ def get_incidence_rates_germany(period=14):
     germany = germany.iloc[periods]
 
     index = germany[['Bundesland', 'Landkreis']]
-    index['Landkreis'] = (index['Landkreis']
-        .map(lambda x: x[3:] + " (LK)" if x.startswith("LK ") else x)
-        .map(lambda x: x[3:] + " (SK)" if x.startswith("SK ") else x)
-    )
 
-    index['Landkreis'] = index['Bundesland'].str.cat(index['Landkreis'], ', ')
+    index['Landkreis'] = 'Germany: ' + index['Landkreis']
+    index['Bundesland'] = '(' + index['Bundesland'] + ')'
 
-    germany['Landkreis'] = index['Landkreis']
-
-    cases = germany[["Landkreis", "cases"]]
-    deaths = germany[["Landkreis", "deaths"]]
+    germany['metadata-index'] = index['Landkreis'] + ' ' + index['Bundesland']
 
     cases_sum = (
-        cases.groupby("Landkreis")
-        .sum()
-        .astype(int)
+        germany.groupby("Landkreis")
+        .agg({'cases': 'sum', 'metadata-index': 'first'})
         .rename(columns={"cases": f"{period}-day-sum"})
     )
     deaths_sum = (
-        deaths.groupby("Landkreis")
-        .sum()
-        .astype(int)
+        germany.groupby("Landkreis")
+        .agg({'deaths': 'sum', 'metadata-index': 'first'})
         .rename(columns={"deaths": f"{period}-day-sum"})
     )
 
@@ -1672,7 +1664,7 @@ def clean_data_germany_remove_goettingen_alt(germany_data, debug=False):
 
     Some diagnostic output is printed, if `debug=True` is used.
 
-    
+
     Context:
 
     Some tests failed because we have a new Landkreis in the data from the RKI,
