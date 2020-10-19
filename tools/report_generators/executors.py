@@ -211,7 +211,8 @@ class ReportExecutor:
                 self.metadata_regions,
                 how='left',
                 left_on='metadata-index',
-                right_index=True
+                right_index=True,
+                suffixes=(None, "_old") #  incidence rate columns overwrite metadata
             )
         elif self.Reporter.category == 'countries':
             incidence_rates = get_incidence_rates_countries(period)[0]
