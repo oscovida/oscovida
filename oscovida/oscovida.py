@@ -773,14 +773,17 @@ def plot_daily_change(ax, series, color, labels=None):
     ax.yaxis.set_ticks_position('both')
 
 
-    # data cleaning: For France, there was a huge spike on 12 April with 26849
-    # new infections. This sets the scale to be too large.
-    # There was also a value of ~-2000 on 22 April. We limit the y-scale to correct
-    # manually for this:
+    # Data cleaning: France new cases daily reports had a huge spike
+    # on 12 April 2020 with 26849 reported new cases. This would set
+    # too large a ymax for a while, which was fixed manually by setting
+    # ymax to min(10000, ymax)... until in October 2020 daily reported
+    # cases soared beyond that anomalous reported value of 12 April 2020.
+    # France also has a negative value of circa -2000 on 22 April 2020.
+    # We limit the y-scale to correct manually for this:
     if region == "France" and label == "cases":
         # get current limits
         ymin, ymax = ax.get_ylim()
-        ax.set_ylim([max(-500, ymin), min(10000, ymax)])
+        ax.set_ylim([max(-500, ymin), ymax])
 
     return ax
 
