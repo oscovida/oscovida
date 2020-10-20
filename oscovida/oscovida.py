@@ -20,7 +20,7 @@ rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
-from matplotlib.ticker import ScalarFormatter, FuncFormatter
+from matplotlib.ticker import ScalarFormatter, FuncFormatter, IndexLocator, FixedLocator, FormatStrFormatter
 from matplotlib.dates import DateFormatter, MONDAY, WeekdayLocator
 from bisect import bisect
 
@@ -776,14 +776,21 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
     habitants = population(region_label)
     if region_label is not "" and habitants:
         ax2 = ax.twinx()  # create an independent y-axis
-        ax2.grid(color='gray', linewidth=0.5, alpha=0.5)
+        # ax2.grid(color='gray', linewidth=0.5, alpha=0.5)
+        # ax2.grid(None)  # disabling the second grid
         # this is just to be sure that we plot the same graph (please leave it commented in the production):
-        # ax2.plot(smooth2.index, smooth2.values * 1E5 / habitants, color='green')
+        ax2.plot(smooth2.index, smooth2.values * 1E5 / habitants, color='green')
         ax2.set_ylabel('daily change\nnormalised per 100K')
 
-        # labels on the right y-axis as well
         ax.set_ylim((0, max(change)))
         ax2.set_ylim((0, max(change) * 1E5 / habitants))
+        l = ax.get_ylim()
+        l2 = ax2.get_ylim()
+        f = lambda x: l2[0] + (x - l[0]) / (l[1] - l[0]) * (l2[1] - l2[0])
+        ticks = f(ax.get_yticks())
+
+        ax2.yaxis.set_major_locator(FixedLocator(ticks))
+
     else:
         ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
         ax.yaxis.set_ticks_position('both')
