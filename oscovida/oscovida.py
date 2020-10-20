@@ -758,38 +758,41 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
     else:
         region_label, type_label = labels
 
-    ax_label = region_label + " new " + type_label
-
-    (change, change_label) , (smooth, smooth_label), \
-        (smooth2, smooth2_label) = compute_daily_change(series)
-
-    ax.bar(change.index, change.values, color=color,
-           label=ax_label, alpha=bar_alpha, linewidth=LW)
-
-    ax.plot(smooth2.index, smooth2.values, color=color,
-            label=ax_label + " " + smooth2_label, linewidth=LW)
-
-    ax.legend()
-    ax.set_ylabel('daily change')
-
-    # create another Y-axis on the right hand side
     habitants = population(region_label)
     if region_label is not "" and habitants:
-        ax2 = ax.twinx()  # create an independent y-axis
-        # ax2.grid(color='gray', linewidth=0.5, alpha=0.5)
-        # ax2.grid(None)  # disabling the second grid
+        # create another Y-axis on the right hand side
+        ax_label = region_label + " new " + type_label
+        (change, change_label), _, (smooth2, smooth2_label) = compute_daily_change(series)
+        # unfortunately there's no simple way of swapping the axes, therefore we define normalised axis first
+        ax2 = ax
+        ax2.grid(None)  # disabling the second grid
         # this is just to be sure that we plot the same graph (please leave it commented in the production):
-        ax2.plot(smooth2.index, smooth2.values * 1E5 / habitants, color='green')
+        # ax2.plot(smooth2.index, smooth2.values * 1E5 / habitants, color='green')
+        ax2.set_ylim((0, max(change) * 1E5 / habitants))
         ax2.set_ylabel('daily change\nnormalised per 100K')
 
-        ax.set_ylim((0, max(change)))
-        ax2.set_ylim((0, max(change) * 1E5 / habitants))
-        l = ax.get_ylim()
-        l2 = ax2.get_ylim()
-        f = lambda x: l2[0] + (x - l[0]) / (l[1] - l[0]) * (l2[1] - l2[0])
-        ticks = f(ax.get_yticks())
+        ax1 = ax2.twinx()  # create an independent y-axis
+        ax1.set_ylim((0, max(change)))
 
-        ax2.yaxis.set_major_locator(FixedLocator(ticks))
+        # there's no easy way of aligning ticks nor a good general solution, therefore let's do a trick
+        # see here: https://stackoverflow.com/questions/45037386/trouble-aligning-ticks-for-matplotlib-twinx-axes
+        l = ax2.get_ylim()
+        l2 = ax1.get_ylim()
+        f = lambda x: l2[0] + (x - l[0]) / (l[1] - l[0]) * (l2[1] - l2[0])
+        ticks = f(ax2.get_yticks())
+
+        ax1.yaxis.set_major_locator(FixedLocator(ticks))
+
+        ax1.bar(change.index, change.values, color=color,
+                label=ax_label, alpha=bar_alpha, linewidth=LW)
+
+        ax1.plot(smooth2.index, smooth2.values, color=color,
+                label=ax_label + " " + smooth2_label, linewidth=LW)
+
+        ax1.legend()
+        ax1.set_ylabel('daily change')
+
+
 
     else:
         ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
