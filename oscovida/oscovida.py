@@ -785,7 +785,11 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
     ax_label = region_label + " new " + type_label
     (change, change_label), _, (smooth2, smooth2_label) = compute_daily_change(series)
 
-    habitants = population(region_label)
+
+    if country and region:
+        habitants = population(country=country, region=region)
+    else:
+        habitants = population(region_label)
     if region_label is not "" and habitants:
         # create another Y-axis on the right hand side
         # unfortunately there's no simple way of swapping the axes, therefore we define normalised axis first
@@ -816,7 +820,6 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         ax1.set_ylabel('daily change')
 
     else:
-        print("Else branch")
         ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
         ax.yaxis.set_ticks_position('both')
         ax.plot(smooth2.index, smooth2.values, color=color,
@@ -1648,7 +1651,7 @@ def overview(country: str, region: str = None, subregion: str = None,
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     c = c[- weeks * 7:]
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
-    plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"))
+    plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"), country=country, region=region)
     # data cleaning
     if country == "Spain":   # https://github.com/oscovida/oscovida/issues/44
         axes[1].set_ylim(bottom=0)
