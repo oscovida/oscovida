@@ -757,12 +757,12 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         region_label = ""
     else:
         region_label, type_label = labels
+    ax_label = region_label + " new " + type_label
+    (change, change_label), _, (smooth2, smooth2_label) = compute_daily_change(series)
 
     habitants = population(region_label)
     if region_label is not "" and habitants:
         # create another Y-axis on the right hand side
-        ax_label = region_label + " new " + type_label
-        (change, change_label), _, (smooth2, smooth2_label) = compute_daily_change(series)
         # unfortunately there's no simple way of swapping the axes, therefore we define normalised axis first
         ax2 = ax
         ax2.grid(None)  # disabling the second grid
@@ -782,21 +782,25 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         ticks = f(ax2.get_yticks())
 
         ax1.yaxis.set_major_locator(FixedLocator(ticks))
-
         ax1.bar(change.index, change.values, color=color,
                 label=ax_label, alpha=bar_alpha, linewidth=LW)
 
         ax1.plot(smooth2.index, smooth2.values, color=color,
-                label=ax_label + " " + smooth2_label, linewidth=LW)
-
+                 label=ax_label + " " + smooth2_label, linewidth=LW)
         ax1.legend()
         ax1.set_ylabel('daily change')
 
-
-
     else:
+        print("Else branch")
         ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
         ax.yaxis.set_ticks_position('both')
+        ax.plot(smooth2.index, smooth2.values, color=color,
+                label=ax_label + " " + smooth2_label, linewidth=LW)
+        ax.bar(change.index, change.values, color=color,
+                label=ax_label, alpha=bar_alpha, linewidth=LW)
+
+        ax.legend()
+        ax.set_ylabel('daily change')
 
     # data cleaning: For France, there was a huge spike on 12 April with 26849
     # new infections. This sets the scale to be too large.
