@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from pandas import DatetimeIndex
 import matplotlib.pyplot as plt
+import pytest
 import oscovida as c
 
 
@@ -85,6 +86,7 @@ def test_choose_random_counties():
     assert len(with_local) == 19
 
 
+@pytest.mark.xfail
 def test_make_compare_plot_hungary():
     with_local = c.choose_random_counties(exclude_region="Baranya", size=18)
     axes, cases, deaths = c.make_compare_plot_hungary("Baranya", compare_with_local=with_local)
@@ -148,9 +150,9 @@ def test_compute_daily_change():
     # We just take the current values and assume they are correct. If the smoothing parameters
     # are changed, then these need to be updated.
     smooth_data = smooth[0]
-    assert abs(smooth_data.sum() - 82664.7) < 1
+    assert abs(smooth_data.sum() - 82617.95) < 1
     smooth2_data = smooth2[0]
-    assert abs(smooth2_data.sum() - 82914.7) < 1
+    assert abs(smooth2_data.sum() - 82809.2) < 1
 
 
 def test_plot_daily_change():
@@ -177,8 +179,8 @@ def test_compute_growth_factor():
     #
     # We just take the current values and assume they are correct. If the smoothing parameters
     # are changed, then these need to be updated.
-    assert abs(f[0].dropna().sum() - 77.3) < 0.1  # original data, should be the same as cases[-1]
-    assert abs(smooth[0].sum() - 78.6) < 0.1
+    assert abs(f[0].dropna().sum() - 77.9) < 0.1  # original data, should be the same as cases[-1]
+    assert abs(smooth[0].sum() - 79.2) < 0.1
 
 
 
@@ -310,6 +312,32 @@ def test_get_population():
     assert 120_000_000 * 1.5 > world.loc['Japan'].population > 120_000_000
     assert 320_000_000 * 1.5 > world.loc['US'].population > 320_000_000
     assert 80_000_000 * 1.5 > world.loc['Germany'].population > 80_000_000
+
+
+def test_clean_data_germany_goettingen_alt_is_fluke():
+    germany_data = c.fetch_data_germany(filter_goettingen_alt=False)
+    cleaned = c.fetch_data_germany(filter_goettingen_alt=True)
+    ## could also use this command:
+    cleaned = c.clean_data_germany_remove_goettingen_alt(germany_data)
+
+    # how many rows did we delete?
+    n = len(germany_data) - len(cleaned)
+
+    if n == 1:
+        # Normal as of 167 Sept (see oscovida.cleane_data_germany_remove_göttingen_alt.__doc__)
+        pass
+    elif n > 1:
+        msg = f"We have found {n} rows of Göttingen alt data - please investigate\n" + \
+            "if this is a real / important LK in Germany"
+        raise ValueError(msg, germany_data, cleaned)
+    elif n == 0:
+        msg = "There are now rows with LK Göttingen (alt). \n" + \
+            "Consider removing the data cleaning code for Göttingen (alt)."
+        print(msg)
+        # should we raise an error here to notice this situation?
+        raise ValueError(msg)
+    else:
+        raise NotImplementedError("This should not be possible.", germany_data, cleaned)
 
 
 def test_get_region_label():

@@ -266,15 +266,20 @@ def fetch_data_germany_last_execution():
 
 
 @joblib_memory.cache
-def fetch_data_germany(include_last_day=True):
-    """Fetch data for Germany from Robert Koch institute.
+def fetch_data_germany(include_last_day=True, filter_goettingen_alt=True) -> pd.DataFrame:
+    """Fetch data for Germany from Robert Koch institute and return as a pandas
+    DataFrame with the `Meldedatum` as the index.
 
-    Data source is https://npgeo-corona-npgeo-de.hub.arcgis.com . The text on the
+    Data source is https://npgeo-corona-npgeo-de.hub.arcgis.com . The text on that
     webpage implies that the data comes from the Robert Koch Institute.
 
-    By default, we omit the last day with data from the retrieved data sets
-    (see reasoning below in source), as the data is commonly update one day
-    later with more accurate (and typically higher) numbers.
+    As an option (`include_last_day`), we can omit the last day with data from
+    the retrieved data sets (see reasoning below in source), as the data is
+    commonly update one day later with more accurate (and typically higher)
+    numbers.
+
+    The `filter_goettingen_alt` option is only needed for a unit test
+    (test_corona.py::test_clean_data_germany_goettingen_alt_is_fluke).
 
     """
 
@@ -322,8 +327,14 @@ def fetch_data_germany(include_last_day=True):
     else:
         cleaned = g2
 
+    # see documentation of clean_data_germany_goettingen_alt for explanation
+    if filter_goettingen_alt:
+        cleaned2 = clean_data_germany_remove_goettingen_alt(cleaned)
+    else:
+        cleaned2 = cleaned
+
     fetch_data_germany_last_execution()
-    return cleaned
+    return cleaned2
 
 
 def pad_cumulative_series_to_yesterday(series):
@@ -572,17 +583,21 @@ def get_incidence_rates_germany(period=14):
     periods = (fortnight_ago < germany.index) & (germany.index < yesterday)
     germany = germany.iloc[periods]
 
-    cases = germany[["Landkreis", "cases"]]
-    deaths = germany[["Landkreis", "deaths"]]
+    index = germany[['Bundesland', 'Landkreis']]
+
+    index['Landkreis'] = 'Germany: ' + index['Landkreis']
+    index['Bundesland'] = '(' + index['Bundesland'] + ')'
+
+    germany['metadata-index'] = index['Landkreis'] + ' ' + index['Bundesland']
 
     cases_sum = (
-        cases.groupby("Landkreis")
-        .sum().astype(int)
+        germany.groupby("Landkreis")
+        .agg({'cases': 'sum', 'Bundesland': 'first', 'metadata-index': 'first'})
         .rename(columns={"cases": f"{period}-day-sum"})
     )
     deaths_sum = (
-        deaths.groupby("Landkreis")
-        .sum().astype(int)
+        germany.groupby("Landkreis")
+        .agg({'deaths': 'sum', 'Bundesland': 'first', 'metadata-index': 'first'})
         .rename(columns={"deaths": f"{period}-day-sum"})
     )
 
@@ -595,20 +610,28 @@ def get_incidence_rates_germany(period=14):
     # [406 rows x 1 columns]
     # Where the values are the total cases/deaths in the past `period` days
 
-    population = (
-        germany_get_population()
-        .population.astype(int)
-        .to_frame()
-    )
+    population = germany_get_population().population.astype(int).to_frame()
 
     cases_incidence = cases_sum.join(population)
     cases_incidence[f"{period}-day-incidence-rate"] = (
         cases_incidence[f"{period}-day-sum"] / cases_incidence["population"] * 100_000
     ).round(decimals=1)
+    # one-line-summary is used for the index entry on the table
+    cases_incidence['one-line-summary'] = (cases_incidence.index
+        .map(lambda x:  x[3:] + " (LK)" if x.startswith("LK ") else x)
+        .map(lambda x:  x[3:] + " (SK)" if x.startswith("SK ") else x)
+        + ' (' + cases_incidence['Bundesland'] + ')'
+    )
+
     deaths_incidence = deaths_sum.join(population)
     deaths_incidence[f"{period}-day-incidence-rate"] = (
         deaths_incidence[f"{period}-day-sum"] / deaths_incidence["population"] * 100_000
     ).round(decimals=1)
+    deaths_incidence['one-line-summary'] = (deaths_incidence.index
+        .map(lambda x:  x[3:] + " (LK)" if x.startswith("LK ") else x)
+        .map(lambda x:  x[3:] + " (SK)" if x.startswith("SK ") else x)
+        + ' (' + deaths_incidence['Bundesland'] + ')'
+    )
 
     # We could join the tables, but it's easier to join them than to split so
     # we'll just return two instead
@@ -719,16 +742,18 @@ def compute_daily_change(series):
     # smoothed curve, technical description
     smooth_label = f"Gaussian window (stddev=3 days)"
     # shorter description
-    smooth_label = f"(rolling mean)"
-    rolling_series = diff.rolling(9, center=True,
-                                  win_type='gaussian',
-                                  min_periods=1).mean(std=3)
+    smooth_label = f"(rolling 7d mean)"
+
+    # Smoothing step 1: get rid of weekly cycles
+    rolling_series = diff.rolling(7, center=True,
+                                  win_type=None,
+                                  min_periods=1).mean()
     smooth = rolling_series, smooth_label
 
     # extra smoothing for better visual effects
-    rolling_series2 = rolling_series.rolling(4, center=True,
+    rolling_series2 = rolling_series.rolling(9, center=True,
                                              win_type='gaussian',
-                                             min_periods=1).mean(std=2)
+                                             min_periods=1).mean(std=3)
     # extra smooth curve
     smooth2_label = "Smoothed " + smooth_label
     # shorter description
@@ -802,14 +827,18 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         ax.legend()
         ax.set_ylabel('daily change')
 
-    # data cleaning: For France, there was a huge spike on 12 April with 26849
-    # new infections. This sets the scale to be too large.
-    # There was also a value of ~-2000 on 22 April. We limit the y-scale to correct
-    # manually for this:
+
+    # Data cleaning: France new cases daily reports had a huge spike
+    # on 12 April 2020 with 26849 reported new cases. This would set
+    # too large a ymax for a while, which was fixed manually by setting
+    # ymax to min(10000, ymax)... until in October 2020 daily reported
+    # cases soared beyond that anomalous reported value of 12 April 2020.
+    # France also has a negative value of circa -2000 on 22 April 2020.
+    # We limit the y-scale to correct manually for this:
     if region_label == "France" and type_label == "cases":
         # get current limits
         ymin, ymax = ax.get_ylim()
-        ax.set_ylim([max(-500, ymin), min(10000, ymax)])
+        ax.set_ylim([max(-500, ymin), ymax])
 
     return ax
 
@@ -1100,11 +1129,13 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
             alpha=0.7)
 
 
-    # data for computation or R
-    smooth_diff = series.diff().rolling(7,
-                                        center=True,
-                                        win_type='gaussian').mean(std=4)
+    # # data for computation or R
+    # start from smooth diffs as used in plot 1
+    (change, change_label) , (smooth, smooth_label), \
+        (smooth2, smooth2_label) = compute_daily_change(series)
 
+    # we only use one return value:
+    smooth_diff = smooth2
     R = compute_R(smooth_diff)
     ax.plot(R.index, R, "-", color=color_R,
             label=region + f" estimated R (using {label})",
@@ -1619,9 +1650,7 @@ def overview(country: str, region: str = None, subregion: str = None,
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
     plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"))
     # data cleaning
-    if country == "China":
-        axes[1].set_ylim(0, 5000)
-    elif country == "Spain":   # https://github.com/oscovida/oscovida/issues/44
+    if country == "Spain":   # https://github.com/oscovida/oscovida/issues/44
         axes[1].set_ylim(bottom=0)
     plot_reproduction_number(axes[3], series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
     plot_doubling_time(axes[5], series=c, color="C1", labels=(region_label, "cases"))
@@ -1715,3 +1744,66 @@ def get_cases_last_week(cases):
     # last week is difference between last value, and the one 7 days before
     cases_last_week = c2[-1] - c2[-8]
     return cases_last_week
+
+
+
+def clean_data_germany_remove_goettingen_alt(germany_data, debug=False):
+    """New 16 September 2020.
+
+    This function removes all data rows that are for the region "LK Göttingen
+    (alt)".
+
+    Some diagnostic output is printed, if `debug=True` is used.
+
+
+    Context:
+
+    Some tests failed because we have a new Landkreis in the data from the RKI,
+    which is called "LK Göttingen (alt)". As of 16 September 2020, there is
+    only one entry. I speculate that this is an error and will disappear over
+    time. The proposed solution is to remove this line from the RKI data, and
+    to only do this if there is at most one row for "LK Göttingen (alt)".
+
+    Here is some debug code:
+
+    germany_data = oscovida.fetch_data_germany()
+    # find all rows for 'LK Göttingen (alt)'
+    sel = germany_data['Landkreis'] == 'LK Göttingen (alt)'
+    print(f"Found {len(germany_data[sel])} rows for Göttingen (alt)")
+    print(germany_data[sel].T)
+
+    with output:
+
+      Found 1 rows for Göttingen (alt)
+      date                             2020-04-09
+      FID                                35939791
+      IdBundesland                              3
+      Bundesland                    Niedersachsen
+      Landkreis                LK Göttingen (alt)
+      Altersgruppe                        A35-A59
+      Geschlecht                                W
+      AnzahlFall                                1
+      AnzahlTodesfall                           0
+      Meldedatum              2020/04/09 00:00:00
+      IdLandkreis                            3159
+      Datenstand            16.09.2020, 00:00 Uhr
+      NeuerFall                                 0
+      NeuerTodesfall                           -9
+      Refdatum                2020/04/09 00:00:00
+      NeuGenesen                                0
+      AnzahlGenesen                             1
+      IstErkrankungsbeginn                      0
+      Altersgruppe2             Nicht übermittelt
+
+    """
+
+    # find all rows for 'LK Göttingen (alt)'
+    sel = germany_data['Landkreis'] == 'LK Göttingen (alt)'
+    if debug:
+        print(f"Found {len(germany_data[sel])} rows for Göttingen (alt)")
+        print(germany_data[sel].T)
+
+    # return all other rows
+    return germany_data[~sel]
+
+
