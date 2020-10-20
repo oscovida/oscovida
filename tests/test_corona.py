@@ -81,12 +81,11 @@ def test_fetch_data_hungary():
 def test_choose_random_counties():
     # Hungary related
     with_local = c.choose_random_counties(exclude_region="Baranya", size=18)
-    print(with_local)
+    # print(with_local)
     assert 'Baranya' not in with_local
     assert len(with_local) == 19
 
 
-@pytest.mark.xfail
 def test_make_compare_plot_hungary():
     with_local = c.choose_random_counties(exclude_region="Baranya", size=18)
     axes, cases, deaths = c.make_compare_plot_hungary("Baranya", compare_with_local=with_local)
@@ -224,7 +223,7 @@ def test_compose_dataframe_summary():
     assert table['total cases'][-1] == 643
 
     # check that most recent data item is last
-    print(table)
+    # print(table)
 
 
 def test_get_cases_last_week():

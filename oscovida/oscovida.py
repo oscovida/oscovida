@@ -20,7 +20,7 @@ rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
-from matplotlib.ticker import ScalarFormatter, FuncFormatter, IndexLocator, FixedLocator, FormatStrFormatter
+from matplotlib.ticker import ScalarFormatter, FuncFormatter, FixedLocator
 from matplotlib.dates import DateFormatter, MONDAY, WeekdayLocator
 from bisect import bisect
 
