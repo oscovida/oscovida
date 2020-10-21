@@ -1,0 +1,25 @@
+BootStrap: library
+From: ubuntu:19.10
+
+%files
+    ./setup-runner.py /usr/bin/setup-runner.py
+
+%environment
+    export TERM=xterm-256color
+
+%post
+    apt-get update
+    apt-get install -y  \
+        liblttng-ust0   \
+        libkrb5-3       \
+        zlib1g          \
+        libssl1.1       \
+        libicu63        \
+        libunwind8      \
+        python3
+
+%apprun setup
+    exec python3 /usr/bin/setup-runner.py $*
+
+%apprun run
+    exec ./run.sh
