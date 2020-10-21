@@ -20,7 +20,7 @@ rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
-from matplotlib.ticker import ScalarFormatter, FuncFormatter
+from matplotlib.ticker import ScalarFormatter, FuncFormatter, FixedLocator
 from matplotlib.dates import DateFormatter, MONDAY, WeekdayLocator
 from bisect import bisect
 
@@ -905,12 +905,11 @@ def plot_doubling_time(ax, series, color, minchange=0.5, labels=None, debug=Fals
     ## Adding a little bit of additional smoothing just for visual effects
     dtime_smooth2 = dtime_smooth.rolling(3, win_type='gaussian', min_periods=1, center=True).mean(std=1)
 
-    ax.set_ylim(0, max(ymax, ax.get_ylim()[1]))     # since we combine two plots, let's take another one into account
+    # ax.set_ylim(0, max(ymax, ax.get_ylim()[1]))     # since we combine two plots, let's take another one into account
     ax.plot(dtime_smooth2.index, dtime_smooth2.values, "-", color=color, alpha=1.0,
             label=dtime_smooth_label,
             linewidth=LW)
-    ax.legend()
-    ax.set_ylabel("doubling time [days]")
+    ax.set_ylabel(f"{labels[1]}\ndoubling time [days]")
     return ax
 
 
@@ -1568,6 +1567,16 @@ def plot_no_data_available(ax, mimic_subplot, text):
     ax.set_xticklabels([])
 
 
+def has_twin(ax: plt.Axes) -> bool:
+    """ Returns True if the `ax` axis has a twinned axis """
+    for other_ax in ax.figure.axes:
+        if other_ax is ax:
+            continue
+        if other_ax.bbox.bounds == ax.bbox.bounds:
+            return True
+    return False
+
+
 def overview(country: str, region: str = None, subregion: str = None,
              savefig: bool = False, weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
@@ -1579,14 +1588,15 @@ def overview(country: str, region: str = None, subregion: str = None,
     if country == "Spain":   # https://github.com/oscovida/oscovida/issues/44
         axes[1].set_ylim(bottom=0)
     plot_reproduction_number(axes[3], series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
-    plot_doubling_time(axes[5], series=c, color="C1", labels=(region_label, "cases"))
-
+    ax_dt_c = axes[5]
+    plot_doubling_time(ax_dt_c, series=c, color="C1", labels=(region_label, "cases"))
+    ax_dt_d = plt.twinx(ax_dt_c)
     if d is not None:
         d = d[- weeks * 7:]
         plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
         plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"))
         plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
-        plot_doubling_time(axes[5], series=d, color="C0", labels=(region_label, "deaths"))
+        plot_doubling_time(ax_dt_d, series=d, color="C0", labels=(region_label, "deaths"))
     if d is None:
         plot_no_data_available(axes[2], mimic_subplot=axes[1], text='daily change in deaths')
         plot_no_data_available(axes[4], mimic_subplot=axes[3], text='R & growth factor (based on deaths)')
@@ -1601,8 +1611,9 @@ def overview(country: str, region: str = None, subregion: str = None,
     for i in range(1, axes.shape[0]):
         axes[i].set_xlim(axes[0].get_xlim())
     for i in range(0, axes.shape[0]):
-        axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
-        axes[i].yaxis.set_ticks_position('both')
+        if not has_twin(axes[i]):
+            axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
+            axes[i].yaxis.set_ticks_position('both')
         if weeks > 0:
             axes[i].get_xaxis().set_major_locator(WeekdayLocator(byweekday=MONDAY))     # put ticks every Monday
             axes[i].get_xaxis().set_major_formatter(DateFormatter('%d %b'))             # date format: `15 Jun`
@@ -1610,6 +1621,19 @@ def overview(country: str, region: str = None, subregion: str = None,
     title = f"Overview {country}{week_str}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
 
+    # combining doubling time plots
+    l = ax_dt_c.get_ylim()
+    l2 = ax_dt_d.get_ylim()
+    f = lambda x: l2[0] + (x - l[0]) / (l[1] - l[0]) * (l2[1] - l2[0])
+    ticks = f(ax_dt_c.get_yticks())
+    ax_dt_d.yaxis.set_major_locator(FixedLocator(ticks))
+    # create a combined legend
+    h_c, l_c = ax_dt_c.get_legend_handles_labels()
+    h_d, l_d = ax_dt_d.get_legend_handles_labels()
+    try:
+        plt.legend([h_c[1], h_d[1]], [l_c[1], l_d[1]])
+    except IndexError:  # in case there are no deaths simply combine all we have
+        plt.legend(h_c + h_d, l_c + l_d)
     # tight_layout gives warnings, for example for Heinsberg
     # fig.tight_layout(pad=1)
 
