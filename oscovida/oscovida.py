@@ -803,13 +803,7 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         ax1 = ax2.twinx()  # create an independent y-axis
         ax1.set_ylim((0, max(change)))
 
-        # there's no easy way of aligning ticks nor a good general solution, therefore let's do a trick
-        # see here: https://stackoverflow.com/questions/45037386/trouble-aligning-ticks-for-matplotlib-twinx-axes
-        l = ax2.get_ylim()
-        l2 = ax1.get_ylim()
-        f = lambda x: l2[0] + (x - l[0]) / (l[1] - l[0]) * (l2[1] - l2[0])
-        ticks = f(ax2.get_yticks())
-
+        ticks = align_twinx_ticks(ax_left=ax2, ax_right=ax1)
         ax1.yaxis.set_major_locator(FixedLocator(ticks))
         ax1.bar(change.index, change.values, color=color,
                 label=ax_label, alpha=bar_alpha, linewidth=LW)
@@ -1653,6 +1647,16 @@ def has_twin(ax: plt.Axes) -> bool:
     return False
 
 
+def align_twinx_ticks(ax_left: plt.Axes, ax_right: plt.Axes) -> np.ndarray:
+    # there's no easy way of aligning ticks nor a good general solution, therefore let's do a trick
+    # see here: https://stackoverflow.com/questions/45037386/trouble-aligning-ticks-for-matplotlib-twinx-axes
+    # obviously, f(left_min) -> right_min and f(left_max) -> right_max, and points in between are mapped proportionally
+    left = ax_left.get_ylim()
+    right = ax_right.get_ylim()
+    f = lambda x: right[0] + (x - left[0]) / (left[1] - left[0]) * (right[1] - right[0])
+    return f(ax_left.get_yticks())
+
+
 def overview(country: str, region: str = None, subregion: str = None,
              savefig: bool = False, weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
     c, d = get_country_data(country, region=region, subregion=subregion)
@@ -1699,10 +1703,7 @@ def overview(country: str, region: str = None, subregion: str = None,
     axes[0].set_title(title)
 
     # combining doubling time plots
-    l = ax_dt_c.get_ylim()
-    l2 = ax_dt_d.get_ylim()
-    f = lambda x: l2[0] + (x - l[0]) / (l[1] - l[0]) * (l2[1] - l2[0])
-    ticks = f(ax_dt_c.get_yticks())
+    ticks = align_twinx_ticks(ax_dt_c, ax_dt_d)
     ax_dt_d.yaxis.set_major_locator(FixedLocator(ticks))
     # create a combined legend
     h_c, l_c = ax_dt_c.get_legend_handles_labels()
