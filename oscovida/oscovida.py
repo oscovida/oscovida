@@ -1567,6 +1567,16 @@ def plot_no_data_available(ax, mimic_subplot, text):
     ax.set_xticklabels([])
 
 
+def has_twin(ax: plt.Axes) -> bool:
+    """ Returns True if the `ax` axis has a twinned axis """
+    for other_ax in ax.figure.axes:
+        if other_ax is ax:
+            continue
+        if other_ax.bbox.bounds == ax.bbox.bounds:
+            return True
+    return False
+
+
 def overview(country: str, region: str = None, subregion: str = None,
              savefig: bool = False, weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
     c, d, region_label = get_country_data(country, region=region, subregion=subregion)
@@ -1600,9 +1610,10 @@ def overview(country: str, region: str = None, subregion: str = None,
     # enforce same x-axis on all plots
     for i in range(1, axes.shape[0]):
         axes[i].set_xlim(axes[0].get_xlim())
-    for i in range(0, axes.shape[0]-1):
-        axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
-        axes[i].yaxis.set_ticks_position('both')
+    for i in range(0, axes.shape[0]):
+        if not has_twin(axes[i]):
+            axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
+            axes[i].yaxis.set_ticks_position('both')
         if weeks > 0:
             axes[i].get_xaxis().set_major_locator(WeekdayLocator(byweekday=MONDAY))     # put ticks every Monday
             axes[i].get_xaxis().set_major_formatter(DateFormatter('%d %b'))             # date format: `15 Jun`
