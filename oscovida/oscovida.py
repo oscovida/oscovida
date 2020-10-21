@@ -1630,8 +1630,10 @@ def overview(country: str, region: str = None, subregion: str = None,
     # create a combined legend
     h_c, l_c = ax_dt_c.get_legend_handles_labels()
     h_d, l_d = ax_dt_d.get_legend_handles_labels()
-    plt.legend([h_c[1], h_d[1]], [l_c[1], l_d[1]])
-
+    try:
+        plt.legend([h_c[1], h_d[1]], [l_c[1], l_d[1]])
+    except IndexError:  # in case there are no deaths simply combine all we have
+        plt.legend(h_c + h_d, l_c + l_d)
     # tight_layout gives warnings, for example for Heinsberg
     # fig.tight_layout(pad=1)
 
