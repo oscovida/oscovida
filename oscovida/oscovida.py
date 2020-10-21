@@ -1627,8 +1627,10 @@ def overview(country: str, region: str = None, subregion: str = None,
     f = lambda x: l2[0] + (x - l[0]) / (l[1] - l[0]) * (l2[1] - l2[0])
     ticks = f(ax_dt_c.get_yticks())
     ax_dt_d.yaxis.set_major_locator(FixedLocator(ticks))
-    ax_dt_c.legend(loc="upper right")
-    ax_dt_d.legend(loc="lower left")
+    # create a combined legend
+    h_c, l_c = ax_dt_c.get_legend_handles_labels()
+    h_d, l_d = ax_dt_d.get_legend_handles_labels()
+    plt.legend([h_c[1], h_d[1]], [l_c[1], l_d[1]])
 
     # tight_layout gives warnings, for example for Heinsberg
     # fig.tight_layout(pad=1)
