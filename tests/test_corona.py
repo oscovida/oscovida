@@ -362,6 +362,13 @@ def test_population():
     assert isinstance(pinneberg, int)
     assert pinneberg > 1E4
 
+    pinneberg = c.population(country="Germany", subregion="LK Pinneberg")
+    assert isinstance(pinneberg, int)
+    assert pinneberg > 1E4
+
+    with pytest.raises(NotImplementedError):
+        c.population("Germany", "Schleswig-Holstein", "LK Pinneberg")
+
     russia = c.population("Russia")
     assert isinstance(russia, int)
     assert russia > 1.4E8

@@ -479,21 +479,26 @@ def get_population() -> pd.DataFrame:
     return population # type: ignore
 
 
-def population(country: str, region: str = None) -> Union[int, None]:
+def population(country: str,
+               region: str = None, subregion: str = None) -> Union[int, None]:
     """
     Returns an `int` which corresponds to the population.
     Only supports regions so far.
     """
     if country.casefold() == 'germany':
-        if region is None:
+        if region is None and subregion is None:
             # use JHU data
             df = get_population()
             return int(df.loc['Germany'].population)
-        else:
+        elif region and subregion:
+            raise NotImplementedError("Cannot use both region and subregion")
+        elif region or subregion:
             df = germany_get_population()
             if region in df['BL'].values:
                 return int(df[df['BL'] == region].population.sum())
-            elif region in df.index:
+            elif subregion in df.index:
+                return int(df.population[subregion])
+            elif region in df.index:    # silently try to use as subregion
                 return int(df.population[region])
             else:
                 raise NotImplementedError(f"{region} in neither in available German Lands nor in Landkreises. " \
