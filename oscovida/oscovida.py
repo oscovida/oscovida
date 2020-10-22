@@ -15,6 +15,7 @@ from typing import Tuple, Union
 # choose font - can be deactivated
 from matplotlib import rcParams
 from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rki_data, rki_population_url
+from oscovida.plotting_helpers import align_twinx_ticks, has_twin, limit_to_smoothed
 
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
@@ -932,6 +933,7 @@ def compute_doubling_time(series, minchange=0.5, labels=None, debug=False):
     return (dtime, dtime_label), (dtime_smooth, dtime_smooth_label)
 
 
+@limit_to_smoothed
 def plot_doubling_time(ax, series, color, minchange=0.5, labels=None, debug=False):
     """Plot doubling time of series, assuming series is accumulated cases/deaths as
     function of days.
@@ -1640,26 +1642,6 @@ def plot_no_data_available(ax, mimic_subplot, text):
             verticalalignment='center')
     ax.set_yticklabels([])
     ax.set_xticklabels([])
-
-
-def has_twin(ax: plt.Axes) -> bool:
-    """ Returns True if the `ax` axis has a twinned axis """
-    for other_ax in ax.figure.axes:
-        if other_ax is ax:
-            continue
-        if other_ax.bbox.bounds == ax.bbox.bounds:
-            return True
-    return False
-
-
-def align_twinx_ticks(ax_left: plt.Axes, ax_right: plt.Axes) -> np.ndarray:
-    # there's no easy way of aligning ticks nor a good general solution, therefore let's do a trick
-    # see here: https://stackoverflow.com/questions/45037386/trouble-aligning-ticks-for-matplotlib-twinx-axes
-    # obviously, f(left_min) -> right_min and f(left_max) -> right_max, and points in between are mapped proportionally
-    left = ax_left.get_ylim()
-    right = ax_right.get_ylim()
-    f = lambda x: right[0] + (x - left[0]) / (left[1] - left[0]) * (right[1] - right[0])
-    return f(ax_left.get_yticks())
 
 
 def overview(country: str, region: str = None, subregion: str = None,
