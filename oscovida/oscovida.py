@@ -11,7 +11,7 @@ import joblib
 import numpy as np
 import pandas as pd
 import IPython.display
-from typing import Tuple
+from typing import Tuple, Union
 # choose font - can be deactivated
 from matplotlib import rcParams
 from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rki_data, rki_population_url
@@ -413,7 +413,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
             deaths = pad_cumulative_series_to_yesterday(deaths)
             cases = pad_cumulative_series_to_yesterday(cases)
 
-        return cases, deaths, region_label
+        return cases, deaths
 
     if landkreis:
         assert landkreis in germany['Landkreis'].values, \
@@ -435,7 +435,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
             deaths = pad_cumulative_series_to_yesterday(deaths)
             cases = pad_cumulative_series_to_yesterday(cases)
 
-        return cases, deaths, region_label
+        return cases, deaths
 
     raise NotImplemented("Should never get to this point.")
 
@@ -463,7 +463,7 @@ def germany_get_population() -> pd.DataFrame:
 
 @joblib_memory.cache
 def get_population() -> pd.DataFrame:
-    """Only support country for now"""
+    """Returns a DataFrame with population data"""
     source = jhu_population_url
     population = fetch_csv_data_from_url(source)
     #  Only include population of entire countries by excluding rows that belong
@@ -477,6 +477,39 @@ def get_population() -> pd.DataFrame:
         .rename(columns={"Population": "population"}) # Rename Population to population
     )
     return population # type: ignore
+
+
+def population(country: str,
+               region: str = None, subregion: str = None) -> Union[int, None]:
+    """
+    Returns an `int` which corresponds to the population.
+    Only supports regions so far.
+    """
+    if country.casefold() == 'germany':
+        if region is None and subregion is None:
+            # use JHU data
+            df = get_population()
+            return int(df.loc['Germany'].population)
+        elif region and subregion:
+            raise NotImplementedError("Cannot use both region and subregion")
+        elif region or subregion:
+            df = germany_get_population()
+            if region in df['BL'].values:
+                return int(df[df['BL'] == region].population.sum())
+            elif subregion in df.index:
+                return int(df.population[subregion])
+            elif region in df.index:    # silently try to use as subregion
+                return int(df.population[region])
+            else:
+                raise NotImplementedError(f"{region} in neither in available German Lands nor in Landkreises. " \
+                                          f"These are {', '.join(sorted(df['BL'].drop_duplicates()))} for Lands and " \
+                                          f"{', '.join(sorted(df.index))} for Landkreises.")
+    else:
+        df = get_population()
+        if country in df.index and region is None:
+            return int(df.loc[country].population)
+        else:
+            return None
 
 @joblib_memory.cache
 def get_incidence_rates_countries(period=14):
@@ -645,7 +678,7 @@ def fetch_data_hungary():
 def get_counties_hungary():
     # return fetch_data_hungary().columns[1:]
     return ['Bács-Kiskun', 'Baranya', 'Békés', 'Borsod-Abaúj-Zemplén', 'Budapest', 'Csongrád', 'Fejér',
-            'Győr-Moson-Sopron', 'Hajú-Bihar', 'Heves', 'Jász-Nagykun-Szolnok', 'Komárom-Esztergom', 'Nógrád', 'Pest',
+            'Győr-Moson-Sopron', 'Hajdú-Bihar', 'Heves', 'Jász-Nagykun-Szolnok', 'Komárom-Esztergom', 'Nógrád', 'Pest',
             'Somogy', 'Szabolcs-Szatmár-Bereg', 'Tolna', 'Vas', 'Veszprém', 'Zala']
 
 
@@ -666,7 +699,7 @@ def get_region_hungary(county):
     region_label = f'Hungary-{county}'
     cases.name = region_label + " cases"
 
-    return cases, None, region_label
+    return cases, None
 
 
 def plot_time_step(ax, series, style="-", labels=None, logscale=True):
@@ -736,7 +769,8 @@ def compute_daily_change(series):
     return change, smooth, smooth2
 
 
-def plot_daily_change(ax, series, color, labels=None):
+def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str] = None,
+                      country: str = None, region: str = None, subregion: str = None):
     """Given a series of data and matplotlib axis ax, plot the
     - difference in the series data from day to day as bars and plot a smooth
     - line to show the overall development
@@ -749,28 +783,51 @@ def plot_daily_change(ax, series, color, labels=None):
     """
     bar_alpha = 0.2
     if labels is None:
-        label = ""
-        region = ""
+        type_label = ""
+        region_label = ""
     else:
-        region, label = labels
+        region_label, type_label = labels
+    ax_label = region_label + " new " + type_label
+    (change, change_label), _, (smooth2, smooth2_label) = compute_daily_change(series)
 
-    ax_label = region + " new " + label
 
-    (change, change_label) , (smooth, smooth_label), \
-        (smooth2, smooth2_label) = compute_daily_change(series)
+    if country and region:
+        habitants = population(country=country, region=region)
+    else:
+        habitants = population(region_label)
+    if region_label is not "" and habitants:
+        # create another Y-axis on the right hand side
+        # unfortunately there's no simple way of swapping the axes, therefore we define normalised axis first
+        ax2 = ax
+        ax2.grid(None)  # disabling the second grid
+        # this is just to be sure that we plot the same graph (please leave it commented in the production):
+        # ax2.plot(smooth2.index, smooth2.values * 1E5 / habitants, color='green')
+        ax2.set_ylim((0, max(change) * 1E5 / habitants))
+        ax2.set_ylabel('daily change\nnormalised per 100K')
 
-    ax.bar(change.index, change.values, color=color,
-           label=ax_label, alpha=bar_alpha, linewidth=LW)
+        ax1 = ax2.twinx()  # create an independent y-axis
+        ax1.set_ylim((0, max(change)))
 
-    ax.plot(smooth2.index, smooth2.values, color=color,
-            label=ax_label + " " + smooth2_label, linewidth=LW)
+        ticks = align_twinx_ticks(ax_left=ax2, ax_right=ax1)
+        ax1.yaxis.set_major_locator(FixedLocator(ticks))
+        ax1.bar(change.index, change.values, color=color,
+                label=ax_label, alpha=bar_alpha, linewidth=LW)
 
-    ax.legend()
-    ax.set_ylabel('daily change')
+        ax1.plot(smooth2.index, smooth2.values, color=color,
+                 label=ax_label + " " + smooth2_label, linewidth=LW)
+        ax1.legend()
+        ax1.set_ylabel('daily change')
 
-    # labels on the right y-axis as well
-    ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
-    ax.yaxis.set_ticks_position('both')
+    else:
+        ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
+        ax.yaxis.set_ticks_position('both')
+        ax.plot(smooth2.index, smooth2.values, color=color,
+                label=ax_label + " " + smooth2_label, linewidth=LW)
+        ax.bar(change.index, change.values, color=color,
+                label=ax_label, alpha=bar_alpha, linewidth=LW)
+
+        ax.legend()
+        ax.set_ylabel('daily change')
 
 
     # Data cleaning: France new cases daily reports had a huge spike
@@ -780,7 +837,7 @@ def plot_daily_change(ax, series, color, labels=None):
     # cases soared beyond that anomalous reported value of 12 April 2020.
     # France also has a negative value of circa -2000 on 22 April 2020.
     # We limit the y-scale to correct manually for this:
-    if region == "France" and label == "cases":
+    if region_label == "France" and type_label == "cases":
         # get current limits
         ymin, ymax = ax.get_ylim()
         ax.set_ylim([max(-500, ymin), ymax])
@@ -1107,8 +1164,43 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
     return ax
 
 
+def get_region_label(country: str, region: str = None, subregion: str = None) -> str:
+    """
+    Produce unique and unambiguous name from region and subregion
+    """
+    # TODO: this might be used to decouple the label creation and fetching data
+    _country = country.casefold()
+    region_label = None
+    if _country == 'germany':
+        # if region == None and subregion == None:
+        #     region_label = _country
+        if region is not None and subregion is None:
+            region_label = f"Germany-{region}"
+        elif region is None and subregion is not None:
+            region_label = f"Germany-{subregion}"
+        elif region is None and subregion is not None:
+            region_label = f"Germany-{subregion}"
+
+    elif _country.lower() == 'us' and region != None:
+        region_label = f"United States: {region}"
+
+    elif _country.lower() == 'hungary':
+        # region -> térség
+        # subregion -> kistérség
+        # county -> megye
+
+        if region is not None:
+            region_label = f"Hungary-{region}"
+
+    # finally:
+    if not region_label:
+        region_label = country
+
+    return region_label
+
+
 def get_country_data(country: str, region: str = None, subregion: str = None, verbose: bool = False,
-                     pad_RKI_data_to_yesterday: bool = True) -> Tuple[pd.Series, pd.Series, str]:
+                     pad_RKI_data_to_yesterday: bool = True) -> Tuple[pd.Series, pd.Series]:
     """Given the name of a country, get the Johns Hopkins data for cases and deaths,
     and return them as a tuple of pandas.Series objects and a string describing the region:
     (cases, deaths, region_label)
@@ -1141,35 +1233,18 @@ def get_country_data(country: str, region: str = None, subregion: str = None, ve
     or two days (or even later in extreme cases).
 
     """
+    special_countries = {
+        'germany': (germany_get_region, {'state': region, 'landkreis': subregion,
+                                         'pad2yesterday': pad_RKI_data_to_yesterday}),
+        'us': (get_region_US, {'state': region}),
+        'hungary': (get_region_hungary, {'county': region})
+    }
 
-    if country.lower() == 'germany':
-        if region == None and subregion == None:
-            c, d = get_country_data_johns_hopkins(country)  # use johns hopkins data
-            country_region = country
-        else:
-            # use German data
-            c, d, country_region = germany_get_region(state=region, landkreis=subregion,
-                                                      pad2yesterday=pad_RKI_data_to_yesterday)
-    elif country.lower() == 'us' and region != None:
-        # load US data
-        c, d = get_region_US(region)
-        country_region = f"United States: {region}"
-
-    elif country.lower() == 'hungary':
-        # region -> térség
-        # subregion -> kistérség
-        # county -> megye
-
-        if region is not None:
-            c, d, country_region = get_region_hungary(county=region)
-
-        else:
-            c, d = get_country_data_johns_hopkins(country)
-            country_region = country
-
+    if country.casefold() in special_countries and (region is not None or subregion is not None):
+        func, kwargs = special_countries[country.casefold()]
+        c, d = func(**kwargs)
     else:
-        c, d = get_country_data_johns_hopkins(country)
-        country_region = country
+        c, d = get_country_data_johns_hopkins(country)  # use johns hopkins data
 
     len_cases1 = len(c)
     # hungarian county data doesn't contain number of deaths
@@ -1184,7 +1259,7 @@ def get_country_data(country: str, region: str = None, subregion: str = None, ve
     if verbose:
         print(f"get_country_data: cases [{len_cases1}] -> [{len_cases2}]")
         print(f"get_country_data: deaths[{len_deaths1}] -> [{len_deaths2}]")
-    return c, d, country_region
+    return c, d
 
 #######################
 
@@ -1335,8 +1410,8 @@ def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Polan
 
     if normalise:
         for country in res_c.keys():
-            res_c[country] *= 100000 / get_population(country)
-            res_d[country] *= 100000 / get_population(country)
+            res_c[country] *= 100000 / population(country)
+            res_d[country] *= 100000 / population(country)
 
     # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
     # for all days.
@@ -1421,7 +1496,7 @@ def get_compare_data_germany(region_subregion, compare_with_local, rolling=7):
     for reg_subreg in [region_subregion] + compare_with_local:
 
         region, subregion = unpack_region_subregion(reg_subreg)
-        c, d, country_subregion = germany_get_region(state=region, landkreis=subregion)
+        c, d = germany_get_region(state=region, landkreis=subregion)
 
         label = label_from_region_subregion((region, subregion))
         df_c[label] = c.diff().rolling(rolling, center=True).mean()  # cases
@@ -1443,7 +1518,7 @@ def get_compare_data_hungary(region, compare_with_local: list, rolling=7):
     df_c = pd.DataFrame()
     # df_d = pd.DataFrame()
     for reg in [region] + compare_with_local:
-        c, d, country_subregion = get_region_hungary(county=reg)
+        c, d = get_region_hungary(county=reg)
         label = str(reg)
         df_c[label] = c.diff().rolling(rolling, center=True).mean()  # cases
         # df_d[label] = d.diff().rolling(rolling, center=True).mean()  # deaths
@@ -1577,13 +1652,24 @@ def has_twin(ax: plt.Axes) -> bool:
     return False
 
 
+def align_twinx_ticks(ax_left: plt.Axes, ax_right: plt.Axes) -> np.ndarray:
+    # there's no easy way of aligning ticks nor a good general solution, therefore let's do a trick
+    # see here: https://stackoverflow.com/questions/45037386/trouble-aligning-ticks-for-matplotlib-twinx-axes
+    # obviously, f(left_min) -> right_min and f(left_max) -> right_max, and points in between are mapped proportionally
+    left = ax_left.get_ylim()
+    right = ax_right.get_ylim()
+    f = lambda x: right[0] + (x - left[0]) / (left[1] - left[0]) * (right[1] - right[0])
+    return f(ax_left.get_yticks())
+
+
 def overview(country: str, region: str = None, subregion: str = None,
              savefig: bool = False, weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
-    c, d, region_label = get_country_data(country, region=region, subregion=subregion)
+    c, d = get_country_data(country, region=region, subregion=subregion)
+    region_label = get_region_label(country, region=region, subregion=subregion)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     c = c[- weeks * 7:]
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
-    plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"))
+    plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"), country=country, region=region)
     # data cleaning
     if country == "Spain":   # https://github.com/oscovida/oscovida/issues/44
         axes[1].set_ylim(bottom=0)
@@ -1622,10 +1708,7 @@ def overview(country: str, region: str = None, subregion: str = None,
     axes[0].set_title(title)
 
     # combining doubling time plots
-    l = ax_dt_c.get_ylim()
-    l2 = ax_dt_d.get_ylim()
-    f = lambda x: l2[0] + (x - l[0]) / (l[1] - l[0]) * (l2[1] - l2[0])
-    ticks = f(ax_dt_c.get_yticks())
+    ticks = align_twinx_ticks(ax_dt_c, ax_dt_d)
     ax_dt_d.yaxis.set_major_locator(FixedLocator(ticks))
     # create a combined legend
     h_c, l_c = ax_dt_c.get_legend_handles_labels()
@@ -1647,12 +1730,13 @@ def compare_plot(country: str, region: str = None, subregion: str = None,
                  savefig: bool = False, normalise: bool = False) -> Tuple[plt.axes, pd.Series, pd.Series]:
     """ Create a pair of plots which show comparison of the region with other most suffering countries
     """
-    c, d, region_label = get_country_data(country, region=region, subregion=subregion)
+    c, d = get_country_data(country, region=region, subregion=subregion)
+    region_label = get_region_label(country, region=region, subregion=subregion)
     if normalise:
         assert subregion is None, f"Normalization does not support subregions"
-        population = get_population(country=country, region=region)
-        c *= 100000 / population
-        d *= 100000 / population
+        _population = population(country=country, region=region)
+        c *= 100000 / _population
+        d *= 100000 / _population
 
     if not subregion and not region:    # i.e. not a region of Germany
         axes_compare, res_c, res_d = make_compare_plot(country, normalise=normalise)

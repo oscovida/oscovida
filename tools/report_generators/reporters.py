@@ -156,7 +156,7 @@ class CountryReport(BaseReport):
         ), f"{country} is unknown. Known countries are {sorted(d.index)}"
 
     def init_metadata(self):
-        cases, deaths, region_label = oscovida.get_country_data(self.country)
+        cases, deaths = oscovida.get_country_data(self.country)
         one_line_summary = f"{self.country}"
 
         self._init_metadata(
@@ -198,8 +198,7 @@ class GermanyReport(BaseReport):
         )
 
     def init_metadata(self):
-        #  TODO: region_label unused, what was this for?
-        cases, deaths, region_label = oscovida.get_country_data(
+        cases, deaths = oscovida.get_country_data(
             "Germany", subregion=self.subregion
         )
         one_line_summary = f"Germany: {self.region} : {self.subregion}"
@@ -296,7 +295,7 @@ class HungaryReport(BaseReport):
         assert region in counties, f"{region} is unknown. Known regions are {counties}"
 
     def init_metadata(self):
-        cases, _, _ = oscovida.get_country_data("Hungary", region=self.region)
+        cases, _ = oscovida.get_country_data("Hungary", region=self.region)
 
         self._init_metadata(
             meta={
