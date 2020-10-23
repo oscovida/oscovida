@@ -796,9 +796,10 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         habitants = population(country=country, region=region)
     else:
         habitants = population(region_label)
-    if region_label and habitants:
+    if region_label and habitants and max(change) > 0:
         # create another Y-axis on the right hand side
-        # unfortunately there's no simple way of swapping the axes, therefore we define normalised axis first
+        # unfortunately there's no simple way of swapping the axes,
+        # therefore we define normalised axis first
         ax2 = ax
         ax2.grid(None)  # disabling the second grid
         # this is just to be sure that we plot the same graph (please leave it commented in the production):
@@ -1678,7 +1679,8 @@ def overview(country: str, region: str = None, subregion: str = None,
         plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
         plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"))
         plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
-        if compute_doubling_time(d)[0][1] != "Cannot compute smooth ratio":
+        problems = ("no data in reduced data set", "Cannot compute smooth ratio")
+        if compute_doubling_time(d)[0][1] not in problems:
             ax_dt_d = plt.twinx(ax_dt_c)
             plot_doubling_time(ax_dt_d, series=d, color="C0", labels=(region_label, "deaths"))
             # combining doubling time plots
