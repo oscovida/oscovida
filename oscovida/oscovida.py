@@ -416,7 +416,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
             deaths = pad_cumulative_series_to_yesterday(deaths)
             cases = pad_cumulative_series_to_yesterday(cases)
 
-        return region_label, cases, deaths
+        return cases, deaths
 
     if landkreis:
         assert landkreis in germany['Landkreis'].values, \
@@ -438,7 +438,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
             deaths = pad_cumulative_series_to_yesterday(deaths)
             cases = pad_cumulative_series_to_yesterday(cases)
 
-        return region_label, cases, deaths
+        return cases, deaths
 
 
 @joblib_memory.cache

@@ -30,7 +30,7 @@ from oscovida import *
 
 # %%
 # load the data
-cases, deaths, region_label = {DATA_LOAD_FUNCTION}({DATA_LOAD_ARGS})
+cases, deaths = {DATA_LOAD_FUNCTION}({DATA_LOAD_ARGS})
 
 # compose into one table
 table = compose_dataframe_summary(cases, deaths)
