@@ -1,4 +1,5 @@
 import numpy as np
+from functools import wraps
 from matplotlib import pyplot as plt
 
 
@@ -30,10 +31,10 @@ def has_twin(ax: plt.Axes) -> bool:
 
 
 def limit_to_smoothed(func, max_ratio=1.5):
+    @wraps(func)
     def wrapper(*args, **kwargs):
         ax = func(*args, **kwargs)
         l1, l2 = ax.lines   # only two line for a moment
-
         if "rolling mean" in l1._label:
             mean, data = l1, l2
         else:
