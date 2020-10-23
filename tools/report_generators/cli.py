@@ -130,7 +130,7 @@ def generate_reports_germany(
         logging.warning(f"Removing datasets label with '(alt)': {bad_datasets}")
 
         for bd in bad_datasets:
-            c, d, _ = oscovida.germany_get_region(landkreis=bd[1])
+            c, d = oscovida.germany_get_region(landkreis=bd[1])
             logging.warning(
                 f"\tremoved: {bd} : len(cases)={len(c)}, len(deaths)={len(d)}"
             )
