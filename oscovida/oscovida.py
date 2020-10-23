@@ -388,11 +388,14 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
 
     if state and landkreis:
         raise NotImplementedError("Try to use 'None' for the state.")
-        """We need to check if this is important."""
+        #  TODO: We need to check if this is important.
 
     if state:
-        assert state in germany['Bundesland'].values, \
-            f"{state} not in available German states. These are {sorted(germany['Bundesland'].drop_duplicates())}"
+        if not state in germany['Bundesland'].values:
+            raise Exception(
+                f"{state} not in available German states. These are "
+                "{sorted(germany['Bundesland'].drop_duplicates())}"
+            )
 
         land = germany[germany['Bundesland'] == state]
         land = land.set_index(pd.to_datetime(land['Meldedatum']))
@@ -413,7 +416,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
             deaths = pad_cumulative_series_to_yesterday(deaths)
             cases = pad_cumulative_series_to_yesterday(cases)
 
-        return cases, deaths
+        return region_label, cases, deaths
 
     if landkreis:
         assert landkreis in germany['Landkreis'].values, \
@@ -435,9 +438,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
             deaths = pad_cumulative_series_to_yesterday(deaths)
             cases = pad_cumulative_series_to_yesterday(cases)
 
-        return cases, deaths
-
-    raise NotImplemented("Should never get to this point.")
+        return region_label, cases, deaths
 
 
 @joblib_memory.cache
