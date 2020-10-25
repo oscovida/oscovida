@@ -313,6 +313,11 @@ def test_get_population():
     assert 80_000_000 * 1.5 > world.loc['Germany'].population > 80_000_000
 
 
+# update 25/10/2020: the following test has started to fail.
+# We mark it as `xfail`. If it remains as `xfail`, we should remove
+# the whole test and data cleaning: presumably, the RKI has tidied up
+# the data now.
+@pytest.mark.xfail
 def test_clean_data_germany_goettingen_alt_is_fluke():
     germany_data = c.fetch_data_germany(filter_goettingen_alt=False)
     cleaned = c.fetch_data_germany(filter_goettingen_alt=True)
@@ -330,7 +335,7 @@ def test_clean_data_germany_goettingen_alt_is_fluke():
             "if this is a real / important LK in Germany"
         raise ValueError(msg, germany_data, cleaned)
     elif n == 0:
-        msg = "There are now rows with LK Göttingen (alt). \n" + \
+        msg = "There are no rows with LK Göttingen (alt). \n" + \
             "Consider removing the data cleaning code for Göttingen (alt)."
         print(msg)
         # should we raise an error here to notice this situation?
