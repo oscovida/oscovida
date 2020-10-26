@@ -42,7 +42,7 @@ jobs:
       run: |
         pytest --verbose --cov-report xml:cov.xml --cov=oscovida
 
-    - name: Test witn nbval
+    - name: Test with nbval
       run: |
         pytest --verbose --cov-report xml:cov.xml --cov=oscovida --cov-append --nbval ./tests/plots/
 
