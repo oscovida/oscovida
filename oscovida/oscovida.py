@@ -15,6 +15,7 @@ from typing import Tuple, Union
 # choose font - can be deactivated
 from matplotlib import rcParams
 from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rki_data, rki_population_url
+from oscovida.plotting_helpers import align_twinx_ticks, has_twin, limit_to_smoothed
 
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
@@ -796,9 +797,10 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         habitants = population(country=country, region=region)
     else:
         habitants = population(region_label)
-    if region_label is not "" and habitants:
+    if region_label and habitants and max(change) > 0:
         # create another Y-axis on the right hand side
-        # unfortunately there's no simple way of swapping the axes, therefore we define normalised axis first
+        # unfortunately there's no simple way of swapping the axes,
+        # therefore we define normalised axis first
         ax2 = ax
         ax2.grid(None)  # disabling the second grid
         # this is just to be sure that we plot the same graph (please leave it commented in the production):
@@ -933,6 +935,7 @@ def compute_doubling_time(series, minchange=0.5, labels=None, debug=False):
     return (dtime, dtime_label), (dtime_smooth, dtime_smooth_label)
 
 
+@limit_to_smoothed
 def plot_doubling_time(ax, series, color, minchange=0.5, labels=None, debug=False):
     """Plot doubling time of series, assuming series is accumulated cases/deaths as
     function of days.
@@ -958,7 +961,7 @@ def plot_doubling_time(ax, series, color, minchange=0.5, labels=None, debug=Fals
 
     # good to take maximum value from here
     dtime_smooth.replace(np.inf, np.nan, inplace=True)  # get rid of x/0 results, which affect max()
-    ymax = min(dtime_smooth.max()*1.5, 5000)  # China has doubling time of 3000 in between
+    # ymax = min(dtime_smooth.max()*1.5, 5000)  # China has doubling time of 3000 in between
 
     ## Adding a little bit of additional smoothing just for visual effects
     dtime_smooth2 = dtime_smooth.rolling(3, win_type='gaussian', min_periods=1, center=True).mean(std=1)
@@ -1643,28 +1646,23 @@ def plot_no_data_available(ax, mimic_subplot, text):
     ax.set_xticklabels([])
 
 
-def has_twin(ax: plt.Axes) -> bool:
-    """ Returns True if the `ax` axis has a twinned axis """
-    for other_ax in ax.figure.axes:
-        if other_ax is ax:
-            continue
-        if other_ax.bbox.bounds == ax.bbox.bounds:
-            return True
-    return False
-
-
-def align_twinx_ticks(ax_left: plt.Axes, ax_right: plt.Axes) -> np.ndarray:
-    # there's no easy way of aligning ticks nor a good general solution, therefore let's do a trick
-    # see here: https://stackoverflow.com/questions/45037386/trouble-aligning-ticks-for-matplotlib-twinx-axes
-    # obviously, f(left_min) -> right_min and f(left_max) -> right_max, and points in between are mapped proportionally
-    left = ax_left.get_ylim()
-    right = ax_right.get_ylim()
-    f = lambda x: right[0] + (x - left[0]) / (left[1] - left[0]) * (right[1] - right[0])
-    return f(ax_left.get_yticks())
-
-
 def overview(country: str, region: str = None, subregion: str = None,
-             savefig: bool = False, weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
+             savefig: bool = False,
+             weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
+    """The `overview` function provides 6 graphs for the region:
+
+    0) the total cumulative number of cases and deaths
+    1) the daily change (cases)
+    2) the daily change (deaths)
+    3) R number and growth factor (cases)
+    4) R number and growth factor (deaths)
+    5) the doubling time (both cases and death)
+
+    `weeks` parameter refers to the last N number of weeks to show. Omit this
+    parameter or use zero value to see the pandemic since the very beginning.
+
+    Returns: subplots, cases (pandas Series), deaths (pandas Series)
+    """
     c, d = get_country_data(country, region=region, subregion=subregion)
     region_label = get_region_label(country, region=region, subregion=subregion)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
@@ -1677,13 +1675,24 @@ def overview(country: str, region: str = None, subregion: str = None,
     plot_reproduction_number(axes[3], series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
     ax_dt_c = axes[5]
     plot_doubling_time(ax_dt_c, series=c, color="C1", labels=(region_label, "cases"))
-    ax_dt_d = plt.twinx(ax_dt_c)
     if d is not None:
         d = d[- weeks * 7:]
         plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
         plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"))
         plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
-        plot_doubling_time(ax_dt_d, series=d, color="C0", labels=(region_label, "deaths"))
+        problems = ("no data in reduced data set", "Cannot compute smooth ratio")
+        if compute_doubling_time(d)[0][1] not in problems:
+            ax_dt_d = plt.twinx(ax_dt_c)
+            plot_doubling_time(ax_dt_d, series=d, color="C0", labels=(region_label, "deaths"))
+            # combining doubling time plots
+            ticks = align_twinx_ticks(ax_dt_c, ax_dt_d)
+            ax_dt_d.yaxis.set_major_locator(FixedLocator(ticks))
+            # create a combined legend
+            h_c, l_c = ax_dt_c.get_legend_handles_labels()
+            h_d, l_d = ax_dt_d.get_legend_handles_labels()
+            axes[5].legend([h_c[1], h_d[1]], [l_c[1], l_d[1]])
+        else:   # just create a legend as is
+            axes[5].legend()
     if d is None:
         plot_no_data_available(axes[2], mimic_subplot=axes[1], text='daily change in deaths')
         plot_no_data_available(axes[4], mimic_subplot=axes[3], text='R & growth factor (based on deaths)')
@@ -1708,16 +1717,6 @@ def overview(country: str, region: str = None, subregion: str = None,
     title = f"Overview {country}{week_str}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
 
-    # combining doubling time plots
-    ticks = align_twinx_ticks(ax_dt_c, ax_dt_d)
-    ax_dt_d.yaxis.set_major_locator(FixedLocator(ticks))
-    # create a combined legend
-    h_c, l_c = ax_dt_c.get_legend_handles_labels()
-    h_d, l_d = ax_dt_d.get_legend_handles_labels()
-    try:
-        plt.legend([h_c[1], h_d[1]], [l_c[1], l_d[1]])
-    except IndexError:  # in case there are no deaths simply combine all we have
-        plt.legend(h_c + h_d, l_c + l_d)
     # tight_layout gives warnings, for example for Heinsberg
     # fig.tight_layout(pad=1)
 
