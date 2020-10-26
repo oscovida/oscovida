@@ -20,7 +20,7 @@ yarl = ">=1.0,<2.0"
 name = "appdirs"
 version = "1.4.4"
 description = "A small Python module for determining appropriate platform-specific dirs, e.g. a \"user data dir\"."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -498,7 +498,7 @@ python-versions = "*"
 name = "future"
 version = "0.18.2"
 description = "Clean single-source support for Python 3 and 2"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 
@@ -506,7 +506,7 @@ python-versions = ">=2.6, !=3.0.*, !=3.1.*, !=3.2.*"
 name = "gitdb"
 version = "4.0.5"
 description = "Git Object Database"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.4"
 
@@ -517,7 +517,7 @@ smmap = ">=3.0.1,<4"
 name = "gitpython"
 version = "3.1.11"
 description = "Python Git Library"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.4"
 
@@ -870,7 +870,7 @@ python-versions = ">=3.6"
 name = "livereload"
 version = "2.6.3"
 description = "Python LiveReload is an awesome tool for web developers"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -885,7 +885,7 @@ python = ">=2.8"
 name = "lunr"
 version = "0.5.8"
 description = "A Python implementation of Lunr.js"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -964,7 +964,7 @@ python-versions = "*"
 name = "mkdocs"
 version = "1.1.2"
 description = "Project documentation with Markdown."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.5"
 
@@ -1027,7 +1027,7 @@ pytkdocs = ">=0.2.0,<0.8.0"
 name = "mknotebooks"
 version = "0.6.2.post0.dev5"
 description = "Plugin for mkdocs to generate markdown documents from jupyter notebooks."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1180,7 +1180,7 @@ python-versions = ">=3.5"
 name = "nltk"
 version = "3.5"
 description = "Natural Language Toolkit"
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 marker = "python_version > \"2.7\""
@@ -1604,7 +1604,7 @@ marker = "os_name == \"nt\""
 name = "pyyaml"
 version = "5.3.1"
 description = "YAML parser and emitter for Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
@@ -1620,7 +1620,7 @@ python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*"
 name = "regex"
 version = "2020.7.14"
 description = "Alternative regular expression module, to replace re."
-category = "main"
+category = "dev"
 optional = false
 python-versions = "*"
 
@@ -1732,7 +1732,7 @@ python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*"
 name = "smmap"
 version = "3.0.4"
 description = "A pure Python implementation of a sliding window memory map manager"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
@@ -1970,7 +1970,7 @@ dev = ["plotly", "psutil", "kaleido"]
 [metadata]
 lock-version = "1.0"
 python-versions = "^3.7"
-content-hash = "34dba6f7a807077a4f3e2c87017d09f02a840166a786f446c6e285cb80035933"
+content-hash = "9485c8943ea44ffcf858ea16074c066eb361b5304df6e21080619ba160b353db"
 
 [metadata.files]
 aiohttp = [

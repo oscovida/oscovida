@@ -43,6 +43,7 @@ setup(
     package_dir={"": "src"},
     package_data={},
     install_requires=[
+        'appdirs==1.*,>=1.4.4',
         'click==7.*,>=7.1.2',
         'ipynb-py-convert==0.*,>=0.4.5',
         'ipywidgets==7.*,>=7.5.1',
