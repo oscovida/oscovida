@@ -239,7 +239,7 @@ manually generate it. The steps would be:
 ```
 #  Set up repositories
 git clone git@github.com/oscovida/oscovida
-git clone git@github.com/oscovida/oscovida.github.io ./oscovida/tools/wwwroot
+git clone git@github.com/oscovida/oscovida.github.io.git ./oscovida/tools/wwwroot
 
 #  Set up environment
 python -m venv .venv
