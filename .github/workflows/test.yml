@@ -46,4 +46,8 @@ jobs:
       run: |
         pytest --verbose --cov-report xml:cov.xml --cov=oscovida --cov-append --nbval ./tests/plots/
 
+    - name: Documentation notebook tests with nbval
+      run: |
+        pytest --verbose --cov-report xml:cov.xml --cov=oscovida --cov-append --nbval ./docs/
+
     - uses: codecov/codecov-action@v1
