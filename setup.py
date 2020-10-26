@@ -39,13 +39,8 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Scientific/Engineering :: Information Analysis',
     ],
-    packages=[
-        'oscovida',
-        'oscovida.plots',
-        'oscovida.report_generators',
-        'oscovida.web',
-    ],
-    package_dir={"": "."},
+    packages=['oscovida', 'oscovida.plots', 'oscovida.web'],
+    package_dir={"": "src"},
     package_data={},
     install_requires=[
         'click==7.*,>=7.1.2',
