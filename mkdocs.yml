@@ -12,7 +12,11 @@ repo_url: https://github.com/oscovida/oscovida
 edit_uri: ""
 
 nav:
-  - API Documentation: 'api.md'
+  - Quick-Start: './quick-start.md'
+  - API Documentation:
+    - 'Regions': './api/regions.md'
+    - 'Statistics': './api/statistics.md'
+    - 'Plotting': './api/plotting.md'
 
 plugins:
   - search
@@ -20,3 +24,8 @@ plugins:
 
 extra_css:
   - css/mkdocstrings.css
+
+markdown_extensions:
+  - admonition
+  - pymdownx.superfences
+  - pymdownx.details

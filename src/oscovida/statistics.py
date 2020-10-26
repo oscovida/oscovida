@@ -1,3 +1,16 @@
+"""Module containing some generic statistics functions for use with Oscovida, we
+currently provide the following functions:
+
+- `daily`: Computes the daily change for the series
+- `smooth`: Smooths the pandas series with a rolling average and mean
+- `doubling_time`: Compute the doubling time for a given series by shifting the
+   rows by one
+- `r_number`: Calculate the R-number using a method similar to RKI
+- `growth_factor`: Computes the growth factor for a series
+- `min_max`: Given a time series, find the min and max values in the time series
+   within the last n days
+"""
+
 import math
 from functools import singledispatch
 from typing import Tuple, Union
@@ -43,7 +56,7 @@ SMOOTHING_METHODS = {
 
 
 def daily(cumulative: pd.Series, drop_negative=True) -> pd.Series:
-    """Computes the daily change for the series
+    """Computes the daily change for the series.
 
     Parameters
     ----------
@@ -68,7 +81,7 @@ def daily(cumulative: pd.Series, drop_negative=True) -> pd.Series:
 
 
 def smooth(obj: pd.Series, kind: str = 'weak', compound: bool = True) -> pd.Series:
-    """Smooths the pandas series with a rolling average and mean
+    """Smooths the pandas series with a rolling average and mean.
 
     Parameters
     ----------
@@ -182,7 +195,7 @@ def r_number(cumulative: pd.Series, tau: int = 4) -> pd.Series:
 
 
 def growth_factor(obj: pd.Series) -> pd.Series:
-    """Computes the growth factor for a series
+    """Computes the growth factor for a series.
 
     Growth factor is just the percent change day-to-day, in this case we add one
     to get the growth, e.g. 20% more cases than yesterday means 1.2 (120%), or

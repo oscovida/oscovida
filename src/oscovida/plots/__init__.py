@@ -1,3 +1,20 @@
+"""Module containing some generic plotting functions for use with Oscovida, the
+plots largely parallel the statistics functions, the following plots can be
+created:
+
+- `plot_totals`: Plots the total numbers for an oscovida `Region`, by default
+  plots only the `confirmed` and `deaths` columns.
+- `plot_daily`: Plots the daily numbers for an oscovida `Region`, by default
+  plots only the `confirmed` and `deaths` columns.
+- `plot_r_number`: Plots the daily r number for an oscovida `Region`, by default
+  plots only the `confirmed` and `deaths` columns.
+- `plot_growth_factor`: Plots the daily growth factor for for an oscovida
+  `Region`, by default plots only the `confirmed` and `deaths` columns.
+- `plot_doubling_time`: Plots the doubling time for an oscovida `Region`, by
+  default plots only the `confirmed` and `deaths` columns.
+- `plot_summary`: Creates a summary plot for the `Region`, contains all plots.
+"""
+
 import importlib
 import warnings
 from typing import Optional, Sequence
@@ -481,6 +498,30 @@ def plot_summary(
     region: Region,
     label_prepend: Optional[str] = None,
 ):
+    """Creates a summary plot for the Region object. This contains:
+
+    - Totals
+    - Daily numbers
+    - R number
+    - Growth factor
+    - Doubling time
+
+    Parameters
+    ----------
+    region : Region
+        An oscovida `Region` object to be plotted
+    label_prepend : [type], optional
+        String to prepend to the label, e.g. "GB" would make the labels "GB cases"
+        and "GB deaths", instead of just generic "cases" and "deaths". This is
+        automatically added when using a Region as an argument, must be manually
+        added when passing a series
+        By default `""`
+
+    Returns
+    -------
+    Axes
+        Axes with plotted lines
+    """
     if label_prepend is None:
         label_prepend = region.admin_1
 
