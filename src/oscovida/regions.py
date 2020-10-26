@@ -115,20 +115,7 @@ class Region:
 
         self._query = []
 
-        if not level is None:
-            if not (1 <= level <= 3):
-                raise ValueError('Level must be between 1 and 3 (inclusive).')
-
-            #  Specifying a level and an administrative below that level doesn't
-            #  make sense, so throw an exception for that here
-            if (self.admin_2 and level < 2) or (self.admin_3):
-                raise ValueError(
-                    '`level` argument is used to return data for all '
-                    'administrative regions at that level, so passing a '
-                    '`level <= 2` and `admin_2` is not supported, neither is '
-                    'passing any level and an `admin_3`.'
-                )
-        else:
+        if level is None:
             if self.admin_1 is None:
                 level = 1
             else:
@@ -141,6 +128,19 @@ class Region:
                         )
                         if not v is None
                     ]
+                )
+        else:
+            if not (1 <= level <= 3):
+                raise ValueError('Level must be between 1 and 3 (inclusive).')
+
+            #  Specifying a level and an administrative below that level doesn't
+            #  make sense, so throw an exception for that here
+            if (self.admin_2 and level < 2) or (self.admin_3):
+                raise ValueError(
+                    '`level` argument is used to return data for all '
+                    'administrative regions at that level, so passing a '
+                    '`level <= 2` and `admin_2` is not supported, neither is '
+                    'passing any level and an `admin_3`.'
                 )
 
         self.level = level
@@ -186,7 +186,7 @@ class Region:
 
     @staticmethod
     def _top_level_region_parser(region: Optional[str]):
-        if region is None:
+        if region is None or region == '*':
             #  If `admin_1` was set to `None`, then we return the entire unfiltered
             #  dataset, so no checks need to be performed
             return namedtuple('Country', ['alpha_3', 'name'])(None, None)
