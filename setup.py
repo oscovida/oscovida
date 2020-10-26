@@ -39,7 +39,7 @@ setup(
         'Programming Language :: Python :: 3',
         'Topic :: Scientific/Engineering :: Information Analysis',
     ],
-    packages=['oscovida', 'oscovida.plots', 'oscovida.web'],
+    packages=['oscovida', 'oscovida.plots'],
     package_dir={"": "src"},
     package_data={},
     install_requires=[
