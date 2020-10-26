@@ -3,21 +3,26 @@ from functools import wraps
 from matplotlib import pyplot as plt
 
 
-def align_twinx_ticks(ax_left: plt.Axes, ax_right: plt.Axes) -> np.ndarray:
+def linear_mapping(_from, _to, x):
     """
-    Returns an array of ticks for the right axis which match ones on the left.
-
-    There's no easy way of aligning ticks nor a good general solution.
     Lets use a simple linear function that maps the ends of one scale onto ends
     of another. Obviously, we need that
           f(left_min) -> right_min and
           f(left_max) -> right_max,
     and points in between are mapped proportionally.
     """
+    return _to[0] + (x - _from[0]) / (_from[1] - _from[0]) * (_to[1] - _to[0])
+    
+    
+def align_twinx_ticks(ax_left: plt.Axes, ax_right: plt.Axes) -> np.ndarray:
+    """
+    Returns an array of ticks for the right axis which match ones on the left.
+
+    There's no easy way of aligning ticks nor a good general solution.
+    """
     left = ax_left.get_ylim()
     right = ax_right.get_ylim()
-    f = lambda x: right[0] + (x - left[0]) / (left[1] - left[0]) * (right[1] - right[0])
-    return f(ax_left.get_yticks())
+    return linear_mapping(left, right, ax_left.get_yticks())
 
 
 def has_twin(ax: plt.Axes) -> bool:
@@ -34,12 +39,24 @@ def limit_to_smoothed(func, max_ratio=1.5):
     @wraps(func)
     def wrapper(*args, **kwargs):
         ax = func(*args, **kwargs)
-        l1, l2 = ax.lines   # only two line for a moment
-        if "rolling mean" in l1._label:
-            mean, data = l1, l2
+        lines, means, points, maxpoint = [], [], [], None
+        if has_twin(ax):
+            graphs = ax.get_shared_x_axes().get_siblings(ax)
+            for graph in graphs:
+                for line in graph.lines:
+                    lines += [line]
         else:
-            mean, data = l2, l1
-        _, ylim = ax.get_ylim()
-        ax.set_ylim(top=min(ylim, np.nanmax(mean._y) * max_ratio))
+            # no twin axes, everything is great!
+            lines = ax.lines
+        for line in lines:
+            if "rolling mean" in line._label:
+                means += [line]
+            else:
+                points += [line]
+        if means:
+            maxpoint = max([np.nanmax(line._y) for line in means])
+
+            _, ylim = ax.get_ylim()
+            ax.set_ylim(top=min(ylim, maxpoint * max_ratio), bottom=0)
         return ax
     return wrapper
