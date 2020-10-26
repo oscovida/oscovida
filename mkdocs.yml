@@ -19,6 +19,7 @@ nav:
     - 'Regions': './api/regions.md'
     - 'Statistics': './api/statistics.md'
     - 'Plotting': './api/plotting.md'
+  - Contributing: './contributing.md'
 
 plugins:
   - search
