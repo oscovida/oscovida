@@ -79,6 +79,7 @@ setup(
             "plotly==4.*,>=4.9.0",
             "pre-commit==2.*,>=2.7.1",
             "psutil==5.*,>=5.7.2",
+            "pymdown-extensions==8.*,>=8.0.1",
             "pytest==5.*,>=5.4.3",
             "pytest-cov==2.*,>=2.10.0",
             "testpath==0.*,>=0.4.4",
@@ -87,6 +88,7 @@ setup(
             "mkdocs==1.*,>=1.1.2",
             "mkdocs-material==5.*,>=5.5.12",
             "mkdocstrings==0.*,>=0.13.2",
+            "pymdown-extensions==8.*,>=8.0.1",
         ],
         "formatting": [
             "black==19.*,>=19.10.0.b0",
