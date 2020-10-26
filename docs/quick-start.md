@@ -18,8 +18,8 @@ object. Internally Oscovida used [COVID-19 Data
 Hub](https://covid19datahub.io/index.html) as its data source, so we follow
 their hierarchical approach to regions:
 
-| Administrative Area         | Administrative area level                                                 |
-|-----------------------------|---------------------------------------------------------------------------|
+| Administrative Area           | Administrative area level                                                 |
+|-------------------------------|---------------------------------------------------------------------------|
 | `administrative_area_level_1` | Administrative area of top level.                                         |
 | `administrative_area_level_2` | Administrative area of a lower level, usually states, regions or cantons. |
 | `administrative_area_level_2` | Administrative are of a lower level, usually cities or municipalities.    |
