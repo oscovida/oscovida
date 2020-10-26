@@ -125,6 +125,13 @@ def create_markdown_index_page(
         f.write(f"date: {date_time}\n")
         f.write("\n")
         f.write("\n")
+        if category == "countries":
+            f.write("A list of countries ordered according to \"
+                    "[7-day incidence is available](countries-incidence-rate.html).\n")
+        elif category == "germany":
+            f.write("A list of districts (Landkreise) for Germany ordered according "
+                    "to [7-day incidence is available](germany-incidence-rate.html).\n")
+        f.write("\n")
         f.write(md_content)
         f.write("\n")
 
