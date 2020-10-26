@@ -12,7 +12,9 @@ repo_url: https://github.com/oscovida/oscovida
 edit_uri: ""
 
 nav:
-  - Quick-Start: './quick-start.md'
+  - Quick-Start: './quick-start.ipynb'
+  - Examples:
+    - 'Germany': './examples/germany.ipynb'
   - API Documentation:
     - 'Regions': './api/regions.md'
     - 'Statistics': './api/statistics.md'
@@ -21,11 +23,17 @@ nav:
 plugins:
   - search
   - mkdocstrings
+  - mknotebooks:
+        binder: true
+        binder_service_name: "gh"
+        binder_branch: "master"
 
 extra_css:
   - css/mkdocstrings.css
 
 markdown_extensions:
+  - tables
   - admonition
   - pymdownx.superfences
   - pymdownx.details
+  - codehilite

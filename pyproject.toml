@@ -75,6 +75,8 @@ jupyterlab = "^2.2.0"
 mkdocs = "^1.1.2"
 mkdocs-material = "^5.5.12"
 mkdocstrings = "^0.13.2"
+mknotebooks = "^0.6.2"
+Pygments = "^2.7.2"
 pymdown-extensions = "^8.0.1"
 mutmut = "^2.1.0"
 nbval = "^0.9.5"
@@ -84,7 +86,7 @@ pytest-cov = "^2.10.0"
 testpath = "^0.4.4"
 
 [tool.poetry.extras]
-docs = ["mkdocs", "mkdocs-material", "mkdocstrings", "pymdown-extensions"]
+docs = ["mkdocs", "mkdocs-material", "mkdocstrings", "pymdown-extensions", "mknotebooks", "Pygments"]
 plotly = ["plotly", "psutil", "kaleido"]
 formatting = ["black", "dephell", "isort", "pre-commit"]
 test = ["coverage", "hypothesis", "mutmut", "nbval", "pytest", "pytest-cov", "testpath"]
