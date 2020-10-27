@@ -1,9 +1,9 @@
-Standard Plots
-==============
+Explanation of plots
+====================
 
 :Date: 2020-05-03 10:00
 :slug: plots
-:tags: About, Data, Plots
+:tags: about, data, plots, tutorial
 
 We discuss the plots from the top (number 1) to the bottom (number 7)
 that are available for `all regions <all-regions.html>`__.

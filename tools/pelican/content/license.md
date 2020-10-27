@@ -1,5 +1,5 @@
 title: License
-tags: About, Data, Code, License
+tags: about, data, code, license
 save-as: license
 date: 2020/04/19 13:00
 

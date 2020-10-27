@@ -1,6 +1,6 @@
 Title: Contributions welcome!
 Date: 2020-04-10 22:00
-tags: About
+tags: about
 slug: contribute
 
 * Bugs and ideas can be reported as a

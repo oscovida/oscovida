@@ -118,7 +118,7 @@ def create_markdown_index_page(
     with open(index_path, "tw") as f:
         f.write(f"title: {title}\n")
         # f.write(f"category: Data\n")  - have stopped using categories (22 April 2020)
-        f.write(f"tags: Data, Plots, {title}\n")
+        f.write(f"tags: data, plots, tracking, {category}\n")
         f.write(f"save-as: {save_as}\n")
         f.write(f"slug: {slug}\n")
         date_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")

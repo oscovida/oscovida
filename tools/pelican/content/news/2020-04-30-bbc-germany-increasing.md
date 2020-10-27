@@ -1,5 +1,5 @@
 title: BBC news reports "Germany's daily cases increasing"
-tags: Data, Germany, Numbers-in-news, News, Analysis
+tags: data, germany, news, analysis
 date: 2020/04/30 10:00
 slug: 2020-04-30-news-report-germanys-daily-cases-increasing
 
