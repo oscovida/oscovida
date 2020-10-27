@@ -10,3 +10,5 @@ date: 2020/06/08 10:00
 - [Overview of COVID 19 medical research (french)](https://lejournal.cnrs.fr/articles/visualiser-la-recherche-sur-le-coronavirus-en-un-coup-doeil)
 
 - [COVID19 tracking in Schleswig Holstein (Germany)](https://www.infmed.uni-kiel.de/de/epidemiologie/covid-19)
+
+- [Corona in Zahlen (in german)](http://corona-in-zahlen.de)
