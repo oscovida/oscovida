@@ -140,7 +140,7 @@ class CountryReport(BaseReport):
             overview_function="overview",
             overview_args=f'"{country}"',
             compare_plot_function="compare_plot",
-            compare_plot_args=f'"{country}"',
+            compare_plot_args=f'"{country}", normalise=True',
             data_load_function="get_country_data",
             data_load_args=f'"{country}"',
             output_file=f"{country}",
