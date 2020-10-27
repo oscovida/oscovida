@@ -1,5 +1,5 @@
 title: Related resources
-tags: About
+tags: about
 save-as: related-resources
 date: 2020/06/08 10:00
 

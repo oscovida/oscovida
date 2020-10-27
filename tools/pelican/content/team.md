@@ -1,6 +1,6 @@
 Title: Team
 Date: 2020-05-27 21:00
-tags: About
+tags: about
 slug: team
 
 Following early work by [Hans Fangohr](http://fangohr.github.io), members of the

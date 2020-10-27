@@ -1,6 +1,6 @@
 Title: Data sources
 Date: 2020-04-10 22:03
-tags: About, Data
+tags: about, data
 slug: data-sources
 
 - We use data

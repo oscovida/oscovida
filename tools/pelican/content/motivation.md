@@ -1,6 +1,6 @@
 Title: Our motivation
 Date: 2020-04-19 10:20
-tags: About
+tags: about
 slug: motivation
 
 
