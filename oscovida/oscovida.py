@@ -797,7 +797,7 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         habitants = population(country=country, region=region)
     else:
         habitants = population(region_label)
-    if region_label and habitants and max(change) > 0:
+    if habitants and max(change) > 0:
         # create another Y-axis on the right hand side
         # unfortunately there's no simple way of swapping the axes,
         # therefore we define normalised axis first
