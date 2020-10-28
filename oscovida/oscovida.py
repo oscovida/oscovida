@@ -395,7 +395,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
         if not state in germany['Bundesland'].values:
             raise Exception(
                 f"{state} not in available German states. These are "
-                "{sorted(germany['Bundesland'].drop_duplicates())}"
+                f"{sorted(germany['Bundesland'].drop_duplicates())}"
             )
 
         land = germany[germany['Bundesland'] == state]
