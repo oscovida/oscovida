@@ -1673,6 +1673,8 @@ def overview(country: str, region: str = None, subregion: str = None,
         except ValueError:
             raise ValueError(f"`dates` are not a valid time range, try something "
                              f"like dates='{c.index[0].date()}:{c.index[-1].date()}'")
+    elif dates and weeks:
+        raise ValueError("`dates` and `weeks` cannot be used together")
     else:
         c = c[- weeks * 7:]
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
