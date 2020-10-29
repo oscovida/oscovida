@@ -382,7 +382,7 @@ def test_population():
     assert isinstance(kyoto, int)
     assert kyoto > 2500000
 
-    # new_jersey = c.population("US", "New Jersey")
-    # assert isinstance(new_jersey, int)
-    # assert new_jersey > 250000000
+    new_jersey = c.population("US", "New Jersey")
+    assert isinstance(new_jersey, int)
+    assert new_jersey > 17000000
 
