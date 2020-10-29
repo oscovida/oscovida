@@ -1647,7 +1647,7 @@ def plot_no_data_available(ax, mimic_subplot, text):
 
 
 def overview(country: str, region: str = None, subregion: str = None,
-             savefig: bool = False,
+             savefig: bool = False, dates: str = None,
              weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
     """The `overview` function provides 6 graphs for the region:
 
@@ -1666,7 +1666,17 @@ def overview(country: str, region: str = None, subregion: str = None,
     c, d = get_country_data(country, region=region, subregion=subregion)
     region_label = get_region_label(country, region=region, subregion=subregion)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
-    c = c[- weeks * 7:]
+    if dates and weeks == 0:
+        try:
+            date_start, date_end = dates.split(':')
+            c = c[date_start:date_end]
+        except ValueError:
+            raise ValueError(f"`dates` are not a valid time range, try something "
+                             f"like dates='{c.index[0].date()}:{c.index[-1].date()}'")
+    elif dates and weeks:
+        raise ValueError("`dates` and `weeks` cannot be used together")
+    else:
+        c = c[- weeks * 7:]
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
     plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"), country=country, region=region)
     # data cleaning
@@ -1676,7 +1686,11 @@ def overview(country: str, region: str = None, subregion: str = None,
     ax_dt_c = axes[5]
     plot_doubling_time(ax_dt_c, series=c, color="C1", labels=(region_label, "cases"))
     if d is not None:
-        d = d[- weeks * 7:]
+        if dates and weeks == 0:
+            date_start, date_end = dates.split(':')
+            d = d[date_start:date_end]
+        else:
+            d = d[- weeks * 7:]
         plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
         plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"))
         plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
