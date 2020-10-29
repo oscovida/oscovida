@@ -201,7 +201,7 @@ def get_region_US(state, county=None, debug=False):
     cases = fetch_cases_US()
 
     assert state in deaths['Province_State'].values, \
-        f"{state} not in available states. These are {sorted(deaths['Province_State'])}"
+        f"{state} not in available states. These are {sorted(set(deaths['Province_State']))}"
 
     if county is None:
         tmpd = deaths.groupby('Province_State').sum()
