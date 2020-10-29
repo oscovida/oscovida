@@ -494,19 +494,14 @@ def population(country: str,
                          "Province_State": "region",
                          "Admin2": "subregion"})
     df = df[df['population'].notnull()]
-    iso2 = df.loc[(df['country'] == country)
-                  & (df['region'].isnull())
-                  & (df['subregion'].isnull())
-                  ].iso2.to_string(index=False).strip()
 
     if country in df.country.values:
         if region is None and subregion is None:
             # use JHU data
             return int(df[(df['country'] == country)
-                          & (df['region'].notnull())
+                          & (df['region'].isnull())
                           & (df['subregion'].isnull())
-                          & (df['iso2'] == iso2)
-                          ].groupby('country').sum().population)
+                          ].population)
         elif region and subregion:
             raise NotImplementedError("Cannot use both region and subregion")
 
@@ -1726,9 +1721,14 @@ def overview(country: str, region: str = None, subregion: str = None,
             ticks = align_twinx_ticks(ax_dt_c, ax_dt_d)
             ax_dt_d.yaxis.set_major_locator(FixedLocator(ticks))
             # create a combined legend
-            h_c, l_c = ax_dt_c.get_legend_handles_labels()
-            h_d, l_d = ax_dt_d.get_legend_handles_labels()
-            axes[5].legend([h_c[1], h_d[1]], [l_c[1], l_d[1]])
+            h_c, l_c = ax_dt_c.get_legend_handles_labels()  # may return [], []
+            h_d, l_d = ax_dt_d.get_legend_handles_labels()  # may return [], []
+            labels = [[], []]
+            for x, y in [[h_c, l_c], [h_d, l_d]]:
+                if x:
+                    labels[0] += [x[1]]
+                    labels[1] += [y[1]]
+            axes[5].legend(*labels)
         else:   # just create a legend as is
             axes[5].legend()
     if d is None:
