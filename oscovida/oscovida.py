@@ -1671,7 +1671,7 @@ def overview(country: str, region: str = None, subregion: str = None,
             date_start, date_end = dates.split(':')
             c = c[date_start:date_end]
         except ValueError:
-            raise ValueError(f"`dates` are not a valid time range, try something "
+            raise ValueError(f"`dates` is not a valid time range, try something "
                              f"like dates='{c.index[0].date()}:{c.index[-1].date()}'")
     elif dates and weeks:
         raise ValueError("`dates` and `weeks` cannot be used together")
