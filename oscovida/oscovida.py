@@ -122,7 +122,8 @@ def fetch_cases_US():
     return df
 
 
-def get_country_data_johns_hopkins(country: str) -> Tuple[pd.DataFrame, pd.DataFrame]:
+def get_country_data_johns_hopkins(country: str,
+                                   region: str = None, subregion: str = None) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Given a country name, return deaths and cases as a tuple of
     pandas time series. Works for all (?) countries in the world, or at least
     those in the Johns Hopkins data set. All rows should contain a datetime
@@ -200,7 +201,7 @@ def get_region_US(state, county=None, debug=False):
     cases = fetch_cases_US()
 
     assert state in deaths['Province_State'].values, \
-        f"{state} not in available states. These are {sorted(deaths['Province_State'])}"
+        f"{state} not in available states. These are {sorted(set(deaths['Province_State']))}"
 
     if county is None:
         tmpd = deaths.groupby('Province_State').sum()
@@ -487,31 +488,49 @@ def population(country: str,
     Returns an `int` which corresponds to the population.
     Only supports regions so far.
     """
-    if country.casefold() == 'germany':
+    df = fetch_csv_data_from_url(jhu_population_url)\
+        .rename(columns={"Population": "population",
+                         "Country_Region": "country",
+                         "Province_State": "region",
+                         "Admin2": "subregion"})
+    df = df[df['population'].notnull()]
+
+    if country in df.country.values:
         if region is None and subregion is None:
             # use JHU data
-            df = get_population()
-            return int(df.loc['Germany'].population)
+            return int(df[(df['country'] == country)
+                          & (df['region'].isnull())
+                          & (df['subregion'].isnull())
+                          ].population)
         elif region and subregion:
             raise NotImplementedError("Cannot use both region and subregion")
-        elif region or subregion:
-            df = germany_get_population()
-            if region in df['BL'].values:
-                return int(df[df['BL'] == region].population.sum())
-            elif subregion in df.index:
-                return int(df.population[subregion])
-            elif region in df.index:    # silently try to use as subregion
-                return int(df.population[region])
-            else:
-                raise NotImplementedError(f"{region} in neither in available German Lands nor in Landkreises. " \
-                                          f"These are {', '.join(sorted(df['BL'].drop_duplicates()))} for Lands and " \
-                                          f"{', '.join(sorted(df.index))} for Landkreises.")
-    else:
-        df = get_population()
-        if country in df.index and region is None:
-            return int(df.loc[country].population)
+
+        elif country.casefold() == 'germany':
+            if region or subregion:
+                df = germany_get_population()
+                if region in df['BL'].values:
+                    return int(df[df['BL'] == region].population.sum())
+                elif subregion in df.index:
+                    return int(df.population[subregion])
+                elif region in df.index:    # silently try to use as subregion
+                    return int(df.population[region])
+                else:
+                    raise NotImplementedError(f"{region} in neither in available German Lands nor in Landkreises. " \
+                                              f"These are {', '.join(sorted(df['BL'].drop_duplicates()))} for Lands and " \
+                                              f"{', '.join(sorted(df.index))} for Landkreises.")
         else:
-            return None
+            if region or subregion:
+                if region in df['region'].values:
+                    return int(df[df['region'] == region].population.sum())
+                elif subregion in df['subregion'].values:
+                    return int(df.population[subregion])
+                elif region in df['subregion']:    # silently try to use as subregion
+                    return int(df.population[subregion])
+                else:
+                    return
+    else:
+        return
+
 
 @joblib_memory.cache
 def get_incidence_rates_countries(period=14):
@@ -1185,10 +1204,10 @@ def get_region_label(country: str, region: str = None, subregion: str = None) ->
         elif region is None and subregion is not None:
             region_label = f"Germany-{subregion}"
 
-    elif _country.lower() == 'us' and region != None:
+    elif _country == 'us' and region != None:
         region_label = f"United States: {region}"
 
-    elif _country.lower() == 'hungary':
+    elif _country == 'hungary':
         # region -> térség
         # subregion -> kistérség
         # county -> megye
@@ -1702,9 +1721,14 @@ def overview(country: str, region: str = None, subregion: str = None,
             ticks = align_twinx_ticks(ax_dt_c, ax_dt_d)
             ax_dt_d.yaxis.set_major_locator(FixedLocator(ticks))
             # create a combined legend
-            h_c, l_c = ax_dt_c.get_legend_handles_labels()
-            h_d, l_d = ax_dt_d.get_legend_handles_labels()
-            axes[5].legend([h_c[1], h_d[1]], [l_c[1], l_d[1]])
+            h_c, l_c = ax_dt_c.get_legend_handles_labels()  # may return [], []
+            h_d, l_d = ax_dt_d.get_legend_handles_labels()  # may return [], []
+            labels = [[], []]
+            for x, y in [[h_c, l_c], [h_d, l_d]]:
+                if x:
+                    labels[0] += [x[1]]
+                    labels[1] += [y[1]]
+            axes[5].legend(*labels)
         else:   # just create a legend as is
             axes[5].legend()
     if d is None:
