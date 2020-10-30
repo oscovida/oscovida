@@ -1342,8 +1342,7 @@ def get_compare_data(countrynames, rolling=7):
     return df_c, df_d
 
 
-
-def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, labeloffset=2, v0=0,
+def plot_logdiff_time(ax, df, xaxislabel=None, yaxislabel=None, style="", labels=True, labeloffset=2, v0=0,
                       highlight={}, other_lines_alpha=0.4):
     """highlight is dictionary: {country_name : color}
 
@@ -1351,9 +1350,7 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
     """
 
     for i, col in enumerate(df.columns):
-        # print(f"plot_logdiff: Processing {i} {col}")
         if col in highlight:
-            # print(f"Found highlight: {col}")
             alpha = 1.0
             color = highlight[col]
             linewidth = 4
@@ -1388,7 +1385,6 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
                 # Add country/region name as text next to last data point of the line:
                 ax.annotate(col, xy=(x + labeloffset, y), textcoords='data')
                 ax.plot([x], [y], "o" + color, alpha=alpha)
-    # ax.legend()
     ax.set_ylabel(yaxislabel)
     ax.set_xlabel(xaxislabel)
     ax.set_yscale('log')
@@ -1396,8 +1392,11 @@ def plot_logdiff_time(ax, df, xaxislabel, yaxislabel, style="", labels=True, lab
     # from https://stackoverflow.com/questions/21920233/matplotlib-log-scale-tick-label-number-formatting/33213196
     ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:g}'.format(y)))
     # ax.set_xscale('log')    # also interesting
-    ax.set_ylim(bottom=set_y_axis_limit(df, v0))
-    ax.set_xlim(left=-1)  #ax.set_xlim(-1, df.index.max())
+    if isinstance(df.index[0], int):
+        ax.set_ylim(bottom=set_y_axis_limit(df, v0))
+        ax.set_xlim(left=-1)  #ax.set_xlim(-1, df.index.max())
+    else:
+        ax.legend(loc='upper left')
     ax.tick_params(left=True, right=True, labelleft=True, labelright=True)
     ax.yaxis.set_ticks_position('both')
 
@@ -1555,13 +1554,8 @@ def make_compare_plot_germany(region_subregion,
                                                   'Hamburg', 'Hessen',
                                                   'Nordrhein-Westfalen',
                                                   'Sachsen-Anhalt'],
-    # The 'compare_with_local' subset is chosen to look sensibly on 2 May 2020.
-    #                          compare_with_local=['Baden-Württemberg', 'Bayern', 'Berlin',
-    #                                              'Brandenburg', 'Bremen', 'Hamburg',
-    #                                              'Hessen', 'Mecklenburg-Vorpommern', 'Niedersachsen',
-    #                                              'Nordrhein-Westfalen', 'Rheinland-Pfalz', 'Saarland',
-    #                                              'Sachsen', 'Sachsen-Anhalt', 'Schleswig-Holstein',  'Thüringen'],
-                              v0c=10, v0d=1):
+                              v0c=10, v0d=1, normalise=True,
+                              weeks=0):
     rolling = 7
     region, subregion = unpack_region_subregion(region_subregion)
     df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local, rolling=rolling)
@@ -1574,8 +1568,20 @@ def make_compare_plot_germany(region_subregion,
     df_c = pd.merge(df_c1, df_c2, how='outer', left_index=True, right_index=True)
     df_d = pd.merge(df_d1, df_d2, how='outer', left_index=True, right_index=True)
 
-    res_c = align_sets_at(v0c, df_c)
-    res_d = align_sets_at(v0d, df_d)
+    kwargs_c, kwargs_d = {}, {}
+    if weeks > 0:
+        res_c = df_c[- weeks * 7:]
+        res_d = df_d[- weeks * 7:]
+        kwargs_c.update({'labels': False})
+        kwargs_d.update({'yaxislabel': '', 'labels': False})
+    else:
+        res_c = align_sets_at(v0c, df_c)
+        res_d = align_sets_at(v0d, df_d)
+        kwargs_c.update({'xaxislabel': f"days since {v0c} cases", 'labeloffset': 1})
+        kwargs_d.update({'xaxislabel': f"days since {v0d} deaths", 'labeloffset': 1})
+
+    kwargs_c.update({"yaxislabel": "daily new cases\n(rolling 7-day mean)"})
+    kwargs_d.update({"yaxislabel": "daily new deaths\n(rolling 7-day mean)"})
 
     # We get NaNs for some lines. This seems to originate in the original data set not having a value recorded
     # for all days.
@@ -1585,17 +1591,19 @@ def make_compare_plot_germany(region_subregion,
     res_c = res_c.interpolate(method='linear', limit=7)
     res_d = res_d.interpolate(method='linear', limit=7)
 
+    if normalise:
+        kwargs_c["yaxislabel"] += "\nnormalised by 100K people"
+        kwargs_d["yaxislabel"] += "\nnormalised by 100K people"
+        for area in res_c.keys():
+            res_c[area] *= 100000 / population("Germany", area)
+            res_d[area] *= 100000 / population("Germany", area)
+
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax = axes[0]
-    plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
-                      "daily new cases\n(rolling 7-day mean)",
-                      v0=v0c, highlight={res_c.columns[0]:"C1"}, labeloffset=0.5)
+    plot_logdiff_time(ax, res_c, v0=v0c, highlight={res_c.columns[0]: "C1"}, **kwargs_c)
     ax = axes[1]
 
-    plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
-                      "daily new deaths\n(rolling 7-day mean)",
-                      v0=v0d, highlight={res_d.columns[0]:"C0"},
-                      labeloffset=0.5)
+    plot_logdiff_time(ax, res_d, v0=v0d, highlight={res_d.columns[0]: "C0"}, **kwargs_d)
 
     # fig.tight_layout(pad=1)
 
