@@ -7,6 +7,11 @@ import pytest
 import oscovida as c
 
 
+def assert_oscovida_object(ax, cases, deaths):
+    assert isinstance(ax, np.ndarray)
+    assert isinstance(cases, (pd.Series, pd.DataFrame))
+    assert isinstance(deaths, (pd.Series, pd.DataFrame))
+
 
 def mock_get_country_data_johns_hopkins(country="China"):
     cases_values = [548, 643, 920, 1406, 2075, 2877, 5509, 6087, 8141, 9802, 11891, 16630, 19716, 23707, 27440, 30587, 34110, 36814, 39829, 42354, 44386, 44759, 59895, 66358, 68413, 70513, 72434, 74211, 74619, 75077, 75550, 77001, 77022, 77241, 77754, 78166, 78600, 78928, 79356, 79932, 80136, 80261, 80386, 80537, 80690, 80770, 80823, 80860, 80887, 80921, 80932, 80945, 80977, 81003, 81033, 81058, 81102, 81156, 81250, 81305, 81435, 81498, 81591, 81661, 81782, 81897, 81999, 82122, 82198, 82279, 82361, 82432, 82511, 82543, 82602, 82665, 82718, 82809, 82883, 82941]
@@ -35,17 +40,16 @@ def test_overview():
     assert cases.name == 'China cases'
     assert deaths.name == 'China deaths'
 
-    isinstance(deaths, pd.core.series.Series)
-    isinstance(deaths, pd.core.series.Series)
+    assert_oscovida_object(axes, cases, deaths)
+    assert_oscovida_object(*c.overview("Germany", weeks=8))
+    assert_oscovida_object(*c.overview("Russia", dates="2020-05-30:2020-06-15"))
 
 
 def test_US_overview():
     axes, cases, deaths = c.overview(country="US", region="New Jersey")
     assert cases.name == 'US-New Jersey cases'
     assert deaths.name == 'US-New Jersey deaths'
-
-    isinstance(deaths, pd.core.series.Series)
-    isinstance(deaths, pd.core.series.Series)
+    assert_oscovida_object(axes, cases, deaths)
 
 
 def test_get_US_region_list():
@@ -60,7 +64,7 @@ def test_Hungary_overview():
     assert cases.name == 'Hungary-Baranya cases'
     assert deaths is None
 
-    isinstance(cases, pd.core.series.Series)
+    isinstance(cases, pd.Series)
     isinstance(deaths, type(None))
 
 
@@ -386,3 +390,14 @@ def test_population():
     assert isinstance(new_jersey, int)
     assert new_jersey > 17000000
 
+
+def test_compare_plot():
+    assert_oscovida_object(*c.make_compare_plot("Russia"))
+    assert_oscovida_object(*c.make_compare_plot("Namibia", normalise=True))
+
+
+def test_compare_plot_germany():
+    assert_oscovida_object(*c.make_compare_plot_germany("Hamburg"))
+    assert_oscovida_object(*c.make_compare_plot_germany("Hamburg", normalise=True))
+    assert_oscovida_object(*c.make_compare_plot_germany("Hamburg", weeks=7))
+    assert_oscovida_object(*c.make_compare_plot_germany("Bayern", normalise=True, weeks=8))
