@@ -1554,7 +1554,7 @@ def make_compare_plot_germany(region_subregion,
                                                   'Nordrhein-Westfalen',
                                                   'Sachsen-Anhalt'],
                               v0c=10, v0d=1, normalise=True,
-                              weeks=0):
+                              weeks=0, dates=None):
     rolling = 7
     region, subregion = unpack_region_subregion(region_subregion)
     df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local, rolling=rolling)
@@ -1568,7 +1568,20 @@ def make_compare_plot_germany(region_subregion,
     df_d = pd.merge(df_d1, df_d2, how='outer', left_index=True, right_index=True)
 
     kwargs_c, kwargs_d = {}, {}
-    if weeks > 0:
+
+    if dates and weeks == 0:
+        try:
+            date_start, date_end = dates.split(':')
+            res_c = df_c[date_start:date_end]
+            res_d = df_d[date_start:date_end]
+            kwargs_c.update({'labels': False})
+            kwargs_d.update({'labels': False})
+        except ValueError:
+            raise ValueError(f"`dates` are not a valid time range, try something "
+                             f"like dates='{df_c.index[0].date()}:{df_c.index[-1].date()}'")
+    elif dates and weeks:
+        raise ValueError("`dates` and `weeks` cannot be used together")
+    elif weeks > 0:
         res_c = df_c[- weeks * 7:]
         res_d = df_d[- weeks * 7:]
         kwargs_d.update({'yaxislabel': '', 'labels': False})

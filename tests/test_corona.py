@@ -43,6 +43,8 @@ def test_overview():
     assert_oscovida_object(axes, cases, deaths)
     assert_oscovida_object(*c.overview("Germany", weeks=8))
     assert_oscovida_object(*c.overview("Russia", dates="2020-05-30:2020-06-15"))
+    with pytest.raises(ValueError):
+        c.overview("Argentina", weeks=8, dates="2020-05-30:2020-06-15")
 
 
 def test_US_overview():
@@ -401,3 +403,6 @@ def test_compare_plot_germany():
     assert_oscovida_object(*c.make_compare_plot_germany("Hamburg", normalise=True))
     assert_oscovida_object(*c.make_compare_plot_germany("Hamburg", weeks=7))
     assert_oscovida_object(*c.make_compare_plot_germany("Bayern", normalise=True, weeks=8))
+    assert_oscovida_object(*c.make_compare_plot_germany("Bayern", normalise=True, dates="2020-05-10:2020-06-15"))
+    with pytest.raises(ValueError):
+        c.make_compare_plot_germany("Bayern", normalise=True, weeks=8, dates="2020-05-10:2020-06-15")
