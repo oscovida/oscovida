@@ -75,6 +75,14 @@ oscillations due to the working week.
 The main lesson is that individual numbers need to be to put the data in context
 to be interpreted.
 
+## Update October 2020
+
+* We added the data point for 30 April in the first plot above, and extended the
+  data series for the second plot through May 2020.
+
+* See also [study on weekly fluctuations of reported
+  numbers](2020-05-10-notebook-Weekly-fluctuations-in-data-from-Germany.html).
+
 ## Further reading
 
 1. The [Jupyter Notebook to create the plots and table above is
