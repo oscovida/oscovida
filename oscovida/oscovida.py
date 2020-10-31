@@ -1361,11 +1361,11 @@ def plot_logdiff_time(ax, df, xaxislabel=None, yaxislabel=None, style="", labels
             linewidth = 2
 
         ax.plot(df.index, df[col].values, color, label=col, linewidth=linewidth, alpha=alpha)
-        if labels:
-            tmp = df[col].dropna()
-            if len(tmp) > 0:   # possible we have no data points
-                x, y = tmp.index[-1], tmp.values[-1]
-
+        tmp = df[col].dropna()
+        if len(tmp) > 0:  # possible we have no data points
+            x, y = tmp.index[-1], tmp.values[-1]
+            ax.plot([x], [y], "o" + color, alpha=alpha)     # dots at the end of each line
+            if labels:
                 # If we use the 'annotate' function on a data point with value 0 or a negative value,
                 # we run into a bizarre bug that the created figure has very large dimensions in the
                 # vertical direction when rendered to svg. The next line prevents this.
@@ -1384,7 +1384,6 @@ def plot_logdiff_time(ax, df, xaxislabel=None, yaxislabel=None, style="", labels
 
                 # Add country/region name as text next to last data point of the line:
                 ax.annotate(col, xy=(x + labeloffset, y), textcoords='data')
-                ax.plot([x], [y], "o" + color, alpha=alpha)
     ax.set_ylabel(yaxislabel)
     ax.set_xlabel(xaxislabel)
     ax.set_yscale('log')
@@ -1572,8 +1571,9 @@ def make_compare_plot_germany(region_subregion,
     if weeks > 0:
         res_c = df_c[- weeks * 7:]
         res_d = df_d[- weeks * 7:]
-        kwargs_c.update({'labels': False})
         kwargs_d.update({'yaxislabel': '', 'labels': False})
+        kwargs_c.update({'labels': False})
+        kwargs_d.update({'labels': False})
     else:
         res_c = align_sets_at(v0c, df_c)
         res_d = align_sets_at(v0d, df_d)
@@ -1594,6 +1594,8 @@ def make_compare_plot_germany(region_subregion,
     if normalise:
         kwargs_c["yaxislabel"] += "\nnormalised by 100K people"
         kwargs_d["yaxislabel"] += "\nnormalised by 100K people"
+        kwargs_c.update({'labels': False})
+        kwargs_d.update({'labels': False})
         for area in res_c.keys():
             res_c[area] *= 100000 / population("Germany", area)
             res_d[area] *= 100000 / population("Germany", area)
