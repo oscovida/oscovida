@@ -1423,7 +1423,7 @@ def set_y_axis_limit(data, current_lim):
 
 def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Poland", "Korea, South",
                                                   "Belarus", "Switzerland", "US"],
-                     v0c=10, v0d=3, normalise=False):
+                     v0c=10, v0d=3, normalise=True):
     rolling = 7
     df_c, df_d = get_compare_data([main_country] + compare_with, rolling=rolling)
     res_c = align_sets_at(v0c, df_c)
@@ -1788,7 +1788,7 @@ def overview(country: str, region: str = None, subregion: str = None,
 
 
 def compare_plot(country: str, region: str = None, subregion: str = None,
-                 savefig: bool = False, normalise: bool = False) -> Tuple[plt.axes, pd.Series, pd.Series]:
+                 savefig: bool = False, normalise: bool = True) -> Tuple[plt.axes, pd.Series, pd.Series]:
     """ Create a pair of plots which show comparison of the region with other most suffering countries
     """
     c, d = get_country_data(country, region=region, subregion=subregion)
