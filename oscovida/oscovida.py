@@ -811,9 +811,8 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
     ax_label = region_label + " new " + type_label
     (change, change_label), _, (smooth2, smooth2_label) = compute_daily_change(series)
 
-
-    if country and region:
-        habitants = population(country=country, region=region)
+    if country and (region or subregion):
+        habitants = population(country=country, region=region, subregion=subregion)
     else:
         habitants = population(region_label)
     if region_label and habitants and max(change) > 0:
@@ -1720,7 +1719,8 @@ def overview(country: str, region: str = None, subregion: str = None,
     else:
         c = c[- weeks * 7:]
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
-    plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"), country=country, region=region)
+    plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"),
+                      country=country, region=region, subregion=subregion)
     # data cleaning
     if country == "Spain":   # https://github.com/oscovida/oscovida/issues/44
         axes[1].set_ylim(bottom=0)
@@ -1734,7 +1734,8 @@ def overview(country: str, region: str = None, subregion: str = None,
         else:
             d = d[- weeks * 7:]
         plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
-        plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"))
+        plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"),
+                          country=country, region=region, subregion=subregion)
         plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
         problems = ("no data in reduced data set", "Cannot compute smooth ratio")
         if compute_doubling_time(d)[0][1] not in problems:
@@ -1794,8 +1795,7 @@ def compare_plot(country: str, region: str = None, subregion: str = None,
     c, d = get_country_data(country, region=region, subregion=subregion)
     region_label = get_region_label(country, region=region, subregion=subregion)
     if normalise:
-        assert subregion is None, f"Normalization does not support subregions"
-        _population = population(country=country, region=region)
+        _population = population(country=country, region=region, subregion=subregion)
         c *= 100000 / _population
         d *= 100000 / _population
 
