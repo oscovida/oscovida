@@ -1689,7 +1689,7 @@ def plot_no_data_available(ax, mimic_subplot, text):
 
 def overview(country: str, region: str = None, subregion: str = None,
              savefig: bool = False, dates: str = None,
-             weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
+             weeks: int = 0, data: Tuple[pd.Series, pd.Series] = None) -> Tuple[plt.axes, pd.Series, pd.Series]:
     """The `overview` function provides 6 graphs for the region:
 
     0) the total cumulative number of cases and deaths
@@ -1704,7 +1704,10 @@ def overview(country: str, region: str = None, subregion: str = None,
 
     Returns: subplots, cases (pandas Series), deaths (pandas Series)
     """
-    c, d = get_country_data(country, region=region, subregion=subregion)
+    if data is None:
+        c, d = get_country_data(country, region=region, subregion=subregion)
+    else:
+        c, d = data
     region_label = get_region_label(country, region=region, subregion=subregion)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     if dates and weeks == 0:
