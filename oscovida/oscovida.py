@@ -815,7 +815,7 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         habitants = population(country=country, region=region, subregion=subregion)
     else:
         habitants = population(region_label)
-    if region_label and habitants and max(change) > 0:
+    if habitants and max(change) > 0:
         # create another Y-axis on the right hand side
         # unfortunately there's no simple way of swapping the axes,
         # therefore we define normalised axis first
@@ -1712,7 +1712,7 @@ def overview(country: str, region: str = None, subregion: str = None,
             date_start, date_end = dates.split(':')
             c = c[date_start:date_end]
         except ValueError:
-            raise ValueError(f"`dates` are not a valid time range, try something "
+            raise ValueError(f"`dates` is not a valid time range, try something "
                              f"like dates='{c.index[0].date()}:{c.index[-1].date()}'")
     elif dates and weeks:
         raise ValueError("`dates` and `weeks` cannot be used together")
