@@ -1130,7 +1130,7 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.1, 100],
 
 
 def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
-                             yscale_days=28, max_yscale=10,
+                             yscale_days=28, max_yscale=10, smoothing=0,
                              labels=None):
     """
     - series is expected to be time series of cases or deaths
@@ -1138,6 +1138,15 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
     - country is the name of the region/country
     - color_g is the colour for the growth factor
     - color_R is the colour for the reproduction number
+
+    R number is calculated based on a 7-day average of the daily changes.
+    See details in compute_R().
+
+    By default the resulting data is not smoothed further. If desired,
+    for visual purposes, the parameter `smoothing` can be given the number
+    of days over which the computer R-values are averaged out (using a Gaussian
+    window with a width of 3 days). A number of 5 or 7 gives smooth results.
+    However, the plotted data then stops 5/2 (=2 days) or 7/2 (=3) days earlier.
 
     See plot_time_step for documentation on other parameters.
     """
@@ -1163,11 +1172,13 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
     (change, change_label) , (smooth, smooth_label), \
         (smooth2, smooth2_label) = compute_daily_change(series)
 
-    # we only use one return value:
-    smooth_diff = smooth2
     # we only use one return value (the 7-day average)
     smooth_diff = smooth
     R = compute_R(smooth_diff)
+    # do some additional smoothing
+    if smoothing != 0:
+        R = R.rolling(smoothing, win_type='gaussian', center=True,
+                      min_periods=smoothing).mean(std=3)
     ax.plot(R.index, R, "-", color=color_R,
             label=region + f" estimated R (using {label})",
             linewidth=4.5, alpha=1)
