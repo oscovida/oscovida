@@ -1016,6 +1016,12 @@ def compute_growth_factor(series):
     # division by zero may lead to np.inf in the data: get rid of that
     f.replace(np.inf, np.nan, inplace=True)  # seems not to affect plot
 
+    # pct_change computed between two values that are NaN each, returns 0
+    # (which should be interpreted as: no change from yesterday's NaN to
+    #  today's NaN. However, the way we use it, this gives misleading values. )
+    # Let's take out those values from f, where the input data was NaN:
+    f[smooth.isna()]=np.nan
+
     # Compute smoother version for line in plots
     f_smoothed = f.rolling(7, center=True, win_type='gaussian', min_periods=3).mean(std=2)
     smooth_label = f"Gaussian window (stddev=2 days)"
