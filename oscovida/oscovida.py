@@ -1163,8 +1163,8 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
     ax.plot(f.index, f.values, 'o', color=color_g, alpha=0.3, label=label_)
 
     label_ = region + " " + label + " daily growth factor " + smoothed_label
-    ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color_g, label=label_, linewidth=LW,
-            alpha=0.7)
+    ax.plot(f_smoothed.index, f_smoothed.values, '-', color=color_g,
+            label=label_, linewidth=LW, alpha=0.7)
 
 
     # # data for computation or R
