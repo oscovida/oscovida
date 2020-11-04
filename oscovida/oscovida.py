@@ -1390,7 +1390,7 @@ def plot_logdiff_time(ax, df, xaxislabel=None, yaxislabel=None, style="", labels
     # from https://stackoverflow.com/questions/21920233/matplotlib-log-scale-tick-label-number-formatting/33213196
     ax.yaxis.set_major_formatter(FuncFormatter(lambda y, _: '{:g}'.format(y)))
     # ax.set_xscale('log')    # also interesting
-    if isinstance(df.index[0], int):
+    if isinstance(df.index[0], (int, np.integer)):
         ax.set_ylim(bottom=set_y_axis_limit(df, v0))
         ax.set_xlim(left=-1)  #ax.set_xlim(-1, df.index.max())
     else:
