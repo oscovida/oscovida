@@ -773,7 +773,7 @@ def compute_daily_change(series):
     # Smoothing step 1: get rid of weekly cycles
     rolling_series = diff.rolling(7, center=True,
                                   win_type=None,
-                                  min_periods=1).mean()
+                                  min_periods=7).mean()
     smooth = rolling_series, smooth_label
 
     # extra smoothing for better visual effects
