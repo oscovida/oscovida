@@ -1165,6 +1165,8 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
 
     # we only use one return value:
     smooth_diff = smooth2
+    # we only use one return value (the 7-day average)
+    smooth_diff = smooth
     R = compute_R(smooth_diff)
     ax.plot(R.index, R, "-", color=color_R,
             label=region + f" estimated R (using {label})",
