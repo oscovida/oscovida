@@ -1708,6 +1708,11 @@ def overview(country: str, region: str = None, subregion: str = None,
         c, d = get_country_data(country, region=region, subregion=subregion)
     else:
         c, d = data
+        assert isinstance(c.index[0], pd.Timestamp), f"The index of 'cases' is not of type `Timestamp`, " \
+                                                     f"try to use `index=pd.DatetimeIndex(dates)`"
+        assert isinstance(d.index[0], pd.Timestamp), f"The index of 'deaths' is not of type `Timestamp`, " \
+                                                     f"try to use `index=pd.DatetimeIndex(dates)`"
+
     region_label = get_region_label(country, region=region, subregion=subregion)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     if dates and weeks == 0:
