@@ -36,7 +36,9 @@ def does_wwwroot_exist(wwwroot, create=False):
 
 def get_country_list():
     d = oscovida.fetch_deaths()
+    d = d[d.index.notnull()]
     c = oscovida.fetch_cases()
+    c = c[c.index.notnull()]
 
     countries = d.index
     countries2 = c.index
@@ -62,7 +64,9 @@ def generate_reports_countries(
     incidence_threshold=50,
 ):
     d = oscovida.fetch_deaths()
+    d = d[d.index.notnull()]
     c = oscovida.fetch_cases()
+    c = c[c.index.notnull()]
 
     countries = d.index
     countries2 = c.index
