@@ -155,9 +155,9 @@ def test_compute_daily_change():
     # We just take the current values and assume they are correct. If the smoothing parameters
     # are changed, then these need to be updated.
     smooth_data = smooth[0]
-    assert abs(smooth_data.sum() - 82617.95) < 1
+    assert abs(smooth_data.sum() - 80740.4) < 1
     smooth2_data = smooth2[0]
-    assert abs(smooth2_data.sum() - 82809.2) < 1
+    assert abs(smooth2_data.sum() - 76903.86) < 1
 
 
 def test_plot_daily_change():
