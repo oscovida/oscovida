@@ -777,9 +777,10 @@ def compute_daily_change(series):
     smooth = rolling_series, smooth_label
 
     # extra smoothing for better visual effects
-    rolling_series2 = rolling_series.rolling(9, center=True,
+    rolling_series2 = rolling_series.rolling(7, center=True,
                                              win_type='gaussian',
-                                             min_periods=1).mean(std=3)
+                                             min_periods=7).mean(std=3)
+
     # extra smooth curve
     smooth2_label = "Smoothed " + smooth_label
     # shorter description
