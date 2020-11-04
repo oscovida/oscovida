@@ -184,8 +184,8 @@ def test_compute_growth_factor():
     #
     # We just take the current values and assume they are correct. If the smoothing parameters
     # are changed, then these need to be updated.
-    assert abs(f[0].dropna().sum() - 77.9) < 0.1  # original data, should be the same as cases[-1]
-    assert abs(smooth[0].sum() - 79.2) < 0.1
+    assert abs(f[0].dropna().sum() - 70.8) < 0.1  # original data, should be the same as cases[-1]
+    assert abs(smooth[0].sum() - 73.05) < 0.1
 
 
 
