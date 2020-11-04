@@ -46,6 +46,16 @@ def test_overview():
     with pytest.raises(ValueError):
         c.overview("Argentina", weeks=8, dates="2020-05-30:2020-06-15")
 
+    days = 10
+    dates = pd.date_range("2020-03-01", periods=days, freq='D')
+    data1 = np.exp(np.linspace(1, 15, days))
+    data2 = np.exp(np.linspace(1, 5, days))
+
+    cases = pd.Series(data1, index=pd.DatetimeIndex(dates))
+    deaths = pd.Series(data2, index=pd.DatetimeIndex(dates))
+
+    assert_oscovida_object(*c.overview("Narnia", data=(cases, deaths)))
+
 
 def test_US_overview():
     axes, cases, deaths = c.overview(country="US", region="New Jersey")
