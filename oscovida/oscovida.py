@@ -1403,6 +1403,8 @@ def plot_logdiff_time(ax, df, xaxislabel=None, yaxislabel=None, style="", labels
 
                 # Add country/region name as text next to last data point of the line:
                 ax.annotate(col, xy=(x + labeloffset, y), textcoords='data')
+            else:
+                ax.legend()
     ax.set_ylabel(yaxislabel)
     ax.set_xlabel(xaxislabel)
     ax.set_yscale('log')
