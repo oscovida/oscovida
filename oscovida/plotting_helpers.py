@@ -1,6 +1,29 @@
+import datetime as dt
 import numpy as np
+import pandas as pd
 from functools import wraps
 from matplotlib import pyplot as plt
+
+
+def cut_dates(df: pd.DataFrame, dates: str) -> pd.DataFrame:
+    """
+    Trim the dataframe according to dates.
+
+    It works in the same way as python slices:
+    * "date_start:" means all dates after `date_start`
+    * "date_end" means all dates before `date_end`
+
+    :param df: a DataFrame to cut
+    :param dates: a string with `:` as a separator, e.g. "2020-01-15:2020-10-20"
+    :return: the DataFrame trimmed according to the dates passed
+    """
+    date_start, date_end = dates.split(':')
+    if date_start == '':
+        date_start = str(df.index[0])
+    if date_end == '':
+        date_end = str(dt.date.today())
+
+    return df[date_start:date_end]
 
 
 def linear_mapping(_from, _to, x):

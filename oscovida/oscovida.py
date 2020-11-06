@@ -15,7 +15,7 @@ from typing import Tuple, Union
 # choose font - can be deactivated
 from matplotlib import rcParams
 from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rki_data, rki_population_url
-from oscovida.plotting_helpers import align_twinx_ticks, has_twin, limit_to_smoothed
+from oscovida.plotting_helpers import align_twinx_ticks, cut_dates, has_twin, limit_to_smoothed
 
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
@@ -1157,8 +1157,8 @@ def plot_reproduction_number(ax, series, color_g='C1', color_R='C4',
     else:
         region, label = labels
 
-     # get smooth data for growth factor from plot 1 to base this plot on
-    (f, f_label) , (f_smoothed, smoothed_label) = compute_growth_factor(series)
+    # get smooth data for growth factor from plot 1 to base this plot on
+    (f, f_label), (f_smoothed, smoothed_label) = compute_growth_factor(series)
 
     label_ = region + " " + label + " daily growth factor " + f_label
     ax.plot(f.index, f.values, 'o', color=color_g, alpha=0.3, label=label_)
@@ -1303,23 +1303,20 @@ def get_country_data(country: str, region: str = None, subregion: str = None, ve
         print(f"get_country_data: deaths[{len_deaths1}] -> [{len_deaths2}]")
     return c, d
 
-#######################
 
-def day0atleast(v0, series):
+def day0atleast(v0: int, series: pd.Series) -> pd.Series:
     try:
         day0 = series[series > v0].index[0]
     except IndexError:  # means no days found for which series.values > v0
-        # print(f"Haven't found value > {v0} is Series {series.name}")
-        result = pd.Series(dtype=object)
+        # print(f"Haven't found value > {v0} in {series.name}")
+        result = pd.Series(dtype=object)    # return an empty object
         return result
-
     # compute timedelta
     timedelta = series.index - day0
     # convert to int as index
     t = pd.to_numeric(timedelta.astype("timedelta64[D]").astype(int))
     # Assemble new series
     result = pd.Series(index=t, data=series.values)
-
     return result
 
 
@@ -1331,7 +1328,6 @@ def align_sets_at(v0, df):
     Returns new dataframe with integer index (representing days after v0).
     """
     res = pd.DataFrame()
-
     for col in df.columns:
         # res[col] = day0for(v0, df[col])
         series = day0atleast(v0, df[col])
@@ -1567,7 +1563,7 @@ def get_compare_data_hungary(region, compare_with_local: list, rolling=7):
     return df_c, None
 
 
-def make_compare_plot_germany(region_subregion,
+def make_compare_plot_germany(region=None, subregion=None,
                               compare_with=[],  # "China", "Italy", "Germany"],
                               compare_with_local=['Bayern',
                                                   'Berlin', 'Bremen',
@@ -1577,7 +1573,6 @@ def make_compare_plot_germany(region_subregion,
                               v0c=10, v0d=1, normalise=True,
                               weeks=0, dates=None):
     rolling = 7
-    region, subregion = unpack_region_subregion(region_subregion)
     df_c1, df_d1 = get_compare_data_germany((region, subregion), compare_with_local, rolling=rolling)
     df_c2, df_d2 = get_compare_data(compare_with, rolling=rolling)
 
@@ -1592,9 +1587,8 @@ def make_compare_plot_germany(region_subregion,
 
     if dates and weeks == 0:
         try:
-            date_start, date_end = dates.split(':')
-            res_c = df_c[date_start:date_end]
-            res_d = df_d[date_start:date_end]
+            res_c = cut_dates(df_c, dates)
+            res_d = cut_dates(df_d, dates)
             kwargs_c.update({'labels': False})
             kwargs_d.update({'labels': False})
         except ValueError:
@@ -1837,7 +1831,7 @@ def compare_plot(country: str, region: str = None, subregion: str = None,
         # We thus compare only against those Laender, that are in the data set:
         # germany = fetch_data_germany()
         # laender = list(germany['Bundesland'].drop_duplicates().sort_values())
-        axes_compare, res_c, red_d = make_compare_plot_germany((region, subregion))
+        axes_compare, res_c, red_d = make_compare_plot_germany(region=region, subregion=subregion, normalise=normalise)
     elif country == "US" and region is not None:
         # skip comparison plot for the US states at the moment
         return None, c, d
