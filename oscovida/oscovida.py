@@ -1732,12 +1732,8 @@ def overview(country: str, region: str = None, subregion: str = None,
     region_label = get_region_label(country, region=region, subregion=subregion)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     if dates and weeks == 0:
-        try:
-            date_start, date_end = dates.split(':')
-            c = c[date_start:date_end]
-        except ValueError:
-            raise ValueError(f"`dates` is not a valid time range, try something "
-                             f"like dates='{c.index[0].date()}:{c.index[-1].date()}'")
+        c = cut_dates(c, dates)
+
     elif dates and weeks:
         raise ValueError("`dates` and `weeks` cannot be used together")
     else:
@@ -1813,7 +1809,8 @@ def overview(country: str, region: str = None, subregion: str = None,
 
 
 def compare_plot(country: str, region: str = None, subregion: str = None,
-                 savefig: bool = False, normalise: bool = True) -> Tuple[plt.axes, pd.Series, pd.Series]:
+                 savefig: bool = False, normalise: bool = True,
+                 dates: str = None) -> Tuple[plt.axes, pd.Series, pd.Series]:
     """ Create a pair of plots which show comparison of the region with other most suffering countries
     """
     c, d = get_country_data(country, region=region, subregion=subregion)
@@ -1831,7 +1828,8 @@ def compare_plot(country: str, region: str = None, subregion: str = None,
         # We thus compare only against those Laender, that are in the data set:
         # germany = fetch_data_germany()
         # laender = list(germany['Bundesland'].drop_duplicates().sort_values())
-        axes_compare, res_c, red_d = make_compare_plot_germany(region=region, subregion=subregion, normalise=normalise)
+        axes_compare, res_c, red_d = make_compare_plot_germany(region=region, subregion=subregion, normalise=normalise,
+                                                               dates=dates)
     elif country == "US" and region is not None:
         # skip comparison plot for the US states at the moment
         return None, c, d

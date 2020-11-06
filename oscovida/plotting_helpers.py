@@ -17,7 +17,12 @@ def cut_dates(df: pd.DataFrame, dates: str) -> pd.DataFrame:
     :param dates: a string with `:` as a separator, e.g. "2020-01-15:2020-10-20"
     :return: the DataFrame trimmed according to the dates passed
     """
-    date_start, date_end = dates.split(':')
+    try:
+        date_start, date_end = dates.split(':')
+    except ValueError:
+        raise ValueError(f"`dates` is not a valid time range, try something "
+                         f"like dates='{df.index[0].date()}:{df.index[-1].date()}'")
+
     if date_start == '':
         date_start = str(df.index[0])
     if date_end == '':
