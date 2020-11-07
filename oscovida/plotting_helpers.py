@@ -3,9 +3,10 @@ import numpy as np
 import pandas as pd
 from functools import wraps
 from matplotlib import pyplot as plt
+from typing import Union
 
 
-def cut_dates(df: pd.DataFrame, dates: str) -> pd.DataFrame:
+def cut_dates(df: Union[pd.DataFrame, pd.Series], dates: str) -> pd.DataFrame:
     """
     Trim the dataframe according to dates.
 

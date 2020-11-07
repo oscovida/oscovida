@@ -1320,8 +1320,6 @@ def day0atleast(v0: int, series: pd.Series) -> pd.Series:
     return result
 
 
-
-
 def align_sets_at(v0, df):
     """Accepts data frame, and aligns so that all entries close to v0 are on the same row.
 
