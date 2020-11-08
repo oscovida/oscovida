@@ -5,6 +5,7 @@ from pandas import DatetimeIndex
 import matplotlib.pyplot as plt
 import pytest
 import oscovida as c
+import oscovida.plotting_helpers as oph
 
 
 def assert_oscovida_object(ax, cases, deaths):
@@ -14,16 +15,21 @@ def assert_oscovida_object(ax, cases, deaths):
 
 
 def mock_get_country_data_johns_hopkins(country="China"):
-    cases_values = [548, 643, 920, 1406, 2075, 2877, 5509, 6087, 8141, 9802, 11891, 16630, 19716, 23707, 27440, 30587, 34110, 36814, 39829, 42354, 44386, 44759, 59895, 66358, 68413, 70513, 72434, 74211, 74619, 75077, 75550, 77001, 77022, 77241, 77754, 78166, 78600, 78928, 79356, 79932, 80136, 80261, 80386, 80537, 80690, 80770, 80823, 80860, 80887, 80921, 80932, 80945, 80977, 81003, 81033, 81058, 81102, 81156, 81250, 81305, 81435, 81498, 81591, 81661, 81782, 81897, 81999, 82122, 82198, 82279, 82361, 82432, 82511, 82543, 82602, 82665, 82718, 82809, 82883, 82941]
-    cases_index = "DatetimeIndex(['2020-01-22', '2020-01-23', '2020-01-24', '2020-01-25',  '2020-01-26', '2020-01-27', '2020-01-28', '2020-01-29',  '2020-01-30', '2020-01-31', '2020-02-01', '2020-02-02',  '2020-02-03', '2020-02-04', '2020-02-05', '2020-02-06',  '2020-02-07', '2020-02-08', '2020-02-09', '2020-02-10',  '2020-02-11', '2020-02-12', '2020-02-13', '2020-02-14',  '2020-02-15', '2020-02-16', '2020-02-17', '2020-02-18',  '2020-02-19', '2020-02-20', '2020-02-21', '2020-02-22',  '2020-02-23', '2020-02-24', '2020-02-25', '2020-02-26',  '2020-02-27', '2020-02-28', '2020-02-29', '2020-03-01',  '2020-03-02', '2020-03-03', '2020-03-04', '2020-03-05',  '2020-03-06', '2020-03-07', '2020-03-08', '2020-03-09',  '2020-03-10', '2020-03-11', '2020-03-12', '2020-03-13',  '2020-03-14', '2020-03-15', '2020-03-16', '2020-03-17',  '2020-03-18', '2020-03-19', '2020-03-20', '2020-03-21',  '2020-03-22', '2020-03-23', '2020-03-24', '2020-03-25',  '2020-03-26', '2020-03-27', '2020-03-28', '2020-03-29',  '2020-03-30', '2020-03-31', '2020-04-01', '2020-04-02',  '2020-04-03', '2020-04-04', '2020-04-05', '2020-04-06',  '2020-04-07', '2020-04-08', '2020-04-09', '2020-04-10'], dtype='datetime64[ns]', freq=None)"
+    cases_values = [548, 643, 920, 1406, 2075, 2877, 5509, 6087, 8141, 9802, 11891, 16630, 19716, 23707, 27440, 30587,
+                    34110, 36814, 39829, 42354, 44386, 44759, 59895, 66358, 68413, 70513, 72434, 74211, 74619, 75077,
+                    75550, 77001, 77022, 77241, 77754, 78166, 78600, 78928, 79356, 79932, 80136, 80261, 80386, 80537,
+                    80690, 80770, 80823, 80860, 80887, 80921, 80932, 80945, 80977, 81003, 81033, 81058, 81102, 81156,
+                    81250, 81305, 81435, 81498, 81591, 81661, 81782, 81897, 81999, 82122, 82198, 82279, 82361, 82432,
+                    82511, 82543, 82602, 82665, 82718, 82809, 82883, 82941]
+    cases_index = pd.date_range("2020-01-22", periods=len(cases_values), freq='D')
 
-    cases = pd.Series(data=cases_values, index=eval(cases_index))
+    cases = pd.Series(data=cases_values, index=cases_index)
     cases.country = "China"
     deaths = cases.copy(deep=True)
     deaths.values[:] = cases.values * 0.1
     deaths.country = "China"
-    deaths.label='deaths'
-    cases.label='cases'
+    deaths.label = 'deaths'
+    cases.label = 'cases'
     return cases, deaths
 
 
@@ -416,3 +422,33 @@ def test_compare_plot_germany():
     assert_oscovida_object(*c.make_compare_plot_germany("Bayern", normalise=True, dates="2020-05-10:2020-06-15"))
     with pytest.raises(ValueError):
         c.make_compare_plot_germany("Bayern", normalise=True, weeks=8, dates="2020-05-10:2020-06-15")
+
+
+def test_cut_dates():
+    cases, deaths = mock_get_country_data_johns_hopkins()
+    cut1 = oph.cut_dates(cases, "2020-02-01:2020-02-20")
+    assert len(cut1) == 20
+    cut2 = oph.cut_dates(cases, ":2020-02-20")
+    assert len(cut2) == 30
+    cut3 = oph.cut_dates(cases, "2020-02-20:")
+    assert len(cut3) == 51
+    with pytest.raises(ValueError):
+        oph.cut_dates(cases, "2020-02-20")
+
+
+def test_day0atleast():
+    cases, deaths = mock_get_country_data_johns_hopkins()
+    res = c.day0atleast(100, cases)
+    assert type(res) == type(cases)
+    assert len(res) == len(cases)
+    assert len(res[res.index >= 0]) == len(cases)
+
+    # should cut the first three values:
+    res = c.day0atleast(1000, cases)
+    assert type(res) == type(cases)
+    assert len(res[res.index >= 0]) == len(cases) - 3
+
+    # should return an empty series
+    res = c.day0atleast(100000, cases)
+    assert type(res) == type(cases)
+    assert len(res) == 0

@@ -189,7 +189,7 @@ class GermanyReport(BaseReport):
             overview_function="overview",
             overview_args=f'country="Germany", subregion="{self.subregion}"',
             compare_plot_function="compare_plot",
-            compare_plot_args=f'country="Germany", subregion="{self.subregion}"',
+            compare_plot_args=f'country="Germany", subregion="{self.subregion}", dates="2020-03-15:"',
             data_load_function="germany_get_region",
             data_load_args=f'landkreis="{self.subregion}"',
             output_file=f"Germany-{self.region}-{self.subregion}",
