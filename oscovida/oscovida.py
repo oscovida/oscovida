@@ -1584,14 +1584,10 @@ def make_compare_plot_germany(region=None, subregion=None,
     kwargs_c, kwargs_d = {}, {}
 
     if dates and weeks == 0:
-        try:
-            res_c = cut_dates(df_c, dates)
-            res_d = cut_dates(df_d, dates)
-            kwargs_c.update({'labels': False})
-            kwargs_d.update({'labels': False})
-        except ValueError:
-            raise ValueError(f"`dates` are not a valid time range, try something "
-                             f"like dates='{df_c.index[0].date()}:{df_c.index[-1].date()}'")
+        res_c = cut_dates(df_c, dates)
+        res_d = cut_dates(df_d, dates)
+        kwargs_c.update({'labels': False})
+        kwargs_d.update({'labels': False})
     elif dates and weeks:
         raise ValueError("`dates` and `weeks` cannot be used together")
     elif weeks > 0:

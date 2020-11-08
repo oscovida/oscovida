@@ -12,7 +12,8 @@ def cut_dates(df: Union[pd.DataFrame, pd.Series], dates: str) -> pd.DataFrame:
 
     It works in the same way as python slices:
     * "date_start:" means all dates after `date_start`
-    * "date_end" means all dates before `date_end`
+    * ":date_end" means all dates before `date_end`
+    * "date_start:date_end" - a slice of dates from `date_start` till `date_end`
 
     :param df: a DataFrame to cut
     :param dates: a string with `:` as a separator, e.g. "2020-01-15:2020-10-20"
