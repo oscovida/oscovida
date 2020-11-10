@@ -15,13 +15,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install dependencies
+      - name: Install oscovida and dependencies
         run: |
           sudo python3 -m pip install --upgrade pip
           pip install -U pytest
-          pip install setuptools
-          pip install nbconvert pelican pytest-tornasync
-          make dev-install
+#          - name: Set up oscovida and webgen
+#            run: |
+#              pip install ./oscovida
+          pip install -U setuptools
+#          pip install nbconvert pelican pytest-tornasync
+          make dev-install  # oscovida with its dependencies
 
       - name: Test with pytest
         run: |
