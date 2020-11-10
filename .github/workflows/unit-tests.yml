@@ -19,9 +19,9 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo python3 -m pip install --upgrade pip
-          pip install -U setuptools
-          sudo pip3 install nbconvert pelican pytest-tornasync
+          python3 -m pip install --upgrade pip
+          pip3 install -U setuptools
+          pip3 install nbconvert pelican pytest-tornasync
 
       - name: Install oscovida
         run: |
