@@ -1,4 +1,4 @@
-name: Generate Webpage for PR
+name: Generate Webpage
 
 on:
   pull_request:

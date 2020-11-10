@@ -2,7 +2,8 @@ Most content has moved to the temporary website https://oscovida.github.io
 
 The remaining content here is only for developers.
 
-[![Build Status](https://travis-ci.com/oscovida/oscovida.svg?branch=master)](https://travis-ci.com/oscovida/oscovida)
+![tests](https://github.com/oscovida/oscovida/workflows/tests/badge.svg)
+![Generate Webpage](https://github.com/oscovida/oscovida/workflows/Generate%20Webpage/badge.svg)
 [![codecov](https://codecov.io/gh/oscovida/oscovida/branch/master/graph/badge.svg)](https://codecov.io/gh/oscovida/oscovida)
 [![project chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://oscovida.zulipchat.com)
 
