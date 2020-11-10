@@ -19,8 +19,8 @@ jobs:
         run: |
           sudo python3 -m pip install --upgrade pip
           pip install -U setuptools
+          sudo pip3 install nbconvert pelican pytest-tornasync
           make dev-install
-          pip install nbconvert pelican pytest-tornasync
 
       - name: Test with pytest
         run: |
