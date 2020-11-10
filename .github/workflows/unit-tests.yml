@@ -1,4 +1,4 @@
-name: Run unit-tests for PR
+name: tests
 
 on:
   push:
@@ -15,11 +15,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Install oscovida and dependencies
+      - name: Install dependencies
         run: |
           sudo python3 -m pip install --upgrade pip
           pip install -U setuptools
           sudo pip3 install nbconvert pelican pytest-tornasync
+
+      - name: Install oscovida
+        run: |
           make dev-install
 
       - name: Test with pytest
@@ -27,4 +30,5 @@ jobs:
           make test
           make test-pelican
           make test-nbval
+
       - uses: codecov/codecov-action@v1
