@@ -19,7 +19,7 @@ jobs:
         run: |
           sudo python3 -m pip install --upgrade pip
           pip install -U pytest
-          pip install pytest-tornasync setuptools
+          pip install nbconvert pytest-tornasync setuptools
           make dev-install
 
       - name: Test with pytest
