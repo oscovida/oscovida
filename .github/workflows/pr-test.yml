@@ -11,7 +11,7 @@ jobs:
 
       - id: addKey
         name: Add key for staging push
-        uses: webfactory/ssh-agent@ef0ce0cab8e3ad0aa0f3e1fb209b0811b68c0c51
+        uses: webfactory/ssh-agent@ee29fafb6aa450493bac9136b346e51ea60a8b5e
         with:
           ssh-private-key: ${{ secrets.STAGING_KEY }}
 
