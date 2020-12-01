@@ -845,6 +845,13 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
 
         ax1.plot(smooth2.index, smooth2.values, color=color,
                  label=ax_label + " " + smooth2_label, linewidth=LW)
+
+        # uncertain graph on the right
+        if not dates:
+            fortnight = series[-14:].diff().dropna()
+            uncert = fortnight.rolling(14, center=True, win_type='gaussian', min_periods=3).mean(std=4)
+            ax1.plot(uncert.index[-7:], uncert.values[-7:], color=color, linestyle='dashed', linewidth=LW, alpha=0.7)
+
         ax1.legend()
         ax1.set_ylabel('daily change')
 
