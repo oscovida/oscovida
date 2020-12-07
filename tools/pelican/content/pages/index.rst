@@ -36,6 +36,10 @@ Occasionally, we try to provide `additional discussion COVID19 related news and 
 
 You can `fire up your own analysis environment in the cloud, select the relevant analysis notebook yourself, re-execute or extend the analysis <https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb>`__. See also our (growing) `set of tutorials <tag-tutorial.html>`__.
 
+--------------
+
+.. raw:: html
+   :file: index-included-for-interactive-map
 
 --------------
 
