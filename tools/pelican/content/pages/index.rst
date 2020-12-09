@@ -38,6 +38,8 @@ You can `fire up your own analysis environment in the cloud, select the relevant
 
 --------------
 
+The colour scale on this world map goes up to the 90th quantile (where 90% of the countries have less than that number of cases), any country with a 7 day incidence rate over the 90th quantile is set to the darkest red colour.
+
 .. raw:: html
    :file: index-included-for-interactive-map
 
