@@ -52,6 +52,7 @@ setup(name="oscovida",
           'click',
           'pytest_tornasync',
           'nbconvert==5.*,<6',
+          'plotly',
       ],
       extras_require={
           'test': [
