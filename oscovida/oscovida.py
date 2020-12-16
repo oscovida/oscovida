@@ -268,7 +268,7 @@ def fetch_data_germany_last_execution():
 
 
 @joblib_memory.cache
-def fetch_data_germany(include_last_day=True, filter_goettingen_alt=True) -> pd.DataFrame:
+def fetch_data_germany(include_last_day=True) -> pd.DataFrame:
     """Fetch data for Germany from Robert Koch institute and return as a pandas
     DataFrame with the `Meldedatum` as the index.
 
@@ -279,10 +279,6 @@ def fetch_data_germany(include_last_day=True, filter_goettingen_alt=True) -> pd.
     the retrieved data sets (see reasoning below in source), as the data is
     commonly update one day later with more accurate (and typically higher)
     numbers.
-
-    The `filter_goettingen_alt` option is only needed for a unit test
-    (test_corona.py::test_clean_data_germany_goettingen_alt_is_fluke).
-
     """
 
     # outdated: datasource = "https://opendata.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0.csv"
@@ -329,14 +325,8 @@ def fetch_data_germany(include_last_day=True, filter_goettingen_alt=True) -> pd.
     else:
         cleaned = g2
 
-    # see documentation of clean_data_germany_goettingen_alt for explanation
-    if filter_goettingen_alt:
-        cleaned2 = clean_data_germany_remove_goettingen_alt(cleaned)
-    else:
-        cleaned2 = cleaned
-
     fetch_data_germany_last_execution()
-    return cleaned2
+    return cleaned
 
 
 def pad_cumulative_series_to_yesterday(series):
@@ -1861,65 +1851,3 @@ def get_cases_last_week(cases):
     # last week is difference between last value, and the one 7 days before
     cases_last_week = c2[-1] - c2[-8]
     return cases_last_week
-
-
-def clean_data_germany_remove_goettingen_alt(germany_data, debug=False):
-    """New 16 September 2020.
-
-    This function removes all data rows that are for the region "LK Göttingen
-    (alt)".
-
-    Some diagnostic output is printed, if `debug=True` is used.
-
-
-    Context:
-
-    Some tests failed because we have a new Landkreis in the data from the RKI,
-    which is called "LK Göttingen (alt)". As of 16 September 2020, there is
-    only one entry. I speculate that this is an error and will disappear over
-    time. The proposed solution is to remove this line from the RKI data, and
-    to only do this if there is at most one row for "LK Göttingen (alt)".
-
-    Here is some debug code:
-
-    germany_data = oscovida.fetch_data_germany()
-    # find all rows for 'LK Göttingen (alt)'
-    sel = germany_data['Landkreis'] == 'LK Göttingen (alt)'
-    print(f"Found {len(germany_data[sel])} rows for Göttingen (alt)")
-    print(germany_data[sel].T)
-
-    with output:
-
-      Found 1 rows for Göttingen (alt)
-      date                             2020-04-09
-      FID                                35939791
-      IdBundesland                              3
-      Bundesland                    Niedersachsen
-      Landkreis                LK Göttingen (alt)
-      Altersgruppe                        A35-A59
-      Geschlecht                                W
-      AnzahlFall                                1
-      AnzahlTodesfall                           0
-      Meldedatum              2020/04/09 00:00:00
-      IdLandkreis                            3159
-      Datenstand            16.09.2020, 00:00 Uhr
-      NeuerFall                                 0
-      NeuerTodesfall                           -9
-      Refdatum                2020/04/09 00:00:00
-      NeuGenesen                                0
-      AnzahlGenesen                             1
-      IstErkrankungsbeginn                      0
-      Altersgruppe2             Nicht übermittelt
-
-    """
-
-    # find all rows for 'LK Göttingen (alt)'
-    sel = germany_data['Landkreis'] == 'LK Göttingen (alt)'
-    if debug:
-        print(f"Found {len(germany_data[sel])} rows for Göttingen (alt)")
-        print(germany_data[sel].T)
-
-    # return all other rows
-    return germany_data[~sel]
-
-

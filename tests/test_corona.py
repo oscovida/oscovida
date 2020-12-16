@@ -204,23 +204,6 @@ def test_compute_growth_factor():
     assert abs(smooth[0].sum() - 73.05) < 0.1
 
 
-
-#def test_plot_growth_factor():
-#    cases, deaths = mock_get_country()
-#    fig, ax = plt.subplots()
-#    ax = c.plot_growth_factor(ax, cases, 'C1')
-#    fig.savefig('test-growth_factor.pdf')
-#
-#
-#def test_plot_growth_factor_fetch_data():
-#    """Similar to test above, but using fresh data"""
-#    for country in ["Korea, South", "China", "Germany"]:
-#        cases, deaths = c.get_country(country)
-#        fig, ax = plt.subplots()
-#        c.plot_growth_factor(ax, cases, 'C1');
-#        c.plot_growth_factor(ax, deaths, 'C0');
-#        fig.savefig(f'test-growth-factor-{country}.pdf')
-
 def test_plot_reproduction_number ():
     cases, deaths = mock_get_country_data_johns_hopkins()
     fig, ax = plt.subplots()
@@ -339,37 +322,6 @@ def test_get_population():
     assert 120_000_000 * 1.5 > world.loc['Japan'].population > 120_000_000
     assert 320_000_000 * 1.5 > world.loc['US'].population > 320_000_000
     assert 80_000_000 * 1.5 > world.loc['Germany'].population > 80_000_000
-
-
-# update 25/10/2020: the following test has started to fail.
-# We mark it as `xfail`. If it remains as `xfail`, we should remove
-# the whole test and data cleaning: presumably, the RKI has tidied up
-# the data now.
-@pytest.mark.xfail
-def test_clean_data_germany_goettingen_alt_is_fluke():
-    germany_data = c.fetch_data_germany(filter_goettingen_alt=False)
-    cleaned = c.fetch_data_germany(filter_goettingen_alt=True)
-    ## could also use this command:
-    cleaned = c.clean_data_germany_remove_goettingen_alt(germany_data)
-
-    # how many rows did we delete?
-    n = len(germany_data) - len(cleaned)
-
-    if n == 1:
-        # Normal as of 167 Sept (see oscovida.cleane_data_germany_remove_göttingen_alt.__doc__)
-        pass
-    elif n > 1:
-        msg = f"We have found {n} rows of Göttingen alt data - please investigate\n" + \
-            "if this is a real / important LK in Germany"
-        raise ValueError(msg, germany_data, cleaned)
-    elif n == 0:
-        msg = "There are no rows with LK Göttingen (alt). \n" + \
-            "Consider removing the data cleaning code for Göttingen (alt)."
-        print(msg)
-        # should we raise an error here to notice this situation?
-        raise ValueError(msg)
-    else:
-        raise NotImplementedError("This should not be possible.", germany_data, cleaned)
 
 
 def test_get_region_label():
