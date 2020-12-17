@@ -28,12 +28,10 @@ class MetadataRegion:
     - also useful for more aggressive parallelisation
 
     """
-
+    @staticmethod
     def get_all():
+        """ Return list of names that are stored on disk.
         """
-        Class method.
-
-        Return list of names that are stored on disk."""
         regions = []
         for fname in os.listdir(MetadataStorageLocation):
             # check this is a valid file:
@@ -45,13 +43,10 @@ class MetadataRegion:
             regions.append(region_name)
         return regions
 
-
+    @staticmethod
     def get_all_as_dataframe():
+        """ Return a Dataframe with all data stored on disk.
         """
-        Class method.
-
-        Return a Dataframe with all data stored on disk."""
-
         regions = MetadataRegion.get_all()
         d = {}
         for region in regions:
@@ -61,13 +56,9 @@ class MetadataRegion:
         df = pd.DataFrame(d).T
         return df
 
-
-
+    @staticmethod
     def clear_all():
-        """Clear all entries from disk, and create storage directory if it doesn't exist yet.
-
-        Class method.
-
+        """ Clear all entries from disk, and create storage directory if it doesn't exist yet.
         """
         if os.path.exists(MetadataStorageLocation):
             for fname in os.listdir(MetadataStorageLocation):
@@ -81,8 +72,6 @@ class MetadataRegion:
             os.makedirs(MetadataStorageLocation)
             # not creating the path here, can lead to a race condition when
             # multiple processed try to create it when running in parallel
-
-
 
     def __init__(self, country, mode="r"):
         """Expects country string and mode
@@ -109,8 +98,6 @@ class MetadataRegion:
         else:
             raise NotImplementedError(f"Unknown mode {mode}")
 
-
-
     def last_updated_hours_ago(self):
         """returns hours since last modification, i.e. number of hours since last time
         something was changed in the object.
@@ -124,16 +111,13 @@ class MetadataRegion:
 
         return hours_ago
 
-
     def _storage_path(self):
         return os.path.join(MetadataStorageLocation,
                             self.country + "-meta.json")
 
-
     def _clear(self):
         self._d = {}
         self._save()
-
 
     def _load(self):
         with open(self._storage_path()) as f_in:
@@ -147,8 +131,7 @@ class MetadataRegion:
             json.dump(self._d, f_out, sort_keys=True, indent=4)
 
     def keys(self):
-        k = self._d.keys()
-        return k
+        return self._d.keys()
 
     def as_dict(self):
         return self._d
