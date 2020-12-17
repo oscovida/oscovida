@@ -70,6 +70,30 @@ def test_US_overview():
     assert_oscovida_object(axes, cases, deaths)
 
 
+def test_germany_overview():
+    axes, cases, deaths = c.overview(country="Germany", region="Hamburg")
+    assert cases.name == 'Germany-Hamburg cases'
+    assert_oscovida_object(axes, cases, deaths)
+
+    axes, cases, deaths = c.overview(country="Germany", subregion="LK Pinneberg")
+    assert deaths.name == 'Germany-LK Pinneberg deaths'
+    assert_oscovida_object(axes, cases, deaths)
+
+    axes, cases, deaths = c.overview(country="Germany", subregion="SK Kassel")
+    assert cases.name == 'Germany-SK Kassel cases'
+    assert deaths.name == 'Germany-SK Kassel deaths'
+    assert_oscovida_object(axes, cases, deaths)
+
+    axes, cases, deaths = c.overview(country="Germany", subregion="StadtRegion Aachen")
+    assert cases.name == 'Germany-StadtRegion Aachen cases'
+    assert_oscovida_object(axes, cases, deaths)
+
+    axes, cases, deaths = c.overview(country="Germany", subregion="Region Hannover")
+    assert cases.name == 'Germany-Region Hannover cases'
+    assert deaths.name == 'Germany-Region Hannover deaths'
+    assert_oscovida_object(axes, cases, deaths)
+
+
 def test_get_US_region_list():
     x = c.get_US_region_list()
     assert x[0] == "Alabama"
@@ -297,6 +321,9 @@ def test_germany_get_population():
 
     pinneberg = germany.loc['LK Pinneberg'].population
     assert pinneberg > 30000
+
+    aachen = germany.loc['StadtRegion Aachen'].population
+    assert aachen > 500000
 
 
 def test_get_population():

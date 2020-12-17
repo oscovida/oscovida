@@ -36,19 +36,6 @@ def test_germany_overview(n=10):
 
     subregions = get_germany_subregion_list()[0:n]
 
-    # data cleaning: on 13 April, we had a Landkreis "LK Göttingen (alt)"
-    # with only one data point. This causes plots to fail, because there
-    # is nothing to plot, and then the legend() command failed.
-    # We assume that the RKI labels unusual data with '(alt)', and remove those.
-
-    alt_data_sets = [x for x in subregions if "(alt)" in x.lower()]
-    if len(alt_data_sets) > 0:
-        print(f"Removing datasets label with '(alt)': {alt_data_sets}")
-        for alt in alt_data_sets:
-            c, d = germany_get_region(landkreis=alt)
-            print(f"  removed: {alt} : len(cases)={len(c)}, len(deaths)={len(d)}")
-            # subregions = [x for x in subregions if not "(alt)" in x.lower()]
-
     start_time = time.time()
     for i, subregion in enumerate(subregions):
         print(f"Processing {i+1:3}/{len(subregions)} [{time.time()-start_time:4.0f}s] {subregion}")
@@ -66,11 +53,6 @@ def test_world_overview(n=10):
         matplotlib.pyplot.close('all')
 
 
-
-def main():
-    test_world_overview(n=300)  # test all
-    test_germany_overview(n=500) # test all
-
-
 if __name__ == "__main__":
-    main()
+    test_world_overview(n=300)      # test all
+    test_germany_overview(n=500)    # test all
