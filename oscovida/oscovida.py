@@ -268,7 +268,7 @@ def fetch_data_germany_last_execution():
 
 
 @joblib_memory.cache
-def fetch_data_germany(include_last_day=True, filter_goettingen_alt=True) -> pd.DataFrame:
+def fetch_data_germany(include_last_day=True) -> pd.DataFrame:
     """Fetch data for Germany from Robert Koch institute and return as a pandas
     DataFrame with the `Meldedatum` as the index.
 
@@ -279,10 +279,6 @@ def fetch_data_germany(include_last_day=True, filter_goettingen_alt=True) -> pd.
     the retrieved data sets (see reasoning below in source), as the data is
     commonly update one day later with more accurate (and typically higher)
     numbers.
-
-    The `filter_goettingen_alt` option is only needed for a unit test
-    (test_corona.py::test_clean_data_germany_goettingen_alt_is_fluke).
-
     """
 
     # outdated: datasource = "https://opendata.arcgis.com/datasets/dd4580c810204019a7b8eb3e0b329dd6_0.csv"
@@ -329,14 +325,8 @@ def fetch_data_germany(include_last_day=True, filter_goettingen_alt=True) -> pd.
     else:
         cleaned = g2
 
-    # see documentation of clean_data_germany_goettingen_alt for explanation
-    if filter_goettingen_alt:
-        cleaned2 = clean_data_germany_remove_goettingen_alt(cleaned)
-    else:
-        cleaned2 = cleaned
-
     fetch_data_germany_last_execution()
-    return cleaned2
+    return cleaned
 
 
 def pad_cumulative_series_to_yesterday(series):
@@ -746,7 +736,9 @@ def plot_time_step(ax, series, style="-", labels=None, logscale=True):
     return ax
 
 
-def compute_daily_change(series):
+def compute_daily_change(series: pd.Series) -> Tuple[Tuple[pd.Series, str],
+                                                     Tuple[pd.Series, str],
+                                                     Tuple[pd.Series, str]]:
     """returns (change, smooth, smooth2)
 
     where 'change' is a tuple of (series, label)
@@ -792,7 +784,8 @@ def compute_daily_change(series):
 
 
 def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str] = None,
-                      country: str = None, region: str = None, subregion: str = None):
+                      country: str = None, region: str = None, subregion: str = None,
+                      dates: str = None, weeks: int = 0):
     """Given a series of data and matplotlib axis ax, plot the
     - difference in the series data from day to day as bars and plot a smooth
     - line to show the overall development
@@ -811,6 +804,12 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         region_label, type_label = labels
     ax_label = region_label + " new " + type_label
     (change, change_label), _, (smooth2, smooth2_label) = compute_daily_change(series)
+    if dates:
+        change = cut_dates(change, dates)
+        smooth2 = cut_dates(smooth2, dates)
+    if weeks:
+        change = change[-7 * weeks:]
+        smooth2 = smooth2[-7 * weeks:]
 
     if country and (region or subregion):
         habitants = population(country=country, region=region, subregion=subregion)
@@ -821,7 +820,6 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         # unfortunately there's no simple way of swapping the axes,
         # therefore we define normalised axis first
         ax2 = ax
-        ax2.grid(None)  # disabling the second grid
         # this is just to be sure that we plot the same graph (please leave it commented in the production):
         # ax2.plot(smooth2.index, smooth2.values * 1E5 / habitants, color='green')
         ax2.set_ylim((0, max(change) * 1E5 / habitants))
@@ -837,6 +835,13 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
 
         ax1.plot(smooth2.index, smooth2.values, color=color,
                  label=ax_label + " " + smooth2_label, linewidth=LW)
+
+        # uncertain graph on the right
+        if not dates:
+            fortnight = series[-14:].diff().dropna()
+            uncert = fortnight.rolling(14, center=True, win_type='gaussian', min_periods=3).mean(std=4)
+            ax1.plot(uncert.index[-7:], uncert.values[-7:], color=color, linestyle='dashed', linewidth=LW, alpha=0.7)
+
         ax1.legend()
         ax1.set_ylabel('daily change')
 
@@ -1715,41 +1720,39 @@ def overview(country: str, region: str = None, subregion: str = None,
     Returns: subplots, cases (pandas Series), deaths (pandas Series)
     """
     if data is None:
-        c, d = get_country_data(country, region=region, subregion=subregion)
+        _c, _d = get_country_data(country, region=region, subregion=subregion)
     else:
-        c, d = data
-        assert isinstance(c.index[0], pd.Timestamp), f"The index of 'cases' is not of type `Timestamp`, " \
+        _c, _d = data
+        assert isinstance(_c.index[0], pd.Timestamp), f"The index of 'cases' is not of type `Timestamp`, " \
                                                      f"try to use `index=pd.DatetimeIndex(dates)`"
-        assert isinstance(d.index[0], pd.Timestamp), f"The index of 'deaths' is not of type `Timestamp`, " \
+        assert isinstance(_d.index[0], pd.Timestamp), f"The index of 'deaths' is not of type `Timestamp`, " \
                                                      f"try to use `index=pd.DatetimeIndex(dates)`"
 
     region_label = get_region_label(country, region=region, subregion=subregion)
     fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
     if dates and weeks == 0:
-        c = cut_dates(c, dates)
-
+        c = cut_dates(_c, dates)
     elif dates and weeks:
         raise ValueError("`dates` and `weeks` cannot be used together")
     else:
-        c = c[- weeks * 7:]
+        c = _c[- weeks * 7:]
     plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
-    plot_daily_change(ax=axes[1], series=c, color="C1", labels=(region_label, "cases"),
-                      country=country, region=region, subregion=subregion)
+    plot_daily_change(ax=axes[1], series=_c, color="C1", labels=(region_label, "cases"),
+                      country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
     # data cleaning
     if country == "Spain":   # https://github.com/oscovida/oscovida/issues/44
         axes[1].set_ylim(bottom=0)
     plot_reproduction_number(axes[3], series=c, color_g="C1", color_R="C5", labels=(region_label, "cases"))
     ax_dt_c = axes[5]
     plot_doubling_time(ax_dt_c, series=c, color="C1", labels=(region_label, "cases"))
-    if d is not None:
+    if _d is not None:
         if dates and weeks == 0:
-            date_start, date_end = dates.split(':')
-            d = d[date_start:date_end]
+            d = cut_dates(_d, dates)
         else:
-            d = d[- weeks * 7:]
+            d = _d[- weeks * 7:]
         plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
-        plot_daily_change(ax=axes[2], series=d, color="C0", labels=(region_label, "deaths"),
-                          country=country, region=region, subregion=subregion)
+        plot_daily_change(ax=axes[2], series=_d, color="C0", labels=(region_label, "deaths"),
+                          country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
         plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
         problems = ("no data in reduced data set", "Cannot compute smooth ratio")
         if compute_doubling_time(d)[0][1] not in problems:
@@ -1769,15 +1772,10 @@ def overview(country: str, region: str = None, subregion: str = None,
             axes[5].legend(*labels)
         else:   # just create a legend as is
             axes[5].legend()
-    if d is None:
+    if _d is None:
+        d = _d
         plot_no_data_available(axes[2], mimic_subplot=axes[1], text='daily change in deaths')
         plot_no_data_available(axes[4], mimic_subplot=axes[3], text='R & growth factor (based on deaths)')
-        # axes[2].set_visible(False)
-        # axes[4].set_visible(False)
-
-    # ax = axes[3]
-    # plot_growth_factor(ax, series=d, color="C0")
-    # plot_growth_factor(ax, series=c, color="C1")
 
     # enforce same x-axis on all plots
     for i in range(1, axes.shape[0]):
@@ -1853,66 +1851,3 @@ def get_cases_last_week(cases):
     # last week is difference between last value, and the one 7 days before
     cases_last_week = c2[-1] - c2[-8]
     return cases_last_week
-
-
-
-def clean_data_germany_remove_goettingen_alt(germany_data, debug=False):
-    """New 16 September 2020.
-
-    This function removes all data rows that are for the region "LK Göttingen
-    (alt)".
-
-    Some diagnostic output is printed, if `debug=True` is used.
-
-
-    Context:
-
-    Some tests failed because we have a new Landkreis in the data from the RKI,
-    which is called "LK Göttingen (alt)". As of 16 September 2020, there is
-    only one entry. I speculate that this is an error and will disappear over
-    time. The proposed solution is to remove this line from the RKI data, and
-    to only do this if there is at most one row for "LK Göttingen (alt)".
-
-    Here is some debug code:
-
-    germany_data = oscovida.fetch_data_germany()
-    # find all rows for 'LK Göttingen (alt)'
-    sel = germany_data['Landkreis'] == 'LK Göttingen (alt)'
-    print(f"Found {len(germany_data[sel])} rows for Göttingen (alt)")
-    print(germany_data[sel].T)
-
-    with output:
-
-      Found 1 rows for Göttingen (alt)
-      date                             2020-04-09
-      FID                                35939791
-      IdBundesland                              3
-      Bundesland                    Niedersachsen
-      Landkreis                LK Göttingen (alt)
-      Altersgruppe                        A35-A59
-      Geschlecht                                W
-      AnzahlFall                                1
-      AnzahlTodesfall                           0
-      Meldedatum              2020/04/09 00:00:00
-      IdLandkreis                            3159
-      Datenstand            16.09.2020, 00:00 Uhr
-      NeuerFall                                 0
-      NeuerTodesfall                           -9
-      Refdatum                2020/04/09 00:00:00
-      NeuGenesen                                0
-      AnzahlGenesen                             1
-      IstErkrankungsbeginn                      0
-      Altersgruppe2             Nicht übermittelt
-
-    """
-
-    # find all rows for 'LK Göttingen (alt)'
-    sel = germany_data['Landkreis'] == 'LK Göttingen (alt)'
-    if debug:
-        print(f"Found {len(germany_data[sel])} rows for Göttingen (alt)")
-        print(germany_data[sel].T)
-
-    # return all other rows
-    return germany_data[~sel]
-
-

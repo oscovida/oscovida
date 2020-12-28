@@ -1,0 +1,11 @@
+/* Only display site's name in the navbar if the latter is fixed. */
+.navbar .navbar-brand {
+  display: none;
+}
+.navbar.navbar-fixed-top .navbar-brand {
+  display: block;
+}
+
+.navbar.navbar-fixed-top .navbar-right {
+  margin-right: inherit;
+}

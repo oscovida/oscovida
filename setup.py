@@ -50,7 +50,9 @@ setup(name="oscovida",
           'ipywidgets',
           'ipynb_py_convert',
           'click',
+          'pytest_tornasync',
           'nbconvert==5.*,<6',
+          'plotly',
       ],
       extras_require={
           'test': [
