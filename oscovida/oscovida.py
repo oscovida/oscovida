@@ -19,6 +19,7 @@ from oscovida.plotting_helpers import align_twinx_ticks, cut_dates, has_twin, li
 
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Inconsolata']
+rcParams['svg.fonttype'] = 'none'
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
 from matplotlib.ticker import ScalarFormatter, FuncFormatter, FixedLocator
