@@ -1762,6 +1762,7 @@ def overview(country: str, region: str = None, subregion: str = None,
             # combining doubling time plots
             ticks = align_twinx_ticks(ax_dt_c, ax_dt_d)
             ax_dt_d.yaxis.set_major_locator(FixedLocator(ticks))
+            ax_dt_d.grid(False)     # don't draw the second grid on top of the legend
             # create a combined legend
             h_c, l_c = ax_dt_c.get_legend_handles_labels()  # may return [], []
             h_d, l_d = ax_dt_d.get_legend_handles_labels()  # may return [], []
