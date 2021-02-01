@@ -18,7 +18,7 @@ from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rk
 from oscovida.plotting_helpers import align_twinx_ticks, cut_dates, has_twin, limit_to_smoothed
 
 rcParams['font.family'] = 'sans-serif'
-rcParams['font.sans-serif'] = ['Inconsolata']
+rcParams['font.sans-serif'] = ['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdana']
 rcParams['svg.fonttype'] = 'none'
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
