@@ -18,7 +18,8 @@ from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rk
 from oscovida.plotting_helpers import align_twinx_ticks, cut_dates, has_twin, limit_to_smoothed
 
 rcParams['font.family'] = 'sans-serif'
-rcParams['font.sans-serif'] = ['Inconsolata']
+rcParams['font.sans-serif'] = ['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdana']
+rcParams['svg.fonttype'] = 'none'
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
 from matplotlib.ticker import ScalarFormatter, FuncFormatter, FixedLocator
@@ -1761,6 +1762,7 @@ def overview(country: str, region: str = None, subregion: str = None,
             # combining doubling time plots
             ticks = align_twinx_ticks(ax_dt_c, ax_dt_d)
             ax_dt_d.yaxis.set_major_locator(FixedLocator(ticks))
+            ax_dt_d.grid(False)     # don't draw the second grid on top of the legend
             # create a combined legend
             h_c, l_c = ax_dt_c.get_legend_handles_labels()  # may return [], []
             h_d, l_d = ax_dt_d.get_legend_handles_labels()  # may return [], []
