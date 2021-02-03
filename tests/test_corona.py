@@ -1,7 +1,6 @@
 import datetime
 import numpy as np
 import pandas as pd
-from pandas import DatetimeIndex
 import matplotlib.pyplot as plt
 import pytest
 import oscovida as c
@@ -321,6 +320,10 @@ def test_germany_get_population():
 
     pinneberg = germany.loc['LK Pinneberg'].population
     assert pinneberg > 30000
+
+    # https://github.com/oscovida/oscovida/issues/210
+    saarpfalz = germany.loc['LK Saarpfalz-Kreis'].population
+    assert saarpfalz > 130000
 
     aachen = germany.loc['StadtRegion Aachen'].population
     assert aachen > 500000
