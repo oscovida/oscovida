@@ -452,6 +452,11 @@ def germany_get_population() -> pd.DataFrame:
         .set_index('county')
     )
     population = population.rename(columns={"EWZ": "population"})
+    # see https://github.com/oscovida/oscovida/issues/210
+    # try to remove this if-clause and see if tests fail:
+    if "LK Saar-Pfalz-Kreis" in population.index:
+        population.loc['LK Saarpfalz-Kreis'] = population.loc['LK Saar-Pfalz-Kreis']
+        population = population.drop('LK Saar-Pfalz-Kreis')
     return population # type: ignore
 
 
