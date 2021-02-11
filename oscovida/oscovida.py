@@ -22,8 +22,10 @@ rcParams['font.sans-serif'] = ['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdan
 rcParams['svg.fonttype'] = 'none'
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
+from matplotlib.collections import LineCollection
+from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.dates import DateFormatter, date2num, MONDAY, WeekdayLocator, MonthLocator
 from matplotlib.ticker import ScalarFormatter, FuncFormatter, FixedLocator
-from matplotlib.dates import DateFormatter, MONDAY, WeekdayLocator
 from bisect import bisect
 
 import matplotlib.pyplot as plt
@@ -739,6 +741,39 @@ def plot_time_step(ax, series, style="-", labels=None, logscale=True):
     ax.legend()
     ax.set_ylabel("total numbers")
     ax.yaxis.set_major_formatter(ScalarFormatter())
+    return ax
+
+
+def plot_incidence_rate(ax, cases: pd.Series, country: str = None, region: str = None, subregion: str = None,
+                        dates: str = None, weeks: int = 0):
+    if dates:
+        cases = cut_dates(cases, dates)
+    if weeks:
+        cases = cases[-7 * (weeks+1):]  # we need to add one week, because we loose one on rolling
+
+    habitants = population(country=country, region=region, subregion=subregion)
+
+    incidence = (cases.diff().dropna().rolling(7).sum()/habitants*100000)
+
+    # convert dates to numbers first
+    inxval = date2num(incidence.index.to_pydatetime())
+    points = np.array([inxval, incidence.values]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+
+    colors = ["green", "gold", "red", "maroon"]
+    red_green_cm = LinearSegmentedColormap.from_list('RedGreen', colors, len(incidence))
+
+    lc = LineCollection(segments, cmap=red_green_cm, norm=plt.Normalize(0, 100), linewidth=2)
+    lc.set_array(incidence.values)  # set the colors according to y values
+
+    # add collection to axes
+    ax.add_collection(lc)
+    ax.xaxis.set_major_locator(MonthLocator(interval=2))
+    ax.xaxis.set_major_formatter(DateFormatter("%b %y"))
+    ax.autoscale_view()
+    ax.set_ylabel("7-day incidence rate\n(per 100K people)")
+    ax.yaxis.set_major_formatter(ScalarFormatter())
+
     return ax
 
 
@@ -1742,7 +1777,9 @@ def overview(country: str, region: str = None, subregion: str = None,
         raise ValueError("`dates` and `weeks` cannot be used together")
     else:
         c = _c[- weeks * 7:]
-    plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
+    # plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
+    plot_incidence_rate(ax=axes[0], cases=_c,
+                        country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
     plot_daily_change(ax=axes[1], series=_c, color="C1", labels=(region_label, "cases"),
                       country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
     # data cleaning
@@ -1756,7 +1793,7 @@ def overview(country: str, region: str = None, subregion: str = None,
             d = cut_dates(_d, dates)
         else:
             d = _d[- weeks * 7:]
-        plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
+        # plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
         plot_daily_change(ax=axes[2], series=_d, color="C0", labels=(region_label, "deaths"),
                           country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
         plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
