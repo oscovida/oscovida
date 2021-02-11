@@ -766,9 +766,9 @@ def plot_incidence_rate(ax, cases: pd.Series, country: str = None, region: str =
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
     colors = ["green", "gold", "red", "maroon"]
-    red_green_cm = LinearSegmentedColormap.from_list('RedGreen', colors, len(incidence))
-
-    lc = LineCollection(segments, cmap=red_green_cm, norm=plt.Normalize(0, 100), linewidth=2)
+    cmap = LinearSegmentedColormap.from_list('RedGreen', colors, len(incidence))
+    norm = plt.Normalize(0, 100)
+    lc = LineCollection(segments, cmap=cmap, norm=norm, linewidth=2)
     lc.set_array(incidence.values)  # set the colors according to y values
 
     # add collection to axes
@@ -779,6 +779,9 @@ def plot_incidence_rate(ax, cases: pd.Series, country: str = None, region: str =
     ax.set_ylabel("7-day incidence rate"+norm_title)
     ax.yaxis.set_major_formatter(ScalarFormatter())
 
+    x, y = incidence.index[-1], incidence.values[-1]
+    ax.plot([x], [y], marker="+", color=cmap(norm(y)))  # marker at the end of the line
+    ax.annotate(f"{y:.1f}", xy=(x, y * 1.1), color=cmap(norm(y)))   # marker annotation
     return ax
 
 
