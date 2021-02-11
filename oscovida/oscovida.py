@@ -753,7 +753,12 @@ def plot_incidence_rate(ax, cases: pd.Series, country: str = None, region: str =
 
     habitants = population(country=country, region=region, subregion=subregion)
 
-    incidence = (cases.diff().dropna().rolling(7).sum()/habitants*100000)
+    if habitants:
+        incidence = (cases.diff().dropna().rolling(7).sum()/habitants*100000)
+        norm_title = ''
+    else:
+        incidence = (cases.diff().dropna().rolling(7).sum())
+        norm_title = "\n(per 100K people)"
 
     # convert dates to numbers first
     inxval = date2num(incidence.index.to_pydatetime())
@@ -771,7 +776,7 @@ def plot_incidence_rate(ax, cases: pd.Series, country: str = None, region: str =
     ax.xaxis.set_major_locator(MonthLocator(interval=2))
     ax.xaxis.set_major_formatter(DateFormatter("%b %y"))
     ax.autoscale_view()
-    ax.set_ylabel("7-day incidence rate\n(per 100K people)")
+    ax.set_ylabel("7-day incidence rate"+norm_title)
     ax.yaxis.set_major_formatter(ScalarFormatter())
 
     return ax
