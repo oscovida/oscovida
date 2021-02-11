@@ -755,10 +755,10 @@ def plot_incidence_rate(ax, cases: pd.Series, country: str = None, region: str =
 
     if habitants:
         incidence = (cases.diff().dropna().rolling(7).sum()/habitants*100000)
-        norm_title = ''
+        norm_title = "\n(per 100K people)"
     else:
         incidence = (cases.diff().dropna().rolling(7).sum())
-        norm_title = "\n(per 100K people)"
+        norm_title = ''
 
     # convert dates to numbers first
     inxval = date2num(incidence.index.to_pydatetime())
