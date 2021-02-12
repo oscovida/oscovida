@@ -206,6 +206,15 @@ def test_plot_daily_change():
     fig.savefig('test-plot_daily_change.pdf')
 
 
+def test_plot_incidence_rate():
+    cases, deaths = mock_get_country_data_johns_hopkins()
+    fig, ax = plt.subplots()
+    ax = c.plot_incidence_rate(ax, cases, cases.country)
+    assert ax is not None
+    assert "per 100K people" in ax.get_ylabel()
+    fig.savefig('test-plot_daily_change.pdf')
+
+
 def test_compute_growth_factor():
     cases, deaths = mock_get_country_data_johns_hopkins()
     f, smooth = c.compute_growth_factor(cases)

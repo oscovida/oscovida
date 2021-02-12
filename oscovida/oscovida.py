@@ -22,8 +22,10 @@ rcParams['font.sans-serif'] = ['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdan
 rcParams['svg.fonttype'] = 'none'
 # need many figures for index.ipynb and germany.ipynb
 rcParams['figure.max_open_warning'] = 50
+from matplotlib.collections import LineCollection
+from matplotlib.colors import LinearSegmentedColormap
+from matplotlib.dates import DateFormatter, date2num, MONDAY, WeekdayLocator, MonthLocator
 from matplotlib.ticker import ScalarFormatter, FuncFormatter, FixedLocator
-from matplotlib.dates import DateFormatter, MONDAY, WeekdayLocator
 from bisect import bisect
 
 import matplotlib.pyplot as plt
@@ -739,6 +741,46 @@ def plot_time_step(ax, series, style="-", labels=None, logscale=True):
     ax.legend()
     ax.set_ylabel("total numbers")
     ax.yaxis.set_major_formatter(ScalarFormatter())
+    return ax
+
+
+def plot_incidence_rate(ax, cases: pd.Series, country: str,
+                        region: str = None, subregion: str = None,
+                        dates: str = None, weeks: int = 0):
+    if dates:
+        cases = cut_dates(cases, dates)
+    if weeks:
+        cases = cases[-7 * (weeks+1):]  # we need to add one week, because we loose one on rolling
+
+    habitants = population(country=country, region=region, subregion=subregion)
+
+    if habitants:
+        incidence = (cases.diff().dropna().rolling(7).sum()/habitants*100000)
+        norm_title = "\n(per 100K people)"
+    else:
+        incidence = (cases.diff().dropna().rolling(7).sum())
+        norm_title = ''
+
+    # convert dates to numbers first
+    inxval = date2num(incidence.index.to_pydatetime())
+    points = np.array([inxval, incidence.values]).T.reshape(-1, 1, 2)
+    segments = np.concatenate([points[:-1], points[1:]], axis=1)
+
+    colors = ["green", "gold", "red", "maroon"]
+    cmap = LinearSegmentedColormap.from_list('RedGreen', colors, len(incidence))
+    norm = plt.Normalize(0, 100)
+    lc = LineCollection(segments, cmap=cmap, norm=norm, linewidth=2)
+    lc.set_array(incidence.values)  # set the colors according to y values
+
+    # add collection to axes
+    ax.add_collection(lc)
+    ax.autoscale_view()
+    ax.set_ylabel("7-day incidence rate"+norm_title)
+    ax.yaxis.set_major_formatter(ScalarFormatter())
+
+    x, y = incidence.index[-1], incidence.values[-1]
+    ax.plot([x], [y], marker="+", color=cmap(norm(y)))  # marker at the end of the line
+    ax.annotate(f"{y:.1f}", xy=(x, y * 1.1), color=cmap(norm(y)))   # marker annotation
     return ax
 
 
@@ -1742,7 +1784,9 @@ def overview(country: str, region: str = None, subregion: str = None,
         raise ValueError("`dates` and `weeks` cannot be used together")
     else:
         c = _c[- weeks * 7:]
-    plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
+    # plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
+    plot_incidence_rate(ax=axes[0], cases=_c,
+                        country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
     plot_daily_change(ax=axes[1], series=_c, color="C1", labels=(region_label, "cases"),
                       country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
     # data cleaning
@@ -1756,7 +1800,7 @@ def overview(country: str, region: str = None, subregion: str = None,
             d = cut_dates(_d, dates)
         else:
             d = _d[- weeks * 7:]
-        plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
+        # plot_time_step(ax=axes[0], series=d, style="-C0", labels=(region_label, "deaths"))
         plot_daily_change(ax=axes[2], series=_d, color="C0", labels=(region_label, "deaths"),
                           country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
         plot_reproduction_number(axes[4], series=d, color_g="C0", color_R="C4", labels=(region_label, "deaths"))
@@ -1785,7 +1829,7 @@ def overview(country: str, region: str = None, subregion: str = None,
         plot_no_data_available(axes[4], mimic_subplot=axes[3], text='R & growth factor (based on deaths)')
 
     # enforce same x-axis on all plots
-    for i in range(1, axes.shape[0]):
+    for i in range(0, axes.shape[0]):
         axes[i].set_xlim(axes[0].get_xlim())
     for i in range(0, axes.shape[0]):
         if not has_twin(axes[i]):
@@ -1794,8 +1838,12 @@ def overview(country: str, region: str = None, subregion: str = None,
         if weeks > 0:
             axes[i].get_xaxis().set_major_locator(WeekdayLocator(byweekday=MONDAY))     # put ticks every Monday
             axes[i].get_xaxis().set_major_formatter(DateFormatter('%d %b'))             # date format: `15 Jun`
+        else:
+            axes[i].xaxis.set_major_formatter(DateFormatter("%b %y"))
+
     week_str = f", last {weeks} weeks" if weeks else ''
-    title = f"Overview {country}{week_str}, last data point from {c.index[-1].date().isoformat()}"
+    region_str = f"{region or subregion}, {country}" if (region or subregion) else country
+    title = f"{region_str}{week_str}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
 
     # tight_layout gives warnings, for example for Heinsberg
