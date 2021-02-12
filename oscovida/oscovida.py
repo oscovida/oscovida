@@ -744,7 +744,8 @@ def plot_time_step(ax, series, style="-", labels=None, logscale=True):
     return ax
 
 
-def plot_incidence_rate(ax, cases: pd.Series, country: str = None, region: str = None, subregion: str = None,
+def plot_incidence_rate(ax, cases: pd.Series, country: str,
+                        region: str = None, subregion: str = None,
                         dates: str = None, weeks: int = 0):
     if dates:
         cases = cut_dates(cases, dates)
@@ -773,8 +774,6 @@ def plot_incidence_rate(ax, cases: pd.Series, country: str = None, region: str =
 
     # add collection to axes
     ax.add_collection(lc)
-    ax.xaxis.set_major_locator(MonthLocator(interval=2))
-    ax.xaxis.set_major_formatter(DateFormatter("%b %y"))
     ax.autoscale_view()
     ax.set_ylabel("7-day incidence rate"+norm_title)
     ax.yaxis.set_major_formatter(ScalarFormatter())
@@ -1830,7 +1829,7 @@ def overview(country: str, region: str = None, subregion: str = None,
         plot_no_data_available(axes[4], mimic_subplot=axes[3], text='R & growth factor (based on deaths)')
 
     # enforce same x-axis on all plots
-    for i in range(1, axes.shape[0]):
+    for i in range(0, axes.shape[0]):
         axes[i].set_xlim(axes[0].get_xlim())
     for i in range(0, axes.shape[0]):
         if not has_twin(axes[i]):
@@ -1839,8 +1838,12 @@ def overview(country: str, region: str = None, subregion: str = None,
         if weeks > 0:
             axes[i].get_xaxis().set_major_locator(WeekdayLocator(byweekday=MONDAY))     # put ticks every Monday
             axes[i].get_xaxis().set_major_formatter(DateFormatter('%d %b'))             # date format: `15 Jun`
+        else:
+            axes[i].xaxis.set_major_formatter(DateFormatter("%b %y"))
+
     week_str = f", last {weeks} weeks" if weeks else ''
-    title = f"Overview {country}{week_str}, last data point from {c.index[-1].date().isoformat()}"
+    region_str = f"{region or subregion}, {country}" if (region or subregion) else country
+    title = f"{region_str}{week_str}, last data point from {c.index[-1].date().isoformat()}"
     axes[0].set_title(title)
 
     # tight_layout gives warnings, for example for Heinsberg
