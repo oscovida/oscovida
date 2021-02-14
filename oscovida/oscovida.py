@@ -543,7 +543,7 @@ def get_incidence_rates_countries(period=14):
     assert all(cases.columns[:2] == ["Lat", "Long"])
 
     yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
-    fortnight_ago = yesterday - datetime.timedelta(days=period)
+    fortnight_ago = yesterday - datetime.timedelta(days=period+1)
     periods = (fortnight_ago < pd.to_datetime(cases.columns[2:])) & (
         pd.to_datetime(cases.columns[2:]) < yesterday
     )
