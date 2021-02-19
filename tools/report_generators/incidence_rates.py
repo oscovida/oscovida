@@ -63,7 +63,7 @@ def create_markdown_incidence_list(regions: DataFrame, threshold):
     logging.info(f"{len(regions5)} regions in markdown index list")
 
     #  Fixes https://github.com/oscovida/oscovida/issues/218
-    regions5 = regions5['Population'].str.replace(',', '')
+    regions5['Population'] = regions5['Population'].str.replace(',', '')
 
     return regions5.to_markdown()
 
