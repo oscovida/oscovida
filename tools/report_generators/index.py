@@ -62,6 +62,8 @@ def create_markdown_index_list(regions: DataFrame):
         "cases-last-week": "New cases last week",
     }
     regions5 = regions4.rename(columns=rename_dict)
+    #  Fixes https://github.com/oscovida/oscovida/issues/218
+    regions5 = regions5.apply(lambda x: x.str.replace(',', ''))
 
     #  Stupid workaround to fix colours for the DataTables JS rendering.
     #  Basically, datatables can format rows based on the **row** values, but it
