@@ -17,7 +17,8 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/1.10.20/css/jquery.dataTables.min.css">
     <link rel="stylesheet" href="{{ SITEURL }}/theme/css/jquery.mglass.css"/>
     <link rel="stylesheet" href="{{ SITEURL }}/theme/css/pygment-solarized-dark.css"/>
-    <link rel="stylesheet" href="{{ SITEURL }}/theme/css/style.css"/>
+    <!-- <link rel="stylesheet" href="{{ SITEURL }}/theme/css/style.css"/> -->
+    <link rel="stylesheet" href="{{ SITEURL }}/theme/css/minimalist-style.css"/>
     {% if FLAT_DESIGN is defined and not FLAT_DESIGN %}
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap-theme.min.css"/>
     {% endif %}
@@ -28,7 +29,20 @@
     <script type="text/javascript" class="init">
       $(document).ready(function() {
           $('#data_table').DataTable( {
-              "order": [[ 3, "desc" ]]
+              "rowCallback": function( row, data, index ) {
+                  if ( data[4] == "True" ) // 4th column is a flag to set the colour red
+                  {
+                      $('td', row).css('background-color', 'LightPink');
+                  }
+              },
+              "order": [[ 3, "desc" ]],
+              "lengthMenu": [[10, 25, 50, 500, -1], [10, 25, 50, 500, "All"]],
+              "pageLength": -1,
+              "columnDefs": [
+                { "type": "string", "targets": 0 },
+                { "type": "num-fmt", "targets": "_all" },
+                { "visible": false,  "targets": [ 4 ] } // hide flag column
+              ]
           } );
       } );
     </script>

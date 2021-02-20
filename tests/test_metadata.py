@@ -1,12 +1,7 @@
-import datetime
-import json
 import math
-import os
 import time
 import pytest
-import numpy as np
 import pandas as pd
-
 
 from oscovida import MetadataRegion
 
@@ -31,7 +26,7 @@ def test_MetadataRegion_basics():
     m = MetadataRegion("UK")
     assert m['html'] == "html-path"
     with pytest.raises(KeyError):
-        m['missing-key'] 
+        m['missing-key']
 
 
 def test_MetadataRegion_updated():
@@ -40,15 +35,15 @@ def test_MetadataRegion_updated():
 
     m.mark_as_updated()
     # should be faster than a second
-    assert m.last_updated_hours_ago()*3600 < 1
+    assert m.last_updated_hours_ago() * 3600 < 1
     assert m.last_updated_hours_ago() > 0
 
     time.sleep(1)
-    assert m.last_updated_hours_ago()*3600 > 0.5
+    assert m.last_updated_hours_ago() * 3600 > 0.5
 
     m2 = MetadataRegion("Test")
-    assert m.last_updated_hours_ago()*3600 > 0.5
-    assert m.last_updated_hours_ago()*3600 < 2.0
+    assert m.last_updated_hours_ago() * 3600 > 0.5
+    assert m.last_updated_hours_ago() * 3600 < 2.0
 
     # calling last_updated adds this key
     assert list(m.keys()) == ["__last_modified__"]
@@ -73,7 +68,6 @@ def test_MetadataRegion_get_regions():
     assert sorted(MetadataRegion.get_all()) == []
 
 
-
 def test_MetadataRegion_get_all_as_dataframe():
     MetadataRegion.clear_all()
     m = MetadataRegion("Germany", "w")
@@ -86,8 +80,8 @@ def test_MetadataRegion_get_all_as_dataframe():
     m['html'] = "html-path"
     m['ipynb'] = "ipynb-path"
 
-    ref = pd.DataFrame({'html' : {'UK' : 'html-path', "Germany" : 'html-pfad'},
-                        'ipynb' : {'UK' : 'ipynb-path', "Germany" : 'ipynb-pfad'}})
+    ref = pd.DataFrame({'html': {'UK': 'html-path', "Germany": 'html-pfad'},
+                        'ipynb': {'UK': 'ipynb-path', "Germany": 'ipynb-pfad'}})
     actual = MetadataRegion.get_all_as_dataframe()
 
     # We want to run this line:

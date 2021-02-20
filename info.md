@@ -96,6 +96,17 @@ oscovida/tools/wwwroot
   data on the binder service (fetching of the German data set varies
   between 1s and 60 seconds).
 
+oscovida/tools/oscovida.github.io
+---------------------------------
+
+This direcotory contains two files (``post-generate.sh`` and ``pre-generate,sh``)
+which act as hooks to run commands before and after the website generation is ran
+by the oscovida.github.io repository. Currently this is used to re-execute specific
+individual notebooks every day alongside the report generation.
+
+More information on how this works can be found in 
+[the readme file in that directory](https://github.com/oscovida/oscovida/blob/master/tools/oscovida.github.io/readme.md)
+
 oscovida/tools/wwwroot/ipynb
 ------------------------------------
 
@@ -228,7 +239,7 @@ manually generate it. The steps would be:
 ```
 #  Set up repositories
 git clone git@github.com/oscovida/oscovida
-git clone git@github.com/oscovida/oscovida.github.io ./oscovida/tools/wwwroot
+git clone git@github.com/oscovida/oscovida.github.io.git ./oscovida/tools/wwwroot
 
 #  Set up environment
 python -m venv .venv

@@ -6,9 +6,10 @@ from typing import List, Union
 from pandas import DataFrame
 from tqdm.auto import tqdm
 
-from oscovida import MetadataRegion
+from oscovida import MetadataRegion, get_incidence_rates_countries, get_incidence_rates_germany
 
 from .index import create_markdown_index_page
+from .incidence_rates import create_markdown_incidence_page
 
 
 class ReportExecutor:
@@ -192,4 +193,40 @@ class ReportExecutor:
             slug,
             pelican_file_path,
             title_prefix,
+        )
+
+    def create_markdown_incidence_page(
+        self,
+        save_as: str = None,
+        slug: str = None,
+        pelican_file_path: str = None,
+        title_prefix: str = "7 Day Incidence Rates: ",
+        period=14,
+        threshold=20
+    ) -> None:
+        #  1st element of incidence_rates is the cases, second is deaths
+        if self.Reporter.category == 'germany':
+            incidence_rates = get_incidence_rates_germany(period)[0]
+            incidence_rates = incidence_rates.merge(
+                self.metadata_regions,
+                how='left',
+                left_on='metadata-index',
+                right_index=True,
+                suffixes=(None, "_old") #  incidence rate columns overwrite metadata
+            )
+        elif self.Reporter.category == 'countries':
+            incidence_rates = get_incidence_rates_countries(period)[0]
+            incidence_rates = incidence_rates.join(self.metadata_regions)
+        else:
+            raise NotImplementedError
+
+        create_markdown_incidence_page(
+            incidence_rates,
+            self.Reporter.category,
+            save_as,
+            slug,
+            pelican_file_path,
+            title_prefix,
+            period,
+            threshold
         )

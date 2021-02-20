@@ -1,7 +1,7 @@
 Title: Open Science
 Date: 2020-04-19 19:00
 slug: open-science
-tags: Open Science, Source code, About
+tags: open science, source code, about
 
 
 To use the analysis provided here, some Python knowledge is required, ideally

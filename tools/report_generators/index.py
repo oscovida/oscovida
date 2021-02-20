@@ -1,6 +1,7 @@
 import datetime
 import logging
 import os
+import numpy as np
 from typing import List
 
 from pandas import DataFrame
@@ -62,6 +63,15 @@ def create_markdown_index_list(regions: DataFrame):
     }
     regions5 = regions4.rename(columns=rename_dict)
 
+    #  Stupid workaround to fix colours for the DataTables JS rendering.
+    #  Basically, datatables can format rows based on the **row** values, but it
+    #  does not know the name of the column for some reason, so there's no way
+    #  to check "If the 3rd column is >= 20 AND it is called 'incidence rate'",
+    #  instead we add a flag column and check if this flag column is True, and
+    #  if it is the row is coloured red...
+    #  For the index this is currently always false.
+    regions5['FLAG'] = np.full(len(regions5.index), False, dtype=bool)
+
     logging.info(f"{len(regions5)} regions in markdown index list")
 
     return regions5.to_markdown()
@@ -108,12 +118,19 @@ def create_markdown_index_page(
     with open(index_path, "tw") as f:
         f.write(f"title: {title}\n")
         # f.write(f"category: Data\n")  - have stopped using categories (22 April 2020)
-        f.write(f"tags: Data, Plots, {title}\n")
+        f.write(f"tags: data, plots, tracking, {category}\n")
         f.write(f"save-as: {save_as}\n")
         f.write(f"slug: {slug}\n")
         date_time = datetime.datetime.now().strftime("%Y/%m/%d %H:%M")
         f.write(f"date: {date_time}\n")
         f.write("\n")
+        f.write("\n")
+        if category == "countries":
+            f.write("A list of countries ordered according to "
+                    "[7-day incidence is available](countries-incidence-rate.html).\n")
+        elif category == "germany":
+            f.write("A list of districts (Landkreise) for Germany ordered according "
+                    "to [7-day incidence is available](germany-incidence-rate.html).\n")
         f.write("\n")
         f.write(md_content)
         f.write("\n")

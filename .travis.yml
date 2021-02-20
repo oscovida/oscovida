@@ -10,10 +10,12 @@ env:
 
 install:
   - pip install -U pytest
+  - pip install pytest-tornasync
   - make dev-install
 
 script:
   - make test
   - make test-pelican
+  - make test-nbval
 
 after_success: bash <(curl -s https://codecov.io/bash)

@@ -13,8 +13,12 @@ dev-install-upgrade-depedencies:
 test:
 	python3 -m pytest -v --cov=oscovida
 
+# execute notebooks to ensure they work
+test-nbval:
+	python3 -m pytest --nbval-lax tools/pelican/content
+
 test-pelican:
-	cd tools && jupyter-nbconvert --execute generate-individiual-plots.ipynb
+	cd tools && python3 -m nbconvert --execute --inplace generate-individiual-plots.ipynb
 	cd tools/pelican && make html
 
 test-html-creation:

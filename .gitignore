@@ -15,5 +15,6 @@ tools/binder
 tools/status
 oscovida.egg-info
 
-venv/
+venv
 .idea/
+replication

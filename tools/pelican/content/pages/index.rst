@@ -4,13 +4,18 @@ Home
 :URL: index.html
 :save_as: index.html
 
-OCOVIDA provides an `open science <open-science.html>`__ portal to see and
+OSCOVIDA provides an `open science <open-science.html>`__ portal to see and
 investigate the COVID19 infections and deaths as a function of time for the
 `US states <us.html>`__, the `districts in Germany <germany.html>`__,
 and most `other countries <countries.html>`__ in the world.
 
 Use OSCOVIDA to monitor the pandemic, second waves, local outbreaks and motivate
 social distancing and support for other containment measures.
+
+European XFEL follows the RKI recommendations for access restrictions to the
+campus after travel abroad or in Germany, we provide tables showing these
+incidence rates for `Germany here <germany-incidence-rate.html>`__, and for
+`countries worldwide here <countries-incidence-rate.html>`__.
 
 Read more about our `motivation <motivation.html>`__, `data sources
 <data-sources.html>`__, `team <team.html>`__, watch a
@@ -31,11 +36,26 @@ Occasionally, we try to provide `additional discussion COVID19 related news and 
 
 You can `fire up your own analysis environment in the cloud, select the relevant analysis notebook yourself, re-execute or extend the analysis <https://mybinder.org/v2/gh/oscovida/binder/master?filepath=ipynb>`__. See also our (growing) `set of tutorials <tag-tutorial.html>`__.
 
+--------------
+
+.. raw:: html
+   :file: index-included-for-interactive-map
+
+The map shows `7-day incidence rates per 100,000 people
+<https://oscovida.github.io/countries-incidence-rate.html>`__ based on data
+reported by the `Johns-Hopkins University
+<https://oscovida.github.io/data-sources.html>`__. The colour scale for the
+this world map goes up to the 90th quantile (where 90% of the countries have
+less than that number of cases): any country with a 7 day incidence rate over
+the 90th quantile is set to the darkest red colour.
 
 --------------
 
 .. raw:: html
    :file: index-included-for-figure1-html
+
+This plot shows a randomly picked country as an example of what data is
+available in the `detailed reports <all-regions.html>`__.
 
 --------------
 

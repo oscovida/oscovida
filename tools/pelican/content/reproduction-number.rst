@@ -3,7 +3,7 @@ Reproduction number
 
 :date: 2020-05-03 10:00
 :slug: reproduction-number
-:tags: About, Data, Plots
+:tags: about, data, plots
 
 A much more `detailed discussion is available here <r-value.html>`__.
    

@@ -1,4 +1,4 @@
-name: Generate Webpage for PR
+name: Generate Webpage
 
 on:
   pull_request:
@@ -11,14 +11,16 @@ jobs:
 
       - id: addKey
         name: Add key for staging push
-        uses: webfactory/ssh-agent@ef0ce0cab8e3ad0aa0f3e1fb209b0811b68c0c51
+        uses: webfactory/ssh-agent@ee29fafb6aa450493bac9136b346e51ea60a8b5e
         with:
           ssh-private-key: ${{ secrets.STAGING_KEY }}
 
       - uses: mshick/add-pr-comment@v1
-        if: ${{ failure()  && steps.addKey.conclusion == 'failuhttps://oscovida.github.io/staging/80/re' }}
+        if: ${{ failure()  && steps.addKey.conclusion == 'failure' }}
         with:
-          message: "Staging key could not be imported, cannot push to oscovida/staging to create test website instance. If this PR is external it may not have access to the required secrets."
+          message: "Staging key could not be imported, cannot push to
+            oscovida/staging to create test website instance. If this PR is
+            external it may not have access to the required secrets."
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]'
           allow-repeats: false
@@ -44,11 +46,16 @@ jobs:
         uses: actions/checkout@v2
         with:
           path: oscovida
+          ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up oscovida and webgen
         run: |
           pip install ./oscovida
           pip install -r ./base/requirements.txt
+
+      - name: Run pre-generate hook
+        run: |
+          ./oscovida/tools/oscovida.github.io/pre-generate.sh
 
       - name: Generate new reports
         run: |
@@ -59,12 +66,15 @@ jobs:
           cd ./oscovida/tools/
           ln -s $WWWROOT ./wwwroot
           ls ./wwwroot
-          python3 -m report_generators.cli --debug --regions=all --workers=max --log-level=INFO --log-file=./wwwroot/report-gen.log
+          python3 -m report_generators.cli --debug \
+            --regions=all  \
+            --workers=max  \
+            --log-level=INFO  \
+            --log-file=./wwwroot/report-gen.log
 
-      - name: Generate individual plots
+      - name: Run post-generate hook
         run: |
-          cd ./oscovida/tools/
-          jupyter-nbconvert generate-individiual-plots.ipynb --execute
+          ./oscovida/tools/oscovida.github.io/post-generate.sh
 
       - name: Update HTML pages
         run: |
@@ -82,7 +92,8 @@ jobs:
 
       - uses: mshick/add-pr-comment@v1
         with:
-          message: "View web reports generated with this branch at [staging/${{ github.event.number }}/](https://oscovida.github.io/staging/${{ github.event.number }}/index.html)"
+          message: "View web reports generated with this branch at
+            [staging/${{ github.event.number }}/](https://oscovida.github.io/staging/${{ github.event.number }}/index.html)"
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           repo-token-user-login: 'github-actions[bot]' # The user.login for temporary GitHub tokens
           allow-repeats: false # This is the default

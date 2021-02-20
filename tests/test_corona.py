@@ -1,23 +1,34 @@
 import datetime
 import numpy as np
 import pandas as pd
-from pandas import DatetimeIndex
 import matplotlib.pyplot as plt
+import pytest
 import oscovida as c
+import oscovida.plotting_helpers as oph
 
+
+def assert_oscovida_object(ax, cases, deaths):
+    assert isinstance(ax, np.ndarray)
+    assert isinstance(cases, (pd.Series, pd.DataFrame))
+    assert isinstance(deaths, (pd.Series, pd.DataFrame))
 
 
 def mock_get_country_data_johns_hopkins(country="China"):
-    cases_values = [548, 643, 920, 1406, 2075, 2877, 5509, 6087, 8141, 9802, 11891, 16630, 19716, 23707, 27440, 30587, 34110, 36814, 39829, 42354, 44386, 44759, 59895, 66358, 68413, 70513, 72434, 74211, 74619, 75077, 75550, 77001, 77022, 77241, 77754, 78166, 78600, 78928, 79356, 79932, 80136, 80261, 80386, 80537, 80690, 80770, 80823, 80860, 80887, 80921, 80932, 80945, 80977, 81003, 81033, 81058, 81102, 81156, 81250, 81305, 81435, 81498, 81591, 81661, 81782, 81897, 81999, 82122, 82198, 82279, 82361, 82432, 82511, 82543, 82602, 82665, 82718, 82809, 82883, 82941]
-    cases_index = "DatetimeIndex(['2020-01-22', '2020-01-23', '2020-01-24', '2020-01-25',  '2020-01-26', '2020-01-27', '2020-01-28', '2020-01-29',  '2020-01-30', '2020-01-31', '2020-02-01', '2020-02-02',  '2020-02-03', '2020-02-04', '2020-02-05', '2020-02-06',  '2020-02-07', '2020-02-08', '2020-02-09', '2020-02-10',  '2020-02-11', '2020-02-12', '2020-02-13', '2020-02-14',  '2020-02-15', '2020-02-16', '2020-02-17', '2020-02-18',  '2020-02-19', '2020-02-20', '2020-02-21', '2020-02-22',  '2020-02-23', '2020-02-24', '2020-02-25', '2020-02-26',  '2020-02-27', '2020-02-28', '2020-02-29', '2020-03-01',  '2020-03-02', '2020-03-03', '2020-03-04', '2020-03-05',  '2020-03-06', '2020-03-07', '2020-03-08', '2020-03-09',  '2020-03-10', '2020-03-11', '2020-03-12', '2020-03-13',  '2020-03-14', '2020-03-15', '2020-03-16', '2020-03-17',  '2020-03-18', '2020-03-19', '2020-03-20', '2020-03-21',  '2020-03-22', '2020-03-23', '2020-03-24', '2020-03-25',  '2020-03-26', '2020-03-27', '2020-03-28', '2020-03-29',  '2020-03-30', '2020-03-31', '2020-04-01', '2020-04-02',  '2020-04-03', '2020-04-04', '2020-04-05', '2020-04-06',  '2020-04-07', '2020-04-08', '2020-04-09', '2020-04-10'], dtype='datetime64[ns]', freq=None)"
+    cases_values = [548, 643, 920, 1406, 2075, 2877, 5509, 6087, 8141, 9802, 11891, 16630, 19716, 23707, 27440, 30587,
+                    34110, 36814, 39829, 42354, 44386, 44759, 59895, 66358, 68413, 70513, 72434, 74211, 74619, 75077,
+                    75550, 77001, 77022, 77241, 77754, 78166, 78600, 78928, 79356, 79932, 80136, 80261, 80386, 80537,
+                    80690, 80770, 80823, 80860, 80887, 80921, 80932, 80945, 80977, 81003, 81033, 81058, 81102, 81156,
+                    81250, 81305, 81435, 81498, 81591, 81661, 81782, 81897, 81999, 82122, 82198, 82279, 82361, 82432,
+                    82511, 82543, 82602, 82665, 82718, 82809, 82883, 82941]
+    cases_index = pd.date_range("2020-01-22", periods=len(cases_values), freq='D')
 
-    cases = pd.Series(data=cases_values, index=eval(cases_index))
+    cases = pd.Series(data=cases_values, index=cases_index)
     cases.country = "China"
     deaths = cases.copy(deep=True)
     deaths.values[:] = cases.values * 0.1
     deaths.country = "China"
-    deaths.label='deaths'
-    cases.label='cases'
+    deaths.label = 'deaths'
+    cases.label = 'cases'
     return cases, deaths
 
 
@@ -34,17 +45,52 @@ def test_overview():
     assert cases.name == 'China cases'
     assert deaths.name == 'China deaths'
 
-    isinstance(deaths, pd.core.series.Series)
-    isinstance(deaths, pd.core.series.Series)
+    assert_oscovida_object(axes, cases, deaths)
+    assert_oscovida_object(*c.overview("Germany", weeks=8))
+    assert_oscovida_object(*c.overview("Russia", dates="2020-05-30:2020-06-15"))
+    with pytest.raises(ValueError):
+        c.overview("Argentina", weeks=8, dates="2020-05-30:2020-06-15")
+
+    days = 10
+    dates = pd.date_range("2020-03-01", periods=days, freq='D')
+    data1 = np.exp(np.linspace(1, 15, days))
+    data2 = np.exp(np.linspace(1, 5, days))
+
+    cases = pd.Series(data1, index=pd.DatetimeIndex(dates))
+    deaths = pd.Series(data2, index=pd.DatetimeIndex(dates))
+
+    assert_oscovida_object(*c.overview("Narnia", data=(cases, deaths)))
 
 
 def test_US_overview():
     axes, cases, deaths = c.overview(country="US", region="New Jersey")
     assert cases.name == 'US-New Jersey cases'
     assert deaths.name == 'US-New Jersey deaths'
+    assert_oscovida_object(axes, cases, deaths)
 
-    isinstance(deaths, pd.core.series.Series)
-    isinstance(deaths, pd.core.series.Series)
+
+def test_germany_overview():
+    axes, cases, deaths = c.overview(country="Germany", region="Hamburg")
+    assert cases.name == 'Germany-Hamburg cases'
+    assert_oscovida_object(axes, cases, deaths)
+
+    axes, cases, deaths = c.overview(country="Germany", subregion="LK Pinneberg")
+    assert deaths.name == 'Germany-LK Pinneberg deaths'
+    assert_oscovida_object(axes, cases, deaths)
+
+    axes, cases, deaths = c.overview(country="Germany", subregion="SK Kassel")
+    assert cases.name == 'Germany-SK Kassel cases'
+    assert deaths.name == 'Germany-SK Kassel deaths'
+    assert_oscovida_object(axes, cases, deaths)
+
+    axes, cases, deaths = c.overview(country="Germany", subregion="StadtRegion Aachen")
+    assert cases.name == 'Germany-StadtRegion Aachen cases'
+    assert_oscovida_object(axes, cases, deaths)
+
+    axes, cases, deaths = c.overview(country="Germany", subregion="Region Hannover")
+    assert cases.name == 'Germany-Region Hannover cases'
+    assert deaths.name == 'Germany-Region Hannover deaths'
+    assert_oscovida_object(axes, cases, deaths)
 
 
 def test_get_US_region_list():
@@ -59,7 +105,7 @@ def test_Hungary_overview():
     assert cases.name == 'Hungary-Baranya cases'
     assert deaths is None
 
-    isinstance(cases, pd.core.series.Series)
+    isinstance(cases, pd.Series)
     isinstance(deaths, type(None))
 
 
@@ -80,7 +126,7 @@ def test_fetch_data_hungary():
 def test_choose_random_counties():
     # Hungary related
     with_local = c.choose_random_counties(exclude_region="Baranya", size=18)
-    print(with_local)
+    # print(with_local)
     assert 'Baranya' not in with_local
     assert len(with_local) == 19
 
@@ -100,23 +146,21 @@ def test_label_from_region_subregion():
     assert c.label_from_region_subregion(("Schleswig Holstein", "Pinneberg")) == "Schleswig Holstein-Pinneberg"
 
 
-
-
 def test_get_country_data():
     # Germany
-    cases, deaths, region_label = c.get_country_data(country="Germany",
-                                                     subregion="SK Hamburg")
-    print(f"region_label = {region_label}")
-    print(f"deaths = {type(deaths)}")
-    print(f"empty")
+    cases, deaths = c.get_country_data(country="Germany", region="Bayern")
+    assert isinstance(deaths, pd.Series)
+    assert cases.name == 'Germany-Bayern cases'
+    assert deaths.name == 'Germany-Bayern deaths'
+
+    cases, deaths = c.get_country_data(country="Germany", subregion="SK Hamburg")
+    assert isinstance(deaths, pd.Series)
     assert cases.name == 'Germany-SK Hamburg cases'
     assert deaths.name == 'Germany-SK Hamburg deaths'
-    assert region_label == 'Germany-SK Hamburg'
 
-    c2, d2, region_label = c.get_country_data(country="United Kingdom")
+    c2, d2 = c.get_country_data(country="United Kingdom")
     assert c2.name == "United Kingdom cases"
     assert d2.name == "United Kingdom deaths"
-    assert region_label == "United Kingdom"
 
 
 def test_compute_daily_change():
@@ -140,7 +184,7 @@ def test_compute_daily_change():
     assert abs(change_data.sum() + cases[0] - cases[-1]) < 1e-8
 
     # for the mock data: cases[-1] - cases[0] is 82393. Explicitely done:
-    assert abs(change_data.sum() - 82393) < 1e-8  
+    assert abs(change_data.sum() - 82393) < 1e-8
 
     # assure that we haven't changed the data significantly when averaging and smoothing:
     # some change can come from
@@ -150,16 +194,24 @@ def test_compute_daily_change():
     # We just take the current values and assume they are correct. If the smoothing parameters
     # are changed, then these need to be updated.
     smooth_data = smooth[0]
-    assert abs(smooth_data.sum() - 82664.7) < 1
+    assert abs(smooth_data.sum() - 80740.4) < 1
     smooth2_data = smooth2[0]
-    assert abs(smooth2_data.sum() - 82914.7) < 1
+    assert abs(smooth2_data.sum() - 76903.86) < 1
 
 
- 
 def test_plot_daily_change():
     cases, deaths = mock_get_country_data_johns_hopkins()
     fig, ax = plt.subplots()
     ax = c.plot_daily_change(ax, cases, 'C1')
+    fig.savefig('test-plot_daily_change.pdf')
+
+
+def test_plot_incidence_rate():
+    cases, deaths = mock_get_country_data_johns_hopkins()
+    fig, ax = plt.subplots()
+    ax = c.plot_incidence_rate(ax, cases, cases.country)
+    assert ax is not None
+    assert "per 100K people" in ax.get_ylabel()
     fig.savefig('test-plot_daily_change.pdf')
 
 
@@ -180,26 +232,9 @@ def test_compute_growth_factor():
     #
     # We just take the current values and assume they are correct. If the smoothing parameters
     # are changed, then these need to be updated.
-    assert abs(f[0].dropna().sum() - 77.3) < 0.1  # original data, should be the same as cases[-1]
-    assert abs(smooth[0].sum() - 78.6) < 0.1
+    assert abs(f[0].dropna().sum() - 70.8) < 0.1  # original data, should be the same as cases[-1]
+    assert abs(smooth[0].sum() - 73.05) < 0.1
 
-
-
-#def test_plot_growth_factor():
-#    cases, deaths = mock_get_country()
-#    fig, ax = plt.subplots()
-#    ax = c.plot_growth_factor(ax, cases, 'C1')
-#    fig.savefig('test-growth_factor.pdf')
-#
-#
-#def test_plot_growth_factor_fetch_data():
-#    """Similar to test above, but using fresh data"""
-#    for country in ["Korea, South", "China", "Germany"]:
-#        cases, deaths = c.get_country(country)
-#        fig, ax = plt.subplots()
-#        c.plot_growth_factor(ax, cases, 'C1');
-#        c.plot_growth_factor(ax, deaths, 'C0');
-#        fig.savefig(f'test-growth-factor-{country}.pdf')
 
 def test_plot_reproduction_number ():
     cases, deaths = mock_get_country_data_johns_hopkins()
@@ -218,7 +253,6 @@ def test_plot_reproduction_number_fetch_data():
         fig.savefig(f'test-reproduction_number-{country}.pdf')
 
 
-
 def test_compose_dataframe_summary():
     cases, deaths = mock_get_country_data_johns_hopkins()
 
@@ -226,8 +260,7 @@ def test_compose_dataframe_summary():
     assert table['total cases'][-1] == 643
 
     # check that most recent data item is last
-    print(table)
-    
+    # print(table)
 
 
 def test_get_cases_last_week():
@@ -242,7 +275,6 @@ def test_get_cases_last_week():
 
     cases, deaths = mock_get_country_data_johns_hopkins(country="China")
     assert c.get_cases_last_week(cases) == 430
-
 
 
 def test_pad_cumulative_series_to_yesterday():
@@ -280,3 +312,141 @@ def test_pad_cumulative_series_to_yesterday():
     y2 = c.pad_cumulative_series_to_yesterday(y)
     assert y.shape == (10,)
     assert y2.shape == y.shape
+
+
+def test_germany_get_population():
+    germany = c.germany_get_population()
+
+    assert germany.index.name == 'county'
+    assert 'population' in germany.columns
+    assert 'cases7_per_100k' in germany.columns
+
+    germany_data = c.fetch_data_germany()
+    assert set(germany_data['Landkreis']) == set(germany.index)
+
+    hamburg = germany.loc['SK Hamburg'].population
+    assert hamburg > 1800000
+
+    pinneberg = germany.loc['LK Pinneberg'].population
+    assert pinneberg > 30000
+
+    # https://github.com/oscovida/oscovida/issues/210
+    saarpfalz = germany.loc['LK Saarpfalz-Kreis'].population
+    assert saarpfalz > 130000
+
+    aachen = germany.loc['StadtRegion Aachen'].population
+    assert aachen > 500000
+
+
+def test_get_population():
+    world = c.get_population()
+
+    assert world.index.name == 'Country_Region'
+    assert 'population' in world.columns
+
+    # Check that the case regions and population regions match
+    try:
+        assert set(c.fetch_cases().index) == set(world.index)
+    except AssertionError:
+        failing_states = {'Palau', 'Western Sahara'}
+        if set(c.fetch_cases().index).symmetric_difference(set(world.index)) == failing_states:
+            pass
+        else:
+            raise AssertionError
+
+    # Tests will have to be updated in 20+ years when the populations increase
+    # more than the 'sensible' lower bound placed here
+    # The lower bound exists in case the summing over regions fails somehow
+    # and includes areas multiple times
+    assert 140_000_000 * 1.5 > world.loc['Russia'].population > 140_000_000
+    assert 120_000_000 * 1.5 > world.loc['Japan'].population > 120_000_000
+    assert 320_000_000 * 1.5 > world.loc['US'].population > 320_000_000
+    assert 80_000_000 * 1.5 > world.loc['Germany'].population > 80_000_000
+
+
+def test_get_region_label():
+    countries = ["China", "Germany", "Hungary", "Russia", "US", "Zimbabwe"]
+    for country in countries:
+        assert c.get_region_label(country) == country
+    assert c.get_region_label(country="US", region="New Jersey") == "United States: New Jersey"
+    assert c.get_region_label(country="Germany", region="Hamburg") == "Germany-Hamburg"
+    assert c.get_region_label(country="Germany", region="LK Pinneberg") == "Germany-LK Pinneberg"
+    assert c.get_region_label(country="Hungary", region="Baranya") == "Hungary-Baranya"
+
+
+def test_population():
+    germany = c.population('Germany')
+    assert isinstance(germany, int)
+    assert germany > 8E7
+
+    bayern = c.population("Germany", "Bayern")
+    assert isinstance(bayern, int)
+    assert bayern > 1E7
+
+    pinneberg = c.population("Germany", "LK Pinneberg")
+    assert isinstance(pinneberg, int)
+    assert pinneberg > 1E4
+
+    pinneberg = c.population(country="Germany", subregion="LK Pinneberg")
+    assert isinstance(pinneberg, int)
+    assert pinneberg > 1E4
+
+    with pytest.raises(NotImplementedError):
+        c.population("Germany", "Schleswig-Holstein", "LK Pinneberg")
+
+    russia = c.population("Russia")
+    assert isinstance(russia, int)
+    assert russia > 1.4E8
+
+    kyoto = c.population("Japan")
+    assert isinstance(kyoto, int)
+    assert kyoto > 2500000
+
+    new_jersey = c.population("US", "New Jersey")
+    assert isinstance(new_jersey, int)
+    assert new_jersey > 17000000
+
+
+def test_compare_plot():
+    assert_oscovida_object(*c.make_compare_plot("Russia"))
+    assert_oscovida_object(*c.make_compare_plot("Namibia", normalise=True))
+
+
+def test_compare_plot_germany():
+    assert_oscovida_object(*c.make_compare_plot_germany("Hamburg"))
+    assert_oscovida_object(*c.make_compare_plot_germany("Hamburg", normalise=True))
+    assert_oscovida_object(*c.make_compare_plot_germany("Hamburg", weeks=7))
+    assert_oscovida_object(*c.make_compare_plot_germany("Bayern", normalise=True, weeks=8))
+    assert_oscovida_object(*c.make_compare_plot_germany("Bayern", normalise=True, dates="2020-05-10:2020-06-15"))
+    with pytest.raises(ValueError):
+        c.make_compare_plot_germany("Bayern", normalise=True, weeks=8, dates="2020-05-10:2020-06-15")
+
+
+def test_cut_dates():
+    cases, deaths = mock_get_country_data_johns_hopkins()
+    cut1 = oph.cut_dates(cases, "2020-02-01:2020-02-20")
+    assert len(cut1) == 20
+    cut2 = oph.cut_dates(cases, ":2020-02-20")
+    assert len(cut2) == 30
+    cut3 = oph.cut_dates(cases, "2020-02-20:")
+    assert len(cut3) == 51
+    with pytest.raises(ValueError):
+        oph.cut_dates(cases, "2020-02-20")
+
+
+def test_day0atleast():
+    cases, deaths = mock_get_country_data_johns_hopkins()
+    res = c.day0atleast(100, cases)
+    assert type(res) == type(cases)
+    assert len(res) == len(cases)
+    assert len(res[res.index >= 0]) == len(cases)
+
+    # should cut the first three values:
+    res = c.day0atleast(1000, cases)
+    assert type(res) == type(cases)
+    assert len(res[res.index >= 0]) == len(cases) - 3
+
+    # should return an empty series
+    res = c.day0atleast(100000, cases)
+    assert type(res) == type(cases)
+    assert len(res) == 0

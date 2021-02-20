@@ -140,7 +140,7 @@ class CountryReport(BaseReport):
             overview_function="overview",
             overview_args=f'"{country}"',
             compare_plot_function="compare_plot",
-            compare_plot_args=f'"{country}"',
+            compare_plot_args=f'"{country}", normalise=True',
             data_load_function="get_country_data",
             data_load_args=f'"{country}"',
             output_file=f"{country}",
@@ -156,7 +156,7 @@ class CountryReport(BaseReport):
         ), f"{country} is unknown. Known countries are {sorted(d.index)}"
 
     def init_metadata(self):
-        cases, deaths, region_label = oscovida.get_country_data(self.country)
+        cases, deaths = oscovida.get_country_data(self.country)
         one_line_summary = f"{self.country}"
 
         self._init_metadata(
@@ -189,7 +189,7 @@ class GermanyReport(BaseReport):
             overview_function="overview",
             overview_args=f'country="Germany", subregion="{self.subregion}"',
             compare_plot_function="compare_plot",
-            compare_plot_args=f'country="Germany", subregion="{self.subregion}"',
+            compare_plot_args=f'country="Germany", subregion="{self.subregion}", dates="2020-03-15:"',
             data_load_function="germany_get_region",
             data_load_args=f'landkreis="{self.subregion}"',
             output_file=f"Germany-{self.region}-{self.subregion}",
@@ -198,8 +198,7 @@ class GermanyReport(BaseReport):
         )
 
     def init_metadata(self):
-        #  TODO: region_label unused, what was this for?
-        cases, deaths, region_label = oscovida.get_country_data(
+        cases, deaths = oscovida.get_country_data(
             "Germany", subregion=self.subregion
         )
         one_line_summary = f"Germany: {self.region} : {self.subregion}"
@@ -296,7 +295,7 @@ class HungaryReport(BaseReport):
         assert region in counties, f"{region} is unknown. Known regions are {counties}"
 
     def init_metadata(self):
-        cases, _, _ = oscovida.get_country_data("Hungary", region=self.region)
+        cases, _ = oscovida.get_country_data("Hungary", region=self.region)
 
         self._init_metadata(
             meta={
