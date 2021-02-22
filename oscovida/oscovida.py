@@ -484,7 +484,14 @@ def population(country: str,
                region: str = None, subregion: str = None) -> Union[int, None]:
     """
     Returns an `int` which corresponds to the population.
-    Only supports regions so far.
+    Only supports JHU countries and Germany Landkreise so far.
+
+    Example:
+
+    $> population(country="Germany", subregion="LK Pinneberg")
+    316103
+    $> population(country="France")
+    65273512
     """
     df = fetch_csv_data_from_url(jhu_population_url)\
         .rename(columns={"Population": "population",
