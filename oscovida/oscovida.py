@@ -770,14 +770,26 @@ def plot_incidence_rate(ax, cases: pd.Series, country: str,
 
     # convert dates to numbers first
     inxval = date2num(incidence.index.to_pydatetime())
-    points = np.array([inxval, incidence.values]).T.reshape(-1, 1, 2)
+    # smoothing
+    incidence_values = pd.Series(incidence.values).rolling(5).mean()
+    if len(incidence_values) > 100:
+        # the number of consecutive segments of the same color, bigger number produces less spaces between segments:
+        chain_len = 2   # 2 means that each segment of the curve is of length 2
+    else:
+        chain_len = 1
+    # a little trick here: we can't split odd amount of points into even number of segments of length 2, therefore
+    # we simply throw away the very first point of the curve making the number of points even
+    starting_point = len(inxval) % chain_len
+    points = np.array([inxval[starting_point:], incidence_values[starting_point:]]).T.reshape(-1, chain_len, 2)
     segments = np.concatenate([points[:-1], points[1:]], axis=1)
 
+    # colormap: the line is green on the bottom, near zero value, then it's yellow around 30,
+    # then in becomes more red, and above 100 it's totally maroon
     colors = ["green", "gold", "red", "maroon"]
     cmap = LinearSegmentedColormap.from_list('RedGreen', colors, len(incidence))
     norm = plt.Normalize(0, 100)
-    lc = LineCollection(segments, cmap=cmap, norm=norm, linewidth=2)
-    lc.set_array(incidence.values)  # set the colors according to y values
+    lc = LineCollection(segments, cmap=cmap, norm=norm, linewidth=LW)
+    lc.set_array(incidence.values[::chain_len])  # set the colors according to y values
 
     # add collection to axes
     ax.add_collection(lc)
