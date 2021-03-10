@@ -32,6 +32,10 @@ from oscovida import *
 # load the data
 cases, deaths = {DATA_LOAD_FUNCTION}({DATA_LOAD_ARGS})
 
+# get population of the region for future normalisation:
+inhabitants = population({COUNTRY})
+print(f"Population of {COUNTRY}: {inhabitants}")
+
 # compose into one table
 table = compose_dataframe_summary(cases, deaths)
 
