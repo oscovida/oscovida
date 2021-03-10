@@ -39,3 +39,11 @@ docker-build:
 docker-test:
 	@# docker run --rm dockertestimage -v $PWD:/io make test-all
 	docker run --rm -it -v $(CWD):/io dockertestimage make test
+
+
+# rsync notebooks to binder repository; needs to be called manually
+# when new notebooks are added to tools/pelican/content/ipynb
+sync-to-binder-repo:
+	@# we assume the binder repo is at ../oscovida-binder relative to
+	@# this directory
+	rsync -auv tools/pelican/content/ipynb/*.ipynb ../oscovida-binder/ipynb
