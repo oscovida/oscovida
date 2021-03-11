@@ -90,3 +90,12 @@ def limit_to_smoothed(func, max_ratio=1.5):
             ax.set_ylim(top=min(ylim, maxpoint * max_ratio), bottom=0)
         return ax
     return wrapper
+
+
+def uncertain_tail(ax: plt.Axes, data: pd.Series, days: int = 3,
+                   color: str = 'gray', linewidth: float = 4, alpha: float = 0.7) -> None:
+    """ Take a curve and plt the last `days` with dashed lines which supposed to mean 'uncertain region'
+    """
+    tail = data.rolling(2 * days, center=True, win_type='gaussian', min_periods=3).mean(std=4)
+    ax.plot(tail.index[-days - 1:], tail.values[-days - 1:],
+            color=color, linestyle='dashed', linewidth=linewidth, alpha=alpha)

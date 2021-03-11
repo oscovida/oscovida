@@ -450,3 +450,10 @@ def test_day0atleast():
     res = c.day0atleast(100000, cases)
     assert type(res) == type(cases)
     assert len(res) == 0
+
+
+def test_uncertain_tail():
+    cases, deaths = mock_get_country_data_johns_hopkins()
+    fig, ax = plt.subplots()
+    ax = c.plot_daily_change(ax, cases[:-30], 'C1')
+    oph.uncertain_tail(ax, cases.diff().dropna(), days=30)
