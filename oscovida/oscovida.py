@@ -904,7 +904,7 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
                 label=ax_label, alpha=bar_alpha, linewidth=LW)
         # RKI data for deaths in German regions is very untrustworthy,
         # see https://oscovida.github.io/2020-germany-reporting-delay-meldeverzug.html
-        if country.casefold() == "germany" and (region or subregion) and labels[1] == "deaths" and not dates:
+        if country == "Germany" and (region or subregion) and labels[1] == "deaths" and not dates:
             uncertainty = 6 * 7     # six weeks
 
         ax1.plot(smooth2.index[:-uncertainty], smooth2.values[:-uncertainty], color=color,
