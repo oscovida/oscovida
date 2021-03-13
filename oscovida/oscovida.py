@@ -15,7 +15,7 @@ from typing import Tuple, Union
 # choose font - can be deactivated
 from matplotlib import rcParams
 from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rki_data, rki_population_url
-from oscovida.plotting_helpers import align_twinx_ticks, cut_dates, has_twin, limit_to_smoothed
+from oscovida.plotting_helpers import align_twinx_ticks, cut_dates, has_twin, limit_to_smoothed, uncertain_tail
 
 rcParams['font.family'] = 'sans-serif'
 rcParams['font.sans-serif'] = ['Tahoma', 'DejaVu Sans', 'Lucida Grande', 'Verdana']
@@ -851,14 +851,16 @@ def compute_daily_change(series: pd.Series) -> Tuple[Tuple[pd.Series, str],
 
 def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str] = None,
                       country: str = None, region: str = None, subregion: str = None,
-                      dates: str = None, weeks: int = 0):
+                      dates: str = None, weeks: int = 0, uncertainty: int = 7):
     """Given a series of data and matplotlib axis ax, plot the
     - difference in the series data from day to day as bars and plot a smooth
     - line to show the overall development
 
     - series is pandas.Series with data as index, and cumulative cases (or
     deaths)
-    - color is color to be used for plotting
+    - `color` is color to be used for plotting
+    - `dates` or `weeks` specify the time range to plot
+    - `uncertainty` is a number of days we plot as a dashed line
 
     See plot_time_step for documentation on other parameters.
     """
@@ -873,6 +875,7 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
     if dates:
         change = cut_dates(change, dates)
         smooth2 = cut_dates(smooth2, dates)
+        uncertainty = 1
     if weeks:
         change = change[-7 * weeks:]
         smooth2 = smooth2[-7 * weeks:]
@@ -898,15 +901,17 @@ def plot_daily_change(ax, series: pd.Series, color: str, labels: Tuple[str, str]
         ax1.yaxis.set_major_locator(FixedLocator(ticks))
         ax1.bar(change.index, change.values, color=color,
                 label=ax_label, alpha=bar_alpha, linewidth=LW)
+        # RKI data for deaths in German regions is very untrustworthy,
+        # see https://oscovida.github.io/2020-germany-reporting-delay-meldeverzug.html
+        if country == "Germany" and (region or subregion) and labels[1] == "deaths" and not dates:
+            uncertainty = 6 * 7     # six weeks
 
-        ax1.plot(smooth2.index, smooth2.values, color=color,
+        ax1.plot(smooth2.index[:-uncertainty], smooth2.values[:-uncertainty], color=color,
                  label=ax_label + " " + smooth2_label, linewidth=LW)
-
-        # uncertain graph on the right
-        if not dates:
-            fortnight = series[-14:].diff().dropna()
-            uncert = fortnight.rolling(14, center=True, win_type='gaussian', min_periods=3).mean(std=4)
-            ax1.plot(uncert.index[-7:], uncert.values[-7:], color=color, linestyle='dashed', linewidth=LW, alpha=0.7)
+        # uncertain (dashed) line on the right
+        if uncertainty > 1:
+            uncertain_tail(ax1, series[-2 * uncertainty:].diff().dropna(), days=uncertainty,
+                           color=color, linewidth=LW, alpha=0.7)
 
         ax1.legend()
         ax1.set_ylabel('daily change')
