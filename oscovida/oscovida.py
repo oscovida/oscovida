@@ -787,7 +787,14 @@ def plot_incidence_rate(ax, cases: pd.Series, country: str,
     colors = ["green", "gold", "red", "maroon"]
     cmap = LinearSegmentedColormap.from_list('RedGreen', colors, len(incidence))
     norm = plt.Normalize(0, 100)
-    lc = LineCollection(segments, cmap=cmap, norm=norm, linewidth=LW)
+    if country == "Germany" and not dates:  # see https://github.com/oscovida/oscovida/issues/228
+        # plot the end of the incidence curve dotted for Germany (the last four points)
+        lc = LineCollection(segments[:-int(4/chain_len)], cmap=cmap, norm=norm, linewidth=LW)
+        lc_end = LineCollection(segments[-int(4/chain_len):], cmap=cmap, norm=norm, linewidth=3, linestyles=[':'], alpha=0.5)
+        lc_end.set_array(incidence.values[-int(4/chain_len)::chain_len])  # set the colors according to y values
+        ax.add_collection(lc_end)
+    else:
+        lc = LineCollection(segments, cmap=cmap, norm=norm, linewidth=LW)
     lc.set_array(incidence.values[::chain_len])  # set the colors according to y values
 
     # add collection to axes
