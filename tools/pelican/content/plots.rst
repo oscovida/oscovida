@@ -1,14 +1,31 @@
 Explanation of plots
 ====================
 
-:Date: 2020-05-03 10:00
+:Date: 2021-03-24 10:00
 :slug: plots
 :tags: about, data, plots, tutorial
 
-We discuss the plots from the top (number 1) to the bottom (number 7)
+We discuss the plots from the top (number 1) to the bottom (number 9)
 that are available for `all regions <all-regions.html>`__.
 
-Plot 1: accumulated cases and deaths as function of time
+Plot 1: 7-day incidence rate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. raw:: html
+
+    <img src="{attach}fig-uk-incidence.svg" alt="United Kingdom data">
+
+-  Shows how many people have been confirmed to be infected
+   during the last seven days prior to a date, per 100 thousand of inhabitants.
+-  This is a cumulative normalised metric, and it is possible to use it for
+   comparison of different regions.
+-  For low rates (around zero) the graph is green, and with the grows of the rate
+   it gradually becomes yellow, then red, then maroon.
+-  The number near the cross on the right edge of the graph shows the latest value.
+-  This number is generally reported in the media as *incidence rate*.
+-  The interesting question is: how fast do they grow?
+
+Plot 2: accumulated cases and deaths as function of time
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
@@ -24,7 +41,7 @@ Plot 1: accumulated cases and deaths as function of time
 -  These numbers can only grow.
 -  The interesting question is: how fast do they grow?
 
-Plot 2: daily changes in cases
+Plot 3: daily changes in cases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
@@ -45,7 +62,7 @@ Plot 2: daily changes in cases
    of new infections decreased to around 100 per day for the second half
    of March, before the numbers started to decrease further.
 
-Plot 3: daily changes in deaths
+Plot 4: daily changes in deaths
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
@@ -59,7 +76,7 @@ Plot 3: daily changes in deaths
    with some time delay, and reduced by a fraction (the `case fatality
    rate <https://en.wikipedia.org/wiki/Case_fatality_rate>`__).
 
-Plot 4: R & growth factor based on cases
+Plot 5: R & growth factor based on cases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
@@ -129,7 +146,7 @@ Assessing success for containment measures
   numbers.
 
 
-Plot 5: R & growth factor based on deaths
+Plot 6: R & growth factor based on deaths
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
@@ -159,7 +176,7 @@ the estimate of R based on infections by several weeks; reflecting the duration
 of the illness.
 
 
-Plot 6: Doubling times
+Plot 7: Doubling times
 ~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
@@ -209,7 +226,7 @@ Plot 6: Doubling times
 
 - Occasionally, the solid lines are omitted if there are not enough data points.
 
-Plot 7: Comparison of daily new cases with other countries
+Plot 8: Comparison of daily new cases with other countries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
@@ -237,7 +254,7 @@ Plot 7: Comparison of daily new cases with other countries
 - [The curve for China starts at a higher value than 10, as the first recorded
   value was 548. We could manually correct this.]
 
-Plot 8: Comparison of daily new deaths with other countries
+Plot 9: Comparison of daily new deaths with other countries
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
