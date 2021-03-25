@@ -1650,17 +1650,12 @@ def make_compare_plot_germany(region=None, subregion=None,
         kwargs_d.update({'labels': False})
     elif dates and weeks:
         raise ValueError("`dates` and `weeks` cannot be used together")
-    elif weeks > 0:
+    else:
         res_c = df_c[- weeks * 7:]
         res_d = df_d[- weeks * 7:]
         kwargs_d.update({'yaxislabel': '', 'labels': False})
         kwargs_c.update({'labels': False})
         kwargs_d.update({'labels': False})
-    else:
-        res_c = align_sets_at(v0c, df_c)
-        res_d = align_sets_at(v0d, df_d)
-        kwargs_c.update({'xaxislabel': f"days since {v0c} cases", 'labeloffset': 1})
-        kwargs_d.update({'xaxislabel': f"days since {v0d} deaths", 'labeloffset': 1})
 
     kwargs_c.update({"yaxislabel": "daily new cases\n(rolling 7-day mean)"})
     kwargs_d.update({"yaxislabel": "daily new deaths\n(rolling 7-day mean)"})
