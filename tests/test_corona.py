@@ -404,7 +404,7 @@ def test_population():
 
     new_jersey = c.population("US", "New Jersey")
     assert isinstance(new_jersey, int)
-    assert new_jersey > 17000000
+    assert new_jersey > 8000000
 
 
 def test_compare_plot():
