@@ -1380,7 +1380,7 @@ def day0atleast(v0: int, series: pd.Series) -> pd.Series:
     return result
 
 
-def align_sets_at(v0, df):
+def align_sets_at(v0: int, df: pd.DataFrame) -> pd.DataFrame:
     """Accepts data frame, and aligns so that all entries close to v0 are on the same row.
 
     Returns new dataframe with integer index (representing days after v0).
@@ -1498,11 +1498,15 @@ def set_y_axis_limit(data, current_lim):
 
 def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Poland", "Korea, South",
                                                   "Belarus", "Switzerland", "US"],
-                     v0c=10, v0d=3, normalise=True):
+                     v0c=10, v0d=3, normalise=True, align=False):
     rolling = 7
     df_c, df_d = get_compare_data([main_country] + compare_with, rolling=rolling)
-    res_c = align_sets_at(v0c, df_c)
-    res_d = align_sets_at(v0d, df_d)
+
+    if align:
+        res_c = align_sets_at(v0c, df_c)
+        res_d = align_sets_at(v0d, df_d)
+    else:
+        res_c, res_d = df_c, df_d
 
     if normalise:
         for country in res_c.keys():
@@ -1519,15 +1523,15 @@ def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Polan
     res_d = res_d.interpolate(method='linear', limit=3)
 
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
-    ax=axes[0]
+    ax = axes[0]
     norm_str = '\nper 100K people'
     plot_logdiff_time(ax, res_c, f"days since {v0c} cases",
                       f"daily new cases{norm_str if normalise else ''}\n(rolling 7-day mean)",
-                      v0=v0c, highlight={main_country:"C1"})
+                      v0=v0c, highlight={main_country: "C1"}, labels=False)
     ax = axes[1]
     plot_logdiff_time(ax, res_d, f"days since {v0d} deaths",
                       f"daily new deaths{norm_str if normalise else ''}\n(rolling 7-day mean)",
-                      v0=v0d, highlight={main_country:"C0"})
+                      v0=v0d, highlight={main_country: "C0"}, labels=False)
 
     if not normalise:
         fig.tight_layout(pad=1)
