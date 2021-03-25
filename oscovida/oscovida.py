@@ -526,7 +526,11 @@ def population(country: str,
         else:
             if region or subregion:
                 if region in df['region'].values:
-                    return int(df[df['region'] == region].population.sum())
+                    combined_key = f"{region}, {country}"
+                    if combined_key in df['Combined_Key']:  # the total population of the region is known
+                        return int(df[df['Combined_Key'] == combined_key].population)
+                    else:   # there's no total population in the dataset, we have to sum up on our own
+                        return int(df[df['region'] == region].population.sum())
                 elif subregion in df['subregion'].values:
                     return int(df.population[subregion])
                 elif region in df['subregion']:    # silently try to use as subregion
