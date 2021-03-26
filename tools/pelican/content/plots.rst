@@ -1,28 +1,30 @@
 Explanation of plots
 ====================
 
-:Date: 2020-05-03 10:00
+:Date: 2021-03-24 10:00
 :slug: plots
 :tags: about, data, plots, tutorial
 
-We discuss the plots from the top (number 1) to the bottom (number 7)
+We discuss the plots from the top (number 1) to the bottom (number 8)
 that are available for `all regions <all-regions.html>`__.
 
-Plot 1: accumulated cases and deaths as function of time
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Plot 1: 7-day incidence rate
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. raw:: html
 
-    <img src="{attach}fig-south-korea1.svg" alt="South Korea data">
+    <img src="{attach}fig-uk-incidence.svg" alt="United Kingdom data">
 
--  Shows how many people have been confirmed to be infected (blue) or
-   have died (red) as a function of time.
--  The y-axis is logarithmic, that means from one grid line to the next,
-   the value represented increases by a factor of 10. (Axis labels: 102=
-   100, 103= 1000, 104= 10000, and so on).
--  These numbers are generally reported in the media.
--  These numbers can only grow.
+-  Shows how many people have been confirmed to be infected
+   during the last seven days prior to a date, per 100 thousand of inhabitants.
+-  This is a cumulative normalised metric, and it is possible to use it for
+   comparison of different regions.
+-  For low rates (around zero) the graph is green, and with the grows of the rate
+   it gradually becomes yellow, then red, then maroon.
+-  The number near the cross on the right edge of the graph shows the latest value.
+-  This number is generally reported in the media as *incidence rate*.
 -  The interesting question is: how fast do they grow?
+
 
 Plot 2: daily changes in cases
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
