@@ -375,36 +375,28 @@ def test_get_region_label():
 
 
 def test_population():
-    germany = c.population('Germany')
-    assert isinstance(germany, int)
-    assert germany > 8E7
+    reference = [("Germany", None, None, 83E6),
+                 ("Germany", "Bayern", None, 13E6),
+                 ("Germany", None, "LK Pinneberg", 3.1E5),
+                 ("Russia", None, None, 1.4E8),
+                 ("Japan", "Kyoto", None, 2.6E6),
+                 ("US", "New Jersey", None, 8.7E6),
+                 ]
+    for country, reg, subreg, ref_pop in reference:
+        actual_population = c.population(country, reg, subreg)
+        print(country)
+        assert isinstance(actual_population, int)
+        assert 0.8 * ref_pop < actual_population < 1.2 * ref_pop
 
-    bayern = c.population("Germany", "Bayern")
-    assert isinstance(bayern, int)
-    assert bayern > 1E7
-
+    # Special cases
+    # pass subregion as region for Germany
     pinneberg = c.population("Germany", "LK Pinneberg")
     assert isinstance(pinneberg, int)
-    assert pinneberg > 1E4
+    assert 3E5 < pinneberg < 4E5
 
-    pinneberg = c.population(country="Germany", subregion="LK Pinneberg")
-    assert isinstance(pinneberg, int)
-    assert pinneberg > 1E4
-
+    # pass both region AND subregion
     with pytest.raises(NotImplementedError):
         c.population("Germany", "Schleswig-Holstein", "LK Pinneberg")
-
-    russia = c.population("Russia")
-    assert isinstance(russia, int)
-    assert russia > 1.4E8
-
-    kyoto = c.population("Japan")
-    assert isinstance(kyoto, int)
-    assert kyoto > 2500000
-
-    new_jersey = c.population("US", "New Jersey")
-    assert isinstance(new_jersey, int)
-    assert new_jersey > 17000000
 
 
 def test_compare_plot():
