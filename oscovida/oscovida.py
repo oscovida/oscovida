@@ -1505,8 +1505,11 @@ def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Polan
     if align:
         res_c = align_sets_at(v0c, df_c)
         res_d = align_sets_at(v0d, df_d)
+        c_xlabel = f'days since {v0c} cases'
+        d_xlabel = f'days since {v0d} deaths'
     else:
         res_c, res_d = df_c, df_d
+        c_xlabel, d_xlabel = None, None
 
     if normalise:
         for country in res_c.keys():
@@ -1525,12 +1528,12 @@ def make_compare_plot(main_country, compare_with=["Germany", "Australia", "Polan
     fig, axes = plt.subplots(2, 1, figsize=(10, 6))
     ax = axes[0]
     norm_str = '\nper 100K people'
-    plot_logdiff_time(ax, res_c, f"{f'days since {v0c} cases' if align else ''}",
-                      f"daily new cases{norm_str if normalise else ''}\n(rolling 7-day mean)",
+    plot_logdiff_time(ax, res_c, xaxislabel=c_xlabel,
+                      yaxislabel=f"daily new cases{norm_str if normalise else ''}\n(rolling 7-day mean)",
                       v0=v0c, highlight={main_country: "C1"}, labels=False)
     ax = axes[1]
-    plot_logdiff_time(ax, res_d, f"{f'days since {v0d} deaths' if align else ''}",
-                      f"daily new deaths{norm_str if normalise else ''}\n(rolling 7-day mean)",
+    plot_logdiff_time(ax, res_d, xaxislabel=d_xlabel,
+                      yaxislabel=f"daily new deaths{norm_str if normalise else ''}\n(rolling 7-day mean)",
                       v0=v0d, highlight={main_country: "C0"}, labels=False)
 
     if not normalise:
@@ -1863,8 +1866,16 @@ def overview(country: str, region: str = None, subregion: str = None,
 
 def compare_plot(country: str, region: str = None, subregion: str = None,
                  savefig: bool = False, normalise: bool = True,
-                 dates: str = None) -> Tuple[plt.axes, pd.Series, pd.Series]:
+                 dates: str = None, align: bool = False) -> Tuple[plt.axes, pd.Series, pd.Series]:
     """ Create a pair of plots which show comparison of the region with other most suffering countries
+
+    :param country: mandatory
+    :param region: default: None
+    :param subregion: default: None
+    :param savefig: save figure as PDF, default: False
+    :param normalise: whether to normalise data, default: True
+    :param dates: range in the format "2020-03-21:2020-05-21"
+    :param align: whether to align the starting point for different countries, default: False
     """
     c, d = get_country_data(country, region=region, subregion=subregion)
     region_label = get_region_label(country, region=region, subregion=subregion)
@@ -1874,7 +1885,7 @@ def compare_plot(country: str, region: str = None, subregion: str = None,
         d *= 100000 / _population
 
     if not subregion and not region:    # i.e. not a region of Germany
-        axes_compare, res_c, res_d = make_compare_plot(country, normalise=normalise)
+        axes_compare, res_c, res_d = make_compare_plot(country, normalise=normalise, align=align)
 
     elif country == "Germany":   # Germany specific plots
         # On 11 April, Mecklenburg Vorpommern data was missing from data set.
