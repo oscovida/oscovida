@@ -5,6 +5,8 @@ Explanation of plots
 :slug: plots
 :tags: about, data, plots, tutorial
 
+.. contents::
+
 We discuss the plots from the top (number 1) to the bottom (number 8)
 that are available for `all regions <all-regions.html>`__.
 
