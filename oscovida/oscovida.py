@@ -1941,8 +1941,11 @@ def compare_plot(country: str, region: str = None, subregion: str = None,
     fig2 = plt.gcf()
 
     if savefig:
-        filename = os.path.join("figures", region_label.replace(" ", "-").replace(",", "-") + '2.svg')
-        fig2.savefig(filename)
+        for j in range(len(axes_compare)):
+            # get the size of the portion to save in inches
+            extent = full_extent(axes_compare[j], fig2)
+            filename = os.path.join("figures", region_label.replace(" ", "-").replace(",", "-") + f'_2-{j + 1}.svg')
+            fig2.savefig(filename, bbox_inches=extent)
 
     return axes_compare, c, d
 
