@@ -250,3 +250,20 @@ Plot 8: Comparison of daily new deaths with other countries
 
 -  As Plot 7, but for deaths not cases.
 
+The role of dashed lines
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+We use a dashed line to indicate where the line cannot be trusted. We should mention this somewhere.
+
+.. raw:: html
+
+    <a href="https://oscovida.github.io/html/Germany-Hamburg-SK-Hamburg.html"> test
+         <img src="{attach}plots-dashed-line-example.png" alt="Plot from Germany, Hamburg, RKI data">
+    </a>
+
+
+Examples:
+
+deaths in RKI-data sets, such as Hamburg: https://oscovida.github.io/html/Germany-Hamburg-SK-Hamburg.html because of the issue explained in https://oscovida.github.io/2020-germany-reporting-delay-meldeverzug.html
+
+computation of rolling averages and incidences for the most current 7 days, where normally we use a centred rolling average, but not for the last week. (Is that right?)
