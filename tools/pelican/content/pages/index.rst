@@ -78,6 +78,7 @@ Acknowledgements
 
 -  The H2020 project `Photon and Neutron Open Science Cloud
    PaNOSC) <https://www.panosc.eu/>`__
+-  `Max Planck Institute for the Structure and Dynamics of Matter <https://www.mpsd.mpg.de/en>`__
 -  `European XFEL <http://www.xfel.eu>`__
 -  `University of Southampton <https://www.soton.ac.uk>`__
 -  `Biological Research Centre <http://www.brc.hu/>`__, Szeged
