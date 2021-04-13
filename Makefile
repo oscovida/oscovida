@@ -4,7 +4,7 @@ install:
 	python3 -m pip install .[test]
 
 dev-install:
-	python3 -m pip install --use-feature=2020-resolver -U -e .[test]
+	python3 -m pip install -U -e .[test]
 	python3 -m pip install notebook
 
 dev-install-upgrade-depedencies:
