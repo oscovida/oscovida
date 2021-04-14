@@ -51,7 +51,7 @@ setup(name="oscovida",
           'ipynb_py_convert',
           'click',
           'pytest_tornasync',
-          'nbconvert',
+          'nbconvert==6.0.1',
           'plotly',
       ],
       extras_require={
