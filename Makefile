@@ -7,6 +7,9 @@ dev-install:
 	python3 -m pip install -U -e .[test]
 	python3 -m pip install notebook
 
+dev-install-pelican:
+	python3 -m pip install -r requirements_pelican.txt
+
 dev-install-upgrade-depedencies:
 	python3 -m pip install --upgrade --upgrade-strategy eager -e .[test]
 
