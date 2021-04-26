@@ -1190,6 +1190,7 @@ def min_max_in_past_n_days(series, n, at_least = [0.75, 1.25], alert=[0.1, 100],
         n = len(series)
 
     series = series.replace(math.inf, math.nan)
+    series = series.replace(-math.inf, math.nan)
 
     min_ = series[-n:].min() - 0.1    # the -0.1 is to make extra space because the line we draw is thick
     max_ = series[-n:].max() + 0.1
