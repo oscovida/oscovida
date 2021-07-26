@@ -253,17 +253,64 @@ Plot 8: Comparison of daily new deaths with other countries
 The role of dashed lines
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-We use a dashed line to indicate where the line cannot be trusted. We should mention this somewhere.
+We use a dashed line to indicate where the data is inaccurate (for some reason).
 
-.. raw:: html
+1. Example 1: Last days in incidence, deaths and cases:
 
-    <a href="https://oscovida.github.io/html/Germany-Hamburg-SK-Hamburg.html"> test
-         <img src="{attach}plots-dashed-line-example.png" alt="Plot from Germany, Hamburg, RKI data">
-    </a>
+   .. raw:: html
+
+       <a href="https://oscovida.github.io/html/United-Kingdom.html"> United Kingdom
+            <img src="{attach}plots-dashed-line-example-uk.png" alt="Plot from UK, JHU data">
+       </a>
+
+   The most recent 7 days in incidence, and new cases and new deaths are shown as a dashed line.
+
+   See the bitmap above as an example. Here the dashed line is chosen because we
+   need a 7-day rolling average over the raw data to average out weekly
+   fluctuations. (Some additional Gaussian smoothing is applied to help the eye
+   which needs another 3 days). See function ``compute_daily_change`` in
+   https://github.com/oscovida/oscovida/blob/master/oscovida/oscovida.py if you
+   care for the details).
+
+   In more detail: For the 7-day average for today, we need to sum the reported new cases from
+   the last 3 days, today, and the next 3 days and divide this by 7 (and we need
+   another 3 days in either direction for visual smoothing). For the most recent
+   7 days, we cannot do this (because we don't know the data from the future
+   yet). Instead, we compute a rolling average using the 7 previous(!) days.
+   Using this method, we can compute the averaged data up to day with the last
+   known data point.
+
+   However, the computation is different (and at times it might be possible to
+   note a step in the data as the line [and/or its slope] as it changes from
+   solid to dashed). This is highlighted through using a dashed line.
+
+2. Example 2: Deaths in German districts
+
+   .. raw:: html
+   
+       <a href="https://oscovida.github.io/html/Germany-Nordrhein-Westfalen-SK-Köln.html"> 
+            <img src="{attach}plots-dashed-line-example-german-district.png" alt="Plot from Germany, Hamburg, RKI data">
+       </a>
+
+   For the data on deaths for districts within Germany that is reported by the
+   RKI, we dash the most recent 6 weeks. The reason here is that the RKI reports
+   deaths with the date at which the infection took place, not the date on which
+   the person died. Before vaccinations were available, it was reasonable to
+   assume that COVID-related deaths would die within 6 weeks of the infection
+   taking place.
+
+   We have a detailed investigation of this phenomenon at https://oscovida.github.io/2020-germany-reporting-delay-meldeverzug.html .
+
+   We thought it is important to understand this when interpreting the data, and
+   have thus dashed the line in the plots for deaths in Germany for the most
+   recent 6 weeks.
+
+   [This six week period should be reviewed as the larger fraction of vaccinated
+   and older people changes this: younger and healthier patients may stay
+   significantly longer in medical and intensive care before they die from
+   COVID.]
 
 
-Examples:
 
-deaths in RKI-data sets, such as Hamburg: https://oscovida.github.io/html/Germany-Hamburg-SK-Hamburg.html because of the issue explained in https://oscovida.github.io/2020-germany-reporting-delay-meldeverzug.html
 
-computation of rolling averages and incidences for the most current 7 days, where normally we use a centred rolling average, but not for the last week. (Is that right?)
+
