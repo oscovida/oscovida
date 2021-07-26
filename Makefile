@@ -4,14 +4,17 @@ install:
 	python3 -m pip install .[test]
 
 dev-install:
-	python3 -m pip install --use-feature=2020-resolver -U -e .[test]
+	python3 -m pip install -U -e .[test]
 	python3 -m pip install notebook
+
+dev-install-pelican:
+	python3 -m pip install -r requirements_pelican.txt
 
 dev-install-upgrade-depedencies:
 	python3 -m pip install --upgrade --upgrade-strategy eager -e .[test]
 
 test:
-	python3 -m pytest -v --cov=oscovida
+	python3 -m pytest -v --showlocals --capture=no --cov=oscovida
 
 # execute notebooks to ensure they work
 test-nbval:

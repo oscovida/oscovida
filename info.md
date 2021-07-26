@@ -199,6 +199,33 @@ Setting up a local installation for development
 3. Get the binder repository:
    `cd tools && git clone git@github.com:oscovida/binder.git binder`
 
+Install software
+================
+
+1. create virtual environment for oscovida and tools that create html from jupyter notebooks (to run everyday to create new plots). For example::
+
+  ```sh
+  python -m venv .venv
+  source .venv/bin/activate
+  # insteall requirements for oscovida
+  pip install .
+  ```
+
+
+2. create virtual environment for pelican::
+
+  ```sh
+  python -m venv .venv_pelican
+  source .venv_pelican/bin/activate
+  # insteall requirements for pelican
+  pip install -r requirements_pelican.txt
+  ```
+
+These steps are used in https://github.com/oscovida/oscovida.github.io/blob/master/.github/workflows/update-webpages.yml .
+
+There are convenience targets `dev-install` and `dev-install-pelican` in the Makefile that can be used once the right Python environment has been activated.
+
+
 Procedure to update data and webpages (manual)
 ==============================================
 

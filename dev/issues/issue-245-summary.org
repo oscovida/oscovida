@@ -1,0 +1,23 @@
+* <2021-04-13 Tue 22:49>
+
+Observations:
+
+the unwanted output from the `overview` function in the rendering of html pages
+(see https://github.com/oscovida/oscovida/issues/245) can be reproduced with
+ with `dev/issues/issue-245.sh` and nbconvert versions > 6.0.1 up to 6.0.7.
+
+ For 6.0.1, it seems to work correctly.
+
+ Will try to pin us to that version for now.
+
+ 
+* <2021-04-14 Wed 07:03>
+
+The pinning of nbconvert to 6.0.1 has worked.
+
+I have then tried to use the HEAD of nbconvert (commit e49b9a8a220c9f9f87c23764ea7b48eac4707937 ), and this also fixes the problem.
+ nbconvert.__version__ is reported as 6.0.8.dev0
+
+ So when 6.0.8 is released, we should switch back to the most current nbconvert, and all should work.
+
+ 
