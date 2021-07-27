@@ -145,8 +145,7 @@ def get_country_data_johns_hopkins(country: str,
     if len(tmp.shape) == 1:     # most countries (Germany, Italy, ...)
         d = tmp
     elif len(tmp.shape) == 2:   # China, France, United Kingdom, ...
-        tmp2 = tmp.drop(columns=['Province/State'])
-        d = tmp2.sum()
+        d = tmp.drop(columns=['Province/State']).sum()
         d.rename("deaths", inplace=True)
     else:
         raise ValueError("Unknown data set structure for deaths {country}:", tmp)
@@ -155,8 +154,7 @@ def get_country_data_johns_hopkins(country: str,
     if len(tmp.shape) == 1:
         c = tmp
     elif len(tmp.shape) == 2:
-        tmp2 = tmp.drop(columns=['Province/State'])
-        c = tmp2.sum()
+        c = tmp.drop(columns=['Province/State']).sum()
         c.rename("cases", inplace=True)
     else:
         raise ValueError("Unknown data set structure for cases {country}:", tmp)
