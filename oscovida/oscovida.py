@@ -141,8 +141,8 @@ def get_country_data_johns_hopkins(country: str,
     # Some countries report sub areas (i.e. multiple rows per country) such as China, France, United Kingdom
     # Denmark. In that case, we sum over all regions.
     tmp = deaths.loc[country]
-    if len(tmp.shape) == 1:
-        d = deaths.loc[country]
+    if len(tmp.shape) == 1:     # most countries (Germany, Italy, ...)
+        d = tmp
     elif len(tmp.shape) == 2:   # China, France, United Kingdom, ...
         tmp2 = tmp.drop(columns=['Province/State'])
         d = tmp2.sum()
@@ -152,7 +152,7 @@ def get_country_data_johns_hopkins(country: str,
 
     tmp = cases.loc[country]
     if len(tmp.shape) == 1:
-        c = cases.loc[country]
+        c = tmp
     elif len(tmp.shape) == 2:
         tmp2 = tmp.drop(columns=['Province/State'])
         c = tmp2.sum()
