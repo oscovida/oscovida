@@ -83,8 +83,8 @@ def test_germany_overview():
     assert deaths.name == 'Germany-SK Kassel deaths'
     assert_oscovida_object(axes, cases, deaths)
 
-    axes, cases, deaths = c.overview(country="Germany", subregion="StadtRegion Aachen")
-    assert cases.name == 'Germany-StadtRegion Aachen cases'
+    axes, cases, deaths = c.overview(country="Germany", subregion="Städteregion Aachen")
+    assert cases.name == 'Germany-Städteregion Aachen cases'
     assert_oscovida_object(axes, cases, deaths)
 
     axes, cases, deaths = c.overview(country="Germany", subregion="Region Hannover")
@@ -334,7 +334,7 @@ def test_germany_get_population():
     saarpfalz = germany.loc['LK Saarpfalz-Kreis'].population
     assert saarpfalz > 130000
 
-    aachen = germany.loc['StadtRegion Aachen'].population
+    aachen = germany.loc['Städteregion Aachen'].population
     assert aachen > 500000
 
 

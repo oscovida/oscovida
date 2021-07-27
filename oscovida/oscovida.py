@@ -454,11 +454,23 @@ def germany_get_population() -> pd.DataFrame:
         .set_index('county')
     )
     population = population.rename(columns={"EWZ": "population"})
+
+    # Some tidy up of the data:
+
     # see https://github.com/oscovida/oscovida/issues/210
     # try to remove this if-clause and see if tests fail:
     if "LK Saar-Pfalz-Kreis" in population.index:
         population.loc['LK Saarpfalz-Kreis'] = population.loc['LK Saar-Pfalz-Kreis']
         population = population.drop('LK Saar-Pfalz-Kreis')
+
+    # 27 July 2021 - test fail because name is "Städteregion Aachen'" in actual data (
+    # i.e. 'StädteRegion' versus 'Städteregion' Aachen)
+    # see https://github.com/oscovida/oscovida/runs/3170956651?check_suite_focus=true#step:6:651
+    if "StädteRegion Aachen" in population.index:
+        population.loc['Städteregion Aachen'] = population.loc['StädteRegion Aachen']
+        population = population.drop('StädteRegion Aachen')
+
+
     return population # type: ignore
 
 
