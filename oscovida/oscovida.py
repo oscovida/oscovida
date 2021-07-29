@@ -139,21 +139,22 @@ def get_country_data_johns_hopkins(country: str,
     assert country in deaths.index, f"{country} not in available countries. These are {sorted(deaths.index)}"
 
     # Some countries report sub areas (i.e. multiple rows per country) such as China, France, United Kingdom
-    # Denmark. In that case, we sum over all regions.
+    # Denmark. In that case, we sum over all regions (by summing over the relevant rows).
+
     tmp = deaths.loc[country]
-    if len(tmp.shape) == 1:
-        d = deaths.loc[country]
+    if len(tmp.shape) == 1:     # most countries (Germany, Italy, ...)
+        d = tmp
     elif len(tmp.shape) == 2:   # China, France, United Kingdom, ...
-        d = deaths.loc[country].sum()
+        d = tmp.drop(columns=['Province/State']).sum()
         d.rename("deaths", inplace=True)
     else:
         raise ValueError("Unknown data set structure for deaths {country}:", tmp)
 
     tmp = cases.loc[country]
     if len(tmp.shape) == 1:
-        c = cases.loc[country]
+        c = tmp
     elif len(tmp.shape) == 2:
-        c = cases.loc[country].sum()
+        c = tmp.drop(columns=['Province/State']).sum()
         c.rename("cases", inplace=True)
     else:
         raise ValueError("Unknown data set structure for cases {country}:", tmp)
@@ -454,11 +455,23 @@ def germany_get_population() -> pd.DataFrame:
         .set_index('county')
     )
     population = population.rename(columns={"EWZ": "population"})
+
+    # Some tidy up of the data:
+
     # see https://github.com/oscovida/oscovida/issues/210
     # try to remove this if-clause and see if tests fail:
     if "LK Saar-Pfalz-Kreis" in population.index:
         population.loc['LK Saarpfalz-Kreis'] = population.loc['LK Saar-Pfalz-Kreis']
         population = population.drop('LK Saar-Pfalz-Kreis')
+
+    # 27 July 2021 - test fail because name is "Städteregion Aachen'" in actual data (
+    # i.e. 'StädteRegion' versus 'Städteregion' Aachen)
+    # see https://github.com/oscovida/oscovida/runs/3170956651?check_suite_focus=true#step:6:651
+    if "StädteRegion Aachen" in population.index:
+        population.loc['Städteregion Aachen'] = population.loc['StädteRegion Aachen']
+        population = population.drop('StädteRegion Aachen')
+
+
     return population # type: ignore
 
 
