@@ -139,21 +139,22 @@ def get_country_data_johns_hopkins(country: str,
     assert country in deaths.index, f"{country} not in available countries. These are {sorted(deaths.index)}"
 
     # Some countries report sub areas (i.e. multiple rows per country) such as China, France, United Kingdom
-    # Denmark. In that case, we sum over all regions.
+    # Denmark. In that case, we sum over all regions (by summing over the relevant rows).
+
     tmp = deaths.loc[country]
-    if len(tmp.shape) == 1:
-        d = deaths.loc[country]
+    if len(tmp.shape) == 1:     # most countries (Germany, Italy, ...)
+        d = tmp
     elif len(tmp.shape) == 2:   # China, France, United Kingdom, ...
-        d = deaths.loc[country].sum()
+        d = tmp.drop(columns=['Province/State']).sum()
         d.rename("deaths", inplace=True)
     else:
         raise ValueError("Unknown data set structure for deaths {country}:", tmp)
 
     tmp = cases.loc[country]
     if len(tmp.shape) == 1:
-        c = cases.loc[country]
+        c = tmp
     elif len(tmp.shape) == 2:
-        c = cases.loc[country].sum()
+        c = tmp.drop(columns=['Province/State']).sum()
         c.rename("cases", inplace=True)
     else:
         raise ValueError("Unknown data set structure for cases {country}:", tmp)
