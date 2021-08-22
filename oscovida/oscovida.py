@@ -14,7 +14,7 @@ import IPython.display
 from typing import Tuple, Union
 # choose font - can be deactivated
 from matplotlib import rcParams
-from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rki_data, rki_population_url
+from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rki_data, rki_population_url, rki_population_backup_file
 from oscovida.plotting_helpers import align_twinx_ticks, cut_dates, has_twin, limit_to_smoothed, uncertain_tail
 
 rcParams['font.family'] = 'sans-serif'
@@ -450,10 +450,28 @@ def germany_get_population() -> pd.DataFrame:
     """The function's behavior duplicates the one for `germany_get_region()` one."""
     source = rki_population_url
     population = fetch_csv_data_from_url(source)
-    population = (
-        population
-        .set_index('county')
-    )
+    try:
+    	population = (
+    	    population
+    	    .set_index('county')
+    	)
+    except KeyError as exception:
+        print(f"Couldn't retrieve population data from RKI ({rki_population_url}). "
+              "Using backup data from August 2020 instead "
+              "(https://github.com/oscovida/oscovida/blob/master/oscovida/backup_data/RKI_Corona_Landkreise.csv)"
+        )
+        
+        # where is the backup file?
+        rki_population_backup_path = os.path.join(os.path.split(__file__)[0],
+                                                  rki_population_backup_file)
+
+        population = pd.read_csv(rki_population_backup_path)
+       	population = (
+    	    population
+    	    .set_index('county')
+    	)
+    
+    
     population = population.rename(columns={"EWZ": "population"})
 
     # Some tidy up of the data:
