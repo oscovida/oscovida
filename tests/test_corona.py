@@ -338,6 +338,15 @@ def test_germany_get_population():
     assert aachen > 500000
 
 
+@pytest.mark.xfail
+def test_germany_get_population_data_online():
+    """If this test passes, then the population data for Germany may be online
+    again (see https://github.com/oscovida/oscovida/issues/261)
+    Hans, 21 August 2021."""
+    population = c.fetch_csv_data_from_url(c.rki_population_url)
+    population = population.set_index('county')
+
+
 def test_get_population():
     world = c.get_population()
 
