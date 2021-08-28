@@ -349,7 +349,7 @@ def test_germany_get_population_data_online():
 
 def test_germany_get_population_backup_data_raw():
     """Sanity check for backup file"""
-    df = c.germany_get_population_backup_data_raw()
+    df = c._germany_get_population_backup_data_raw()
 
     # expect 412 districts
     assert len(df) == 412
