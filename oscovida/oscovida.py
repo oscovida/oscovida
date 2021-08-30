@@ -445,10 +445,25 @@ def fetch_csv_data_from_url(source) -> pd.DataFrame:
     return data # type: ignore
 
 
+def _germany_get_population_backup_data_raw() -> pd.DataFrame:
+    """Function is not meant to be used directly.
+    Use germany_get_population() instead (which will call this function if required).
+    """
+
+    # where is the backup file?
+    rki_population_backup_path = os.path.join(os.path.split(__file__)[0],
+                                              rki_population_backup_file)
+
+    population = pd.read_csv(rki_population_backup_path)
+    return population
+
+
+
 @joblib_memory.cache
 def germany_get_population() -> pd.DataFrame:
     """The function's behavior duplicates the one for `germany_get_region()` one."""
     source = rki_population_url
+
     population = fetch_csv_data_from_url(source)
     try:
     	population = (
@@ -460,18 +475,12 @@ def germany_get_population() -> pd.DataFrame:
               "Using backup data from August 2020 instead "
               "(https://github.com/oscovida/oscovida/blob/master/oscovida/backup_data/RKI_Corona_Landkreise.csv)"
         )
-        
-        # where is the backup file?
-        rki_population_backup_path = os.path.join(os.path.split(__file__)[0],
-                                                  rki_population_backup_file)
-
-        population = pd.read_csv(rki_population_backup_path)
+        population = _germany_get_population_backup_data_raw()
        	population = (
     	    population
     	    .set_index('county')
     	)
-    
-    
+
     population = population.rename(columns={"EWZ": "population"})
 
     # Some tidy up of the data:
