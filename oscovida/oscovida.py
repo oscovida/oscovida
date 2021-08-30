@@ -445,7 +445,7 @@ def fetch_csv_data_from_url(source) -> pd.DataFrame:
     return data # type: ignore
 
 
-def germany_get_population_backup_data_raw() -> pd.DataFrame:
+def _germany_get_population_backup_data_raw() -> pd.DataFrame:
     """Function is not meant to be used directly.
     Use germany_get_population() instead (which will call this function if required).
     """
@@ -475,7 +475,7 @@ def germany_get_population() -> pd.DataFrame:
               "Using backup data from August 2020 instead "
               "(https://github.com/oscovida/oscovida/blob/master/oscovida/backup_data/RKI_Corona_Landkreise.csv)"
         )
-        population = germany_get_population_backup_data_raw()
+        population = _germany_get_population_backup_data_raw()
        	population = (
     	    population
     	    .set_index('county')

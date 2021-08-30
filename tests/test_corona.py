@@ -338,7 +338,6 @@ def test_germany_get_population():
     assert aachen > 500000
 
 
-@pytest.mark.xfail
 def test_germany_get_population_data_online():
     """If this test passes, then the population data for Germany may be online
     again (see https://github.com/oscovida/oscovida/issues/261)
@@ -349,7 +348,7 @@ def test_germany_get_population_data_online():
 
 def test_germany_get_population_backup_data_raw():
     """Sanity check for backup file"""
-    df = c.germany_get_population_backup_data_raw()
+    df = c._germany_get_population_backup_data_raw()
 
     # expect 412 districts
     assert len(df) == 412
