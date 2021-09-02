@@ -93,6 +93,12 @@ def test_germany_overview():
     assert_oscovida_object(axes, cases, deaths)
 
 
+def test_get_incidence_rates_german():
+    cases, deaths = c.get_incidence_rates_germany()
+    number_of_german_districts = 412
+    assert len(cases) == len(deaths) == number_of_german_districts
+
+
 def test_get_US_region_list():
     x = c.get_US_region_list()
     assert x[0] == "Alabama"
