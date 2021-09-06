@@ -94,8 +94,10 @@ def test_germany_overview():
 
 
 def test_get_incidence_rates_german():
-    cases, deaths = c.get_incidence_rates_germany()
     number_of_german_districts = 412
+    cases, deaths = c.get_incidence_rates_germany()
+    assert len(cases) == len(deaths) == number_of_german_districts
+    cases, deaths = c.get_incidence_rates_germany(7)
     assert len(cases) == len(deaths) == number_of_german_districts
 
 
