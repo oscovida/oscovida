@@ -656,7 +656,6 @@ def get_incidence_rates_germany(period=14):
     yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
     fortnight_ago = yesterday - datetime.timedelta(days=period)
     periods = (fortnight_ago < germany.index) & (germany.index < yesterday)
-    germany = germany.iloc[periods]
 
     index = germany[['Bundesland', 'Landkreis']]
 
@@ -665,16 +664,33 @@ def get_incidence_rates_germany(period=14):
 
     germany['metadata-index'] = index['Landkreis'] + ' ' + index['Bundesland']
 
+    # save the list of districts for the future. There must be 412 elements
+    all_districts = germany.groupby("Landkreis").agg({'Bundesland':'first', 'metadata-index':'first'})
+
+    # Limit the timeframe to the last `period` days (we may loose some of districts here):
+    germany = germany.iloc[periods]
+
     cases_sum = (
         germany.groupby("Landkreis")
         .agg({'cases': 'sum', 'Bundesland': 'first', 'metadata-index': 'first'})
         .rename(columns={"cases": f"{period}-day-sum"})
     )
+    # restore dropped districts:
+    if len(cases_sum) < len(all_districts):
+        cases_sum = cases_sum.reindex(all_districts.index, fill_value=0)
+        for kreis in cases_sum[cases_sum['7-day-sum']==0].index:
+            cases_sum.loc[kreis, 1:] = all_districts.loc[kreis]
+
     deaths_sum = (
         germany.groupby("Landkreis")
         .agg({'deaths': 'sum', 'Bundesland': 'first', 'metadata-index': 'first'})
         .rename(columns={"deaths": f"{period}-day-sum"})
     )
+    # restore dropped districts:
+    if len(deaths_sum) < len(all_districts):
+        deaths_sum = deaths_sum.reindex(all_districts.index, fill_value=0)
+        for kreis in deaths_sum[deaths_sum['7-day-sum'] == 0].index:
+            deaths_sum.loc[kreis, 1:] = all_districts.loc[kreis]
 
     # Now we have tables like:
     #                            cases
