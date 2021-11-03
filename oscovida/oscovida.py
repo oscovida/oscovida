@@ -1948,6 +1948,8 @@ def overview(country: str, region: str = None, subregion: str = None,
     return axes, c, d
 
 
+
+
 def compare_plot(country: str, region: str = None, subregion: str = None,
                  savefig: bool = False, normalise: bool = True,
                  dates: str = None, align: bool = False) -> Tuple[plt.axes, pd.Series, pd.Series]:
@@ -2007,3 +2009,144 @@ def get_cases_last_week(cases):
     # last week is difference between last value, and the one 7 days before
     cases_last_week = c2[-1] - c2[-8]
     return cases_last_week
+
+
+
+
+
+#
+# Exploration of DIVI data
+#
+
+@joblib_memory.cache
+def fetch_divi_data(germany=False, by_country=False, by_age=False):
+
+    def fix_index(data: pd.DataFrame):
+        d2 = data.set_index(pd.to_datetime(data['Datum'], utc=True))
+        d2.drop(labels=['Datum'], axis=1, inplace=True)
+        return d2
+        
+    # for all of Germany, split according to Children and adults
+    if germany:
+        germany = fix_index(pd.read_csv("https://diviexchange.blob.core.windows.net/%24web/zeitreihe-deutschland.csv"))
+
+    # for adults only, split according to country
+    if by_country:
+        by_country = fix_index(pd.read_csv("https://diviexchange.blob.core.windows.net/%24web/zeitreihe-bundeslaender.csv"))
+    
+    # Age distribution
+    if by_age:
+        by_age = fix_index(pd.read_csv("https://diviexchange.blob.core.windows.net/%24web/bund-covid-altersstruktur-zeitreihe_ab-2021-04-29.csv"))
+    
+    return germany, by_country, by_age
+
+
+def plot_germany_patients_in_icu(ax, series: pd.Series, color: str, 
+                      dates: str = None, weeks: int = 0):
+    """Given a series of data and matplotlib axis ax, plot the
+    - difference in the series data from day to day as bars and plot a smooth
+    - line to show the overall development
+
+    - series is pandas.Series with data as index, and cumulative cases (or
+    deaths)
+    - `color` is color to be used for plotting
+    - `dates` or `weeks` specify the time range to plot
+    - `uncertainty` is a number of days we plot as a dashed line
+
+    See plot_time_step for documentation on other parameters.
+    """
+    bar_alpha = 0.2
+    ax_label = "COVID patients in ICU"
+    
+    if dates:
+        series = cut_dates(series, dates)
+        uncertainty = 1
+    if weeks:
+        series = series[-7 * weeks:]
+
+    ax.plot(series.index, series.values, color=color,
+            label=ax_label, linewidth=LW)
+
+    ax.legend()
+    ax.set_ylabel('COVID patients in ICU')
+
+    return ax
+
+
+
+
+def overview_divi(country: str = "Germany", region: str = None, subregion: str = None,
+             savefig: bool = False, dates: str = None,
+             weeks: int = 0) -> Tuple[plt.axes, pd.Series, pd.Series]:
+    """The `overview` function provides 6 graphs for the region:
+
+    XXX TODO update
+
+    0) the total cumulative number of cases and deaths
+    1) the daily change (cases)
+    2) the daily change (deaths)
+    3) R number and growth factor (cases)
+    4) R number and growth factor (deaths)
+    5) the doubling time (both cases and death)
+
+    `weeks` parameter refers to the last N number of weeks to show. Omit this
+    parameter or use zero value to see the pandemic since the very beginning.
+
+    Returns: subplots, cases (pandas Series), deaths (pandas Series)
+    """
+    _c, _d = get_country_data(country, region=region, subregion=subregion)
+
+    region_label = get_region_label(country, region=region, subregion=subregion)
+    fig, axes = plt.subplots(6, 1, figsize=(10, 15), sharex=False)
+    if dates and weeks == 0:
+        c = cut_dates(_c, dates)
+    elif dates and weeks:
+        raise ValueError("`dates` and `weeks` cannot be used together")
+    else:
+        c = _c[- weeks * 7:]
+    # plot_time_step(ax=axes[0], series=c, style="-C1", labels=(region_label, "cases"))
+    plot_incidence_rate(ax=axes[0], cases=_c,
+                        country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
+
+    plot_daily_change(ax=axes[1], series=_c, color="C1", labels=(region_label, "cases"),
+                      country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
+    
+    data, _, _ = fetch_divi_data(germany=True)
+    # children and grown ups together
+    divi = data.groupby("Datum").sum()
+    plot_germany_patients_in_icu(axes[2], divi['Aktuelle_COVID_Faelle_ITS'], color="C1", 
+                                 dates=dates, weeks=weeks)
+
+    # plot_daily_change(ax=axes[3], series=_d, color="C0", labels=(region_label, "deaths"),
+    #                   country=country, region=region, subregion=subregion, dates=dates, weeks=weeks)
+    #
+    
+    # data cleaning
+
+    # enforce same x-axis on all plots
+    for i in range(0, axes.shape[0]):
+        axes[i].set_xlim(axes[0].get_xlim())
+    for i in range(0, axes.shape[0]):
+        if not has_twin(axes[i]):
+            axes[i].tick_params(left=True, right=True, labelleft=True, labelright=True)
+            axes[i].yaxis.set_ticks_position('both')
+        if weeks > 0:
+            axes[i].get_xaxis().set_major_locator(WeekdayLocator(byweekday=MONDAY))     # put ticks every Monday
+            axes[i].get_xaxis().set_major_formatter(DateFormatter('%d %b'))             # date format: `15 Jun`
+        else:
+            axes[i].xaxis.set_major_formatter(DateFormatter("%b %y"))
+
+    week_str = f", last {weeks} weeks" if weeks else ''
+    region_str = f"{region or subregion}, {country}" if (region or subregion) else country
+    title = f"{region_str}{week_str}, last data point from {c.index[-1].date().isoformat()}"
+    axes[0].set_title(title)
+
+    # tight_layout gives warnings, for example for Heinsberg
+    # fig.tight_layout(pad=1)
+
+    filename = os.path.join("figures", region_label.replace(" ", "-").replace(",", "-") + '.svg')
+    if savefig:
+        fig.savefig(filename)
+    return axes, c #, d
+
+
