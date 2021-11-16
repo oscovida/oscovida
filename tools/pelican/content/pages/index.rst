@@ -73,7 +73,7 @@ This project was started by `Hans Fangohr <https://fangohr.github.io>`__ early i
 `other volunteers <https://oscovida.github.io/team.html>`__ as an open science demonstrator.
 Currently, the project is maintained by Hans Fangohr from the
 `Max Planck Institute for Structure and Dynamics of Matter <https://www.mpsd.mpg.de/research/ssus/comput-science>`__,
-`Yuri Kirienko <https://github.com/kirienko>`__, and
+`Yury Kirienko <https://github.com/kirienko>`__, and
 `Robert Rosca <https://github.com/RobertRosca>`__ 
 from `European XFEL <http://xfel.eu>`__. European XFEL kindly provides the hardware to compute the daily
 updates of all plots.
