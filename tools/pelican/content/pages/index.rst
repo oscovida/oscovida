@@ -69,7 +69,7 @@ History and authors
 ===================
 
 This project was started by `Hans Fangohr <https://fangohr.github.io>`__ early in 2020, and later developed further with the
-`Photon and Neutron Open Science Cloud PaNOSC) <https://www.panosc.eu/>`__ and
+`Photon and Neutron Open Science Cloud (PaNOSC) <https://www.panosc.eu/>`__ and
 `other volunteers <https://oscovida.github.io/team.html>`__ as an open science demonstrator.
 Currently, the project is maintained by Hans Fangohr from the
 `Max Planck Institute for Structure and Dynamics of Matter <https://www.mpsd.mpg.de/research/ssus/comput-science>`__,
