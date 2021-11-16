@@ -76,8 +76,15 @@ jobs:
         run: |
           ./oscovida/tools/oscovida.github.io/post-generate.sh
 
+      - name: Set up pelican venv
+        run: |
+          python -m venv .venv_pelican
+          source .venv_pelican/bin/activate
+          pip install -r ./oscovida/requirements_pelican.txt
+
       - name: Update HTML pages
         run: |
+          source .venv_pelican/bin/activate
           cd ./oscovida/tools/pelican
           make publish
 
