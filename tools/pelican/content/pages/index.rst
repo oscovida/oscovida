@@ -65,6 +65,20 @@ touch <mailto:oscovidaproject@gmail.com>`__. Ideas, suggestions and
 error reports, are welcome at our
 `issue tracker <https://github.com/oscovida/oscovida/issues>`__.
 
+History and authors
+===================
+
+This project was started by `Hans Fangohr <https://fangohr.github.io>`__ early in 2020, and later developed further with the
+`Photon and Neutron Open Science Cloud (PaNOSC) <https://www.panosc.eu/>`__ and
+`other volunteers <https://oscovida.github.io/team.html>`__ as an open science demonstrator.
+Currently, the project is maintained by Hans Fangohr from the
+`Max Planck Institute for Structure and Dynamics of Matter <https://www.mpsd.mpg.de/research/ssus/comput-science>`__,
+`Yury Kirienko <https://github.com/kirienko>`__, and
+`Robert Rosca <https://github.com/RobertRosca>`__ 
+from `European XFEL <http://xfel.eu>`__. European XFEL kindly provides the hardware to compute the daily
+updates of all plots.
+
+
 Disclaimer
 ==========
 
@@ -76,10 +90,9 @@ processing. You are welcome to use the material at your own risk. See
 Acknowledgements
 ================
 
--  The H2020 project `Photon and Neutron Open Science Cloud
-   PaNOSC) <https://www.panosc.eu/>`__
 -  `Max Planck Institute for the Structure and Dynamics of Matter <https://www.mpsd.mpg.de/en>`__
 -  `European XFEL <http://www.xfel.eu>`__
+-  The H2020 project `Photon and Neutron Open Science Cloud (PaNOSC) <https://www.panosc.eu/>`__
 -  `University of Southampton <https://www.soton.ac.uk>`__
 -  `Biological Research Centre <http://www.brc.hu/>`__, Szeged
 -  `Dept. of Software Engineering, University of Szeged <https://u-szeged.hu/>`__, Hungary
