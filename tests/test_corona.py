@@ -83,14 +83,23 @@ def test_germany_overview():
     assert deaths.name == 'Germany-SK Kassel deaths'
     assert_oscovida_object(axes, cases, deaths)
 
-    axes, cases, deaths = c.overview(country="Germany", subregion="StadtRegion Aachen")
-    assert cases.name == 'Germany-StadtRegion Aachen cases'
+    axes, cases, deaths = c.overview(country="Germany", subregion="Städteregion Aachen")
+    assert cases.name == 'Germany-Städteregion Aachen cases'
     assert_oscovida_object(axes, cases, deaths)
 
     axes, cases, deaths = c.overview(country="Germany", subregion="Region Hannover")
     assert cases.name == 'Germany-Region Hannover cases'
     assert deaths.name == 'Germany-Region Hannover deaths'
     assert_oscovida_object(axes, cases, deaths)
+
+
+@pytest.mark.xfail
+def test_get_incidence_rates_germany():
+    number_of_german_districts = 412
+    cases, deaths = c.get_incidence_rates_germany()
+    assert len(cases) == len(deaths) == number_of_german_districts
+    cases, deaths = c.get_incidence_rates_germany(7)
+    assert len(cases) == len(deaths) == number_of_german_districts
 
 
 def test_get_US_region_list():
@@ -314,6 +323,7 @@ def test_pad_cumulative_series_to_yesterday():
     assert y2.shape == y.shape
 
 
+@pytest.mark.xfail
 def test_germany_get_population():
     germany = c.germany_get_population()
 
@@ -334,8 +344,31 @@ def test_germany_get_population():
     saarpfalz = germany.loc['LK Saarpfalz-Kreis'].population
     assert saarpfalz > 130000
 
-    aachen = germany.loc['StadtRegion Aachen'].population
+    aachen = germany.loc['Städteregion Aachen'].population
     assert aachen > 500000
+
+
+def test_germany_get_population_data_online():
+    """If this test passes, then the population data for Germany may be online
+    again (see https://github.com/oscovida/oscovida/issues/261)
+    Hans, 21 August 2021."""
+    population = c.fetch_csv_data_from_url(c.rki_population_url)
+    population = population.set_index('county')
+
+
+def test_germany_get_population_backup_data_raw():
+    """Sanity check for backup file"""
+    df = c._germany_get_population_backup_data_raw()
+
+    # expect 412 districts
+    assert len(df) == 412
+
+    # expect about 83 million inhabitants
+    pop = df['EWZ']   # EWZ = EinWohnerZahl = population
+    total = pop.sum()
+
+    assert 83e6 < total < 83.3e6   # as of Aug 2021: 83166711
+
 
 
 def test_get_population():
@@ -348,7 +381,7 @@ def test_get_population():
     try:
         assert set(c.fetch_cases().index) == set(world.index)
     except AssertionError:
-        failing_states = {'Palau', 'Western Sahara'}
+        failing_states = {'Western Sahara'}
         if set(c.fetch_cases().index).symmetric_difference(set(world.index)) == failing_states:
             pass
         else:

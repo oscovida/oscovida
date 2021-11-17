@@ -10,6 +10,10 @@ rki_data = "https://www.arcgis.com/sharing/rest/content/items/f10774f1c63e401684
 # RKI population source (Germany only)
 rki_population_url = "https://opendata.arcgis.com/datasets/917fc37a709542548cc3be077a786c17_0.csv"
 
+# if the above link is malfunctioning (see for example
+# https://github.com/oscovida/oscovida/issues/261), then use this data source for population data
+rki_population_backup_file = "backup_data/RKI_Corona_Landkreise.csv"
+
 # Hungary data in CSV format
 # TODO: it looks like this source is updated manually and irregularly
 hungary_data = "https://raw.githubusercontent.com/sanbrock/covid19/master/datafile.csv"
