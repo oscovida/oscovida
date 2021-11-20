@@ -416,7 +416,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
 
     if landkreis:
         assert landkreis in germany['Landkreis'].values, \
-            f"{state} not in available German states. These are {sorted(germany['Landkreis'].drop_duplicates())}"
+            f"{landkreis} not in available German districts. These are {sorted(germany['Landkreis'].drop_duplicates())}"
 
         lk = germany[germany["Landkreis"] == landkreis]
         lk.index = pd.to_datetime(lk['Meldedatum'])
@@ -494,9 +494,14 @@ def germany_get_population() -> pd.DataFrame:
     # 27 July 2021 - test fail because name is "Städteregion Aachen'" in actual data (
     # i.e. 'StädteRegion' versus 'Städteregion' Aachen)
     # see https://github.com/oscovida/oscovida/runs/3170956651?check_suite_focus=true#step:6:651
-    if "StädteRegion Aachen" in population.index:
-        population.loc['Städteregion Aachen'] = population.loc['StädteRegion Aachen']
-        population = population.drop('StädteRegion Aachen')
+    # if "StädteRegion Aachen" in population.index:
+    #    population.loc['Städteregion Aachen'] = population.loc['StädteRegion Aachen']
+    #    population = population.drop('StädteRegion Aachen')
+    #
+    # Update: 19 November 2021
+    # This behaviour now seems reversed, ie Aachen has the same name in population and RKI data now again.
+    # We leave the code above commented out, in case the problem
+    # comes back again.
 
 
     return population # type: ignore
@@ -553,6 +558,9 @@ def population(country: str,
         elif country.casefold() == 'germany':
             if region or subregion:
                 df = germany_get_population()
+                # XXX Aachen is broken:
+                # if subregion == "StädteRegion Aachen":
+                #    subregion = "Städteregion Aachen"
                 if region in df['BL'].values:
                     return int(df[df['BL'] == region].population.sum())
                 elif subregion in df.index:
@@ -560,7 +568,7 @@ def population(country: str,
                 elif region in df.index:    # silently try to use as subregion
                     return int(df.population[region])
                 else:
-                    raise NotImplementedError(f"{region} in neither in available German Lands nor in Landkreises. " \
+                    raise NotImplementedError(f"region={region} subregion={subregion} in neither in available German Lands nor in Landkreises. " \
                                               f"These are {', '.join(sorted(df['BL'].drop_duplicates()))} for Lands and " \
                                               f"{', '.join(sorted(df.index))} for Landkreises.")
         else:

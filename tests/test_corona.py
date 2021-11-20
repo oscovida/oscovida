@@ -83,8 +83,8 @@ def test_germany_overview():
     assert deaths.name == 'Germany-SK Kassel deaths'
     assert_oscovida_object(axes, cases, deaths)
 
-    axes, cases, deaths = c.overview(country="Germany", subregion="Städteregion Aachen")
-    assert cases.name == 'Germany-Städteregion Aachen cases'
+    axes, cases, deaths = c.overview(country="Germany", subregion="StädteRegion Aachen")
+    assert cases.name == 'Germany-StädteRegion Aachen cases'
     assert_oscovida_object(axes, cases, deaths)
 
     axes, cases, deaths = c.overview(country="Germany", subregion="Region Hannover")
