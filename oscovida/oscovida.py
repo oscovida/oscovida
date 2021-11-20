@@ -416,7 +416,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
 
     if landkreis:
         assert landkreis in germany['Landkreis'].values, \
-            f"{state} not in available German states. These are {sorted(germany['Landkreis'].drop_duplicates())}"
+            f"{landkreis} not in available German districts. These are {sorted(germany['Landkreis'].drop_duplicates())}"
 
         lk = germany[germany["Landkreis"] == landkreis]
         lk.index = pd.to_datetime(lk['Meldedatum'])
