@@ -393,7 +393,7 @@ def test_get_population():
 
         # difference between missing population data, and our expectation
         should_be_emtpy_set = deviation.symmetric_difference(known_missing_states)
-        print(f"{should_be_emtpy_set=}")
+        print(f"should_be_empty_set={should_be_emtpy_set}")
         # check that the deviation are only those regions for which we expect it
         assert deviation == known_missing_states
 
