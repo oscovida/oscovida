@@ -381,11 +381,22 @@ def test_get_population():
     try:
         assert set(c.fetch_cases().index) == set(world.index)
     except AssertionError:
-        failing_states = {'Western Sahara'}
-        if set(c.fetch_cases().index).symmetric_difference(set(world.index)) == failing_states:
-            pass
-        else:
-            raise AssertionError
+        # occasionally, population data is missing for case data:
+        known_missing_states = {'Western Sahara', 'Antarctica'}
+
+        msg = "Deviations are: "
+        deviation = set((c.fetch_cases().index).symmetric_difference(set(world.index)))
+        msg += str(deviation)
+        print(msg)
+
+        print(f"Expect these to deviate: {known_missing_states}.")
+
+        # difference between missing population data, and our expectation
+        should_be_emtpy_set = deviation.symmetric_difference(known_missing_states)
+        print(f"{should_be_emtpy_set=}")
+        # check that the deviation are only those regions for which we expect it
+        assert deviation == known_missing_states
+
 
     # Tests will have to be updated in 20+ years when the populations increase
     # more than the 'sensible' lower bound placed here
