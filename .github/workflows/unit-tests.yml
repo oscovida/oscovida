@@ -33,6 +33,8 @@ jobs:
       - name: Install oscovida
         run: |
           make dev-install
+          # which pandas are we using?
+          python -c "import pandas; print(pandas.__version__)"
 
       - name: Test with pytest
         run: |
