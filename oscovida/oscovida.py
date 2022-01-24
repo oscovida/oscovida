@@ -360,7 +360,7 @@ def pad_cumulative_series_to_yesterday(series):
     if last < yesterday:
         # repeat last data point with index for yesterday
         series[yesterday] = series[last]
-        series2 = series.resample("1D").pad()
+        series2 = series.resample("1D").fillna(method="ffill")
         return series2
     else:
         return series
@@ -1444,8 +1444,8 @@ def get_country_data(country: str, region: str = None, subregion: str = None, ve
     # hungarian county data doesn't contain number of deaths
     len_deaths1 = 0 if d is None else len(d)
     # resample data so we have one value per day
-    c = c.resample("D").pad()
-    d = None if d is None else d.resample("D").pad()
+    c = c.resample("D").fillna(method="ffill")
+    d = None if d is None else d.resample("D").fillna(method="ffill")
 
     len_cases2 = len(c)
     len_deaths2 = 0 if d is None else len(d)
@@ -2011,7 +2011,7 @@ def get_cases_last_week(cases):
     """Given cumulative cases time series, return the number of cases from the last week.
     """
     # make sure we have one value for every day
-    c2 = cases.resample('D').pad()
+    c2 = cases.resample('D').fillna(method="ffill")
     # last week is difference between last value, and the one 7 days before
     cases_last_week = c2[-1] - c2[-8]
     return cases_last_week
