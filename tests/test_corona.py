@@ -382,7 +382,7 @@ def test_get_population():
         assert set(c.fetch_cases().index) == set(world.index)
     except AssertionError:
         # occasionally, population data is missing for case data:
-        known_missing_states = {'Western Sahara', 'Antarctica'}
+        known_missing_states = {'Western Sahara'}
 
         msg = "Deviations are: "
         deviation = set((c.fetch_cases().index).symmetric_difference(set(world.index)))
