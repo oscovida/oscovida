@@ -428,7 +428,6 @@ def test_population():
                  ]
     for country, reg, subreg, ref_pop in reference:
         actual_population = c.population(country, reg, subreg)
-        print(country)
         assert isinstance(actual_population, int)
         assert 0.8 * ref_pop < actual_population < 1.2 * ref_pop
 
