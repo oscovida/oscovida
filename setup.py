@@ -34,7 +34,7 @@ setup(name="oscovida",
       packages=find_packages(),
       install_requires=[
           'joblib',
-          'pandas==1.3.1',
+          'pandas',
           'seaborn',
           'matplotlib',
           'markdown',
