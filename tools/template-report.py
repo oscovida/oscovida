@@ -40,7 +40,7 @@ print(f'Population of {OVERVIEW_ARGS}: {{inhabitants}} people')
 table = compose_dataframe_summary(cases, deaths)
 
 # show tables with up to 1000 rows
-pd.set_option("max_rows", 1000)
+pd.set_option("display.max_rows", 1000)
 
 # display the table
 table
