@@ -11,6 +11,7 @@ python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pel
 python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pelican/content/ipynb/2020-are-summer-holidays-triggering-rising-cases.ipynb
 python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pelican/content/ipynb/compare-rki-and-johns-hopkins-data.ipynb
 python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pelican/content/ipynb/germany-hospitalisierungsrate.ipynb
+python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pelican/content/ipynb/2022-germany-rki-overview.ipynb
 
 # the next file dosn't exist, so the script fails here. Remove it for now:
 # python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pelican/content/ipynb/2020-compare-germany-data-sources.ipynb
