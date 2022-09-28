@@ -45,7 +45,7 @@ setup(name="oscovida",
           'pelican',
           'pelican-jupyter',
           'seaborn',
-          'tabulate<0.8.8',  # Pinned until release with https://github.com/astanin/python-tabulate/pull/111 is made
+          'tabulate',  
           'tqdm',
           'ipywidgets',
           'ipynb_py_convert',
