@@ -1,3 +1,6 @@
 nbconvert<6
 pelican
 pelican-jupyter
+ipython_genutils
+Jinja2==3.0.3
+

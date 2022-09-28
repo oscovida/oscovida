@@ -14,7 +14,7 @@ import IPython.display
 from typing import Tuple, Union
 # choose font - can be deactivated
 from matplotlib import rcParams
-from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rki_data, rki_population_url
+from oscovida.data_sources import base_url, hungary_data, jhu_population_url, rki_data, rki_population_url, rki_population_backup_file
 from oscovida.plotting_helpers import align_twinx_ticks, cut_dates, has_twin, limit_to_smoothed, uncertain_tail
 
 rcParams['font.family'] = 'sans-serif'
@@ -139,21 +139,22 @@ def get_country_data_johns_hopkins(country: str,
     assert country in deaths.index, f"{country} not in available countries. These are {sorted(deaths.index)}"
 
     # Some countries report sub areas (i.e. multiple rows per country) such as China, France, United Kingdom
-    # Denmark. In that case, we sum over all regions.
+    # Denmark. In that case, we sum over all regions (by summing over the relevant rows).
+
     tmp = deaths.loc[country]
-    if len(tmp.shape) == 1:
-        d = deaths.loc[country]
+    if len(tmp.shape) == 1:     # most countries (Germany, Italy, ...)
+        d = tmp
     elif len(tmp.shape) == 2:   # China, France, United Kingdom, ...
-        d = deaths.loc[country].sum()
+        d = tmp.drop(columns=['Province/State']).sum()
         d.rename("deaths", inplace=True)
     else:
         raise ValueError("Unknown data set structure for deaths {country}:", tmp)
 
     tmp = cases.loc[country]
     if len(tmp.shape) == 1:
-        c = cases.loc[country]
+        c = tmp
     elif len(tmp.shape) == 2:
-        c = cases.loc[country].sum()
+        c = tmp.drop(columns=['Province/State']).sum()
         c.rename("cases", inplace=True)
     else:
         raise ValueError("Unknown data set structure for cases {country}:", tmp)
@@ -359,7 +360,7 @@ def pad_cumulative_series_to_yesterday(series):
     if last < yesterday:
         # repeat last data point with index for yesterday
         series[yesterday] = series[last]
-        series2 = series.resample("1D").pad()
+        series2 = series.resample("1D").fillna(method="ffill")
         return series2
     else:
         return series
@@ -415,7 +416,7 @@ def germany_get_region(state=None, landkreis=None, pad2yesterday=False):
 
     if landkreis:
         assert landkreis in germany['Landkreis'].values, \
-            f"{state} not in available German states. These are {sorted(germany['Landkreis'].drop_duplicates())}"
+            f"{landkreis} not in available German districts. These are {sorted(germany['Landkreis'].drop_duplicates())}"
 
         lk = germany[germany["Landkreis"] == landkreis]
         lk.index = pd.to_datetime(lk['Meldedatum'])
@@ -444,21 +445,65 @@ def fetch_csv_data_from_url(source) -> pd.DataFrame:
     return data # type: ignore
 
 
+def _germany_get_population_backup_data_raw() -> pd.DataFrame:
+    """Function is not meant to be used directly.
+    Use germany_get_population() instead (which will call this function if required).
+    """
+
+    # where is the backup file?
+    rki_population_backup_path = os.path.join(os.path.split(__file__)[0],
+                                              rki_population_backup_file)
+
+    population = pd.read_csv(rki_population_backup_path)
+    return population
+
+
+
 @joblib_memory.cache
 def germany_get_population() -> pd.DataFrame:
     """The function's behavior duplicates the one for `germany_get_region()` one."""
     source = rki_population_url
+
     population = fetch_csv_data_from_url(source)
-    population = (
-        population
-        .set_index('county')
-    )
+    try:
+    	population = (
+    	    population
+    	    .set_index('county')
+    	)
+    except KeyError as exception:
+        print(f"Couldn't retrieve population data from RKI ({rki_population_url}). "
+              "Using backup data from August 2020 instead "
+              "(https://github.com/oscovida/oscovida/blob/master/oscovida/backup_data/RKI_Corona_Landkreise.csv)"
+        )
+        population = _germany_get_population_backup_data_raw()
+       	population = (
+    	    population
+    	    .set_index('county')
+    	)
+
     population = population.rename(columns={"EWZ": "population"})
+
+    # Some tidy up of the data:
+
     # see https://github.com/oscovida/oscovida/issues/210
     # try to remove this if-clause and see if tests fail:
     if "LK Saar-Pfalz-Kreis" in population.index:
         population.loc['LK Saarpfalz-Kreis'] = population.loc['LK Saar-Pfalz-Kreis']
         population = population.drop('LK Saar-Pfalz-Kreis')
+
+    # 27 July 2021 - test fail because name is "Städteregion Aachen'" in actual data (
+    # i.e. 'StädteRegion' versus 'Städteregion' Aachen)
+    # see https://github.com/oscovida/oscovida/runs/3170956651?check_suite_focus=true#step:6:651
+    # if "StädteRegion Aachen" in population.index:
+    #    population.loc['Städteregion Aachen'] = population.loc['StädteRegion Aachen']
+    #    population = population.drop('StädteRegion Aachen')
+    #
+    # Update: 19 November 2021
+    # This behaviour now seems reversed, ie Aachen has the same name in population and RKI data now again.
+    # We leave the code above commented out, in case the problem
+    # comes back again.
+
+
     return population # type: ignore
 
 
@@ -513,6 +558,9 @@ def population(country: str,
         elif country.casefold() == 'germany':
             if region or subregion:
                 df = germany_get_population()
+                # XXX Aachen is broken:
+                # if subregion == "StädteRegion Aachen":
+                #    subregion = "Städteregion Aachen"
                 if region in df['BL'].values:
                     return int(df[df['BL'] == region].population.sum())
                 elif subregion in df.index:
@@ -520,7 +568,7 @@ def population(country: str,
                 elif region in df.index:    # silently try to use as subregion
                     return int(df.population[region])
                 else:
-                    raise NotImplementedError(f"{region} in neither in available German Lands nor in Landkreises. " \
+                    raise NotImplementedError(f"region={region} subregion={subregion} in neither in available German Lands nor in Landkreises. " \
                                               f"These are {', '.join(sorted(df['BL'].drop_duplicates()))} for Lands and " \
                                               f"{', '.join(sorted(df.index))} for Landkreises.")
         else:
@@ -616,7 +664,6 @@ def get_incidence_rates_germany(period=14):
     yesterday = datetime.datetime.now() - datetime.timedelta(days=1)
     fortnight_ago = yesterday - datetime.timedelta(days=period)
     periods = (fortnight_ago < germany.index) & (germany.index < yesterday)
-    germany = germany.iloc[periods]
 
     index = germany[['Bundesland', 'Landkreis']]
 
@@ -625,16 +672,33 @@ def get_incidence_rates_germany(period=14):
 
     germany['metadata-index'] = index['Landkreis'] + ' ' + index['Bundesland']
 
+    # save the list of districts for the future. There must be 412 elements
+    all_districts = germany.groupby("Landkreis").agg({'Bundesland': 'first', 'metadata-index': 'first'})
+
+    # Limit the timeframe to the last `period` days (we may loose some of districts here):
+    germany = germany.iloc[periods]
+
     cases_sum = (
         germany.groupby("Landkreis")
         .agg({'cases': 'sum', 'Bundesland': 'first', 'metadata-index': 'first'})
         .rename(columns={"cases": f"{period}-day-sum"})
     )
+    # restore dropped districts:
+    if len(cases_sum) < len(all_districts):
+        cases_sum = cases_sum.reindex(all_districts.index, fill_value=0)
+        for kreis in cases_sum[cases_sum[f'{period}-day-sum'] == 0].index:
+            cases_sum.loc[kreis, 1:] = all_districts.loc[kreis]
+
     deaths_sum = (
         germany.groupby("Landkreis")
         .agg({'deaths': 'sum', 'Bundesland': 'first', 'metadata-index': 'first'})
         .rename(columns={"deaths": f"{period}-day-sum"})
     )
+    # restore dropped districts:
+    if len(deaths_sum) < len(all_districts):
+        deaths_sum = deaths_sum.reindex(all_districts.index, fill_value=0)
+        for kreis in deaths_sum[deaths_sum[f'{period}-day-sum'] == 0].index:
+            deaths_sum.loc[kreis, 1:] = all_districts.loc[kreis]
 
     # Now we have tables like:
     #                            cases
@@ -1380,8 +1444,8 @@ def get_country_data(country: str, region: str = None, subregion: str = None, ve
     # hungarian county data doesn't contain number of deaths
     len_deaths1 = 0 if d is None else len(d)
     # resample data so we have one value per day
-    c = c.resample("D").pad()
-    d = None if d is None else d.resample("D").pad()
+    c = c.resample("D").fillna(method="ffill")
+    d = None if d is None else d.resample("D").fillna(method="ffill")
 
     len_cases2 = len(c)
     len_deaths2 = 0 if d is None else len(d)
@@ -1947,7 +2011,7 @@ def get_cases_last_week(cases):
     """Given cumulative cases time series, return the number of cases from the last week.
     """
     # make sure we have one value for every day
-    c2 = cases.resample('D').pad()
+    c2 = cases.resample('D').fillna(method="ffill")
     # last week is difference between last value, and the one 7 days before
     cases_last_week = c2[-1] - c2[-8]
     return cases_last_week

@@ -51,8 +51,7 @@ SOCIAL = (('Open Science COVID Analysis', 'https://twitter.com/OSCOVIDAproject')
 
 DEFAULT_PAGINATION = False
 
-STATIC_PATHS = ['content/pages', 'content/news', 'content/ipynb']
-# ARTICLE_PATHS = ['content']
+STATIC_PATHS = ['pages', 'news', 'ipynb']
 
 # THEME = "/Users/fangohr/pelican-themes/bootstrap2"
 THEME = "themes/plumage"
