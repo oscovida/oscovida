@@ -44,14 +44,14 @@ setup(name="oscovida",
           'pelican',
           'pelican-jupyter',
           'seaborn',
-          'tabulate<0.8.8',  # Pinned until release with https://github.com/astanin/python-tabulate/pull/111 is made
+          'tabulate',  
           'tqdm',
           'ipywidgets',
           'ipynb_py_convert',
-          'Jinja2==3.0.3',   # Pinned to address https://github.com/oscovida/oscovida/issues/300
+          'Jinja2==3.0.3',
           'click',
           'pytest_tornasync',
-          'nbconvert==6.5.0',
+          'nbconvert',
           'plotly',
       ],
       extras_require={
