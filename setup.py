@@ -51,7 +51,7 @@ setup(name="oscovida",
           'Jinja2==3.0.3',   # Pinned to address https://github.com/oscovida/oscovida/issues/300
           'click',
           'pytest_tornasync',
-          'nbconvert==6.5.0',
+          'nbconvert==6.5.1',
           'plotly',
       ],
       extras_require={
