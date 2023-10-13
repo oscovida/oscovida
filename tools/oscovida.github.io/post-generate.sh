@@ -16,6 +16,9 @@ python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pel
 # the next file dosn't exist, so the script fails here. Remove it for now:
 # python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pelican/content/ipynb/2020-compare-germany-data-sources.ipynb
 
+# the next file dosn't exist, so the script fails here. Remove it for now:
+# python -m nbconvert --execute --inplace --ExecutePreprocessor.timeout=600 ../pelican/content/ipynb/2020-compare-germany-data-sources.ipynb
+
 # The incidence rate pages have period and case encoded in the URL, but we want
 # a generic link available to these pages, so here we make a symlink to allow
 # for a generic url:

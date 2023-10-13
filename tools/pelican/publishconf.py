@@ -96,7 +96,9 @@ inject_google_analytics_into_html_notebooks(GOOGLE_ANALYTICS)
 
 
 # copy notebooks from content/ipynb to ../wwwroot/ipynb
-command = "rsync -auv content/ipynb/*ipynb ../wwwroot/ipynb"
-print("Copy notebooks*ipynb from content/ipynb to wwwroot/ipynb:")
-os.system(command)
+# command = "rsync -auv content/ipynb/*ipynb ../wwwroot/ipynb"
+# print("Copy notebooks*ipynb from content/ipynb to wwwroot/ipynb:")
+# os.system(command)
+print("Here, we should copy the ipynb/*ipynb files into the binder repository")
+print("to fully automate the process (if a new article is added, for example.")
 
