@@ -48,7 +48,7 @@ setup(name="oscovida",
           'tqdm',
           'ipywidgets',
           'ipynb_py_convert',
-          'Jinja2==3.0.3',   # Pinned to address https://github.com/oscovida/oscovida/issues/300
+          'Jinja2==3.1.3',   # Pinned to address https://github.com/oscovida/oscovida/issues/300
           'click',
           'pytest_tornasync',
           'nbconvert==6.5.0',
